@@ -1,14 +1,20 @@
 package jmt.jteach;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
@@ -46,6 +52,10 @@ public class MediatorTeach {
 
     //reference of components defined inside this class
     private SelectPanel selectPanel;
+
+    private JPanel animdescrPanel;
+    private JPanel descriptionPanel;
+    private JPanel animationPanel;
 
     private JLabel helpLabel;
 	private HoverHelp help;
@@ -116,6 +126,66 @@ public class MediatorTeach {
 		return toolbar;
 	}
 
+    /**
+     * Create the JPanel containing the text and the animation. The creation is perfomed in the MediatorTech to separate the logic around this panel from the class JTeachMain
+     * @return JPanel containing the text and the animation
+     */
+    protected void setAnimationPanel(JPanel panel){
+        animdescrPanel = panel;
+        animdescrPanel.setBackground(Color.RED);
+        /*animdescrPanel = new JPanel(new BorderLayout());
+        animdescrPanel.setBackground(Color.BLUE);
+        animdescrPanel.setBorder(BorderFactory.createEtchedBorder());
+        
+         
+        descriptionPanel = new JPanel();
+        descriptionPanel.setBackground(Color.RED);
+        animdescrPanel.add(descriptionPanel, BorderLayout.NORTH);
+
+
+        animationPanel = new JPanel();
+        animationPanel.setBackground(Color.WHITE);
+        animdescrPanel.add(animationPanel, BorderLayout.CENTER);
+
+        
+        return animdescrPanel; */
+
+        
+/* Box hBox = Box.createHorizontalBox();
+        hBox.setBackground(Color.RED);
+		hBox.add(Box.createHorizontalStrut(20));
+		//Horizontal box containing Description label and buttons
+		Box descrBox = Box.createVerticalBox();
+		descrBox.add(new JLabel("ciao questa sarebbe la descrizione"));
+		descrBox.add(Box.createHorizontalStrut(10));
+		descrBox.setPreferredSize(new Dimension(220, 1000));
+		descrBox.setMinimumSize(new Dimension(200, 200));
+        descrBoxBox.setBackground(Color.YELLOW);
+        hBox.add(descrBox);
+        
+
+        Box totalBox = Box.createVerticalBox();
+		totalBox.add(Box.createVerticalStrut(30));
+		totalBox.add(hBox);
+		totalBox.add(Box.createVerticalStrut(30));	
+        totalBox.setBackground(Color.BLUE);	
+		mainPane.add(totalBox);
+		hBox.add(descrBox);
+		hBox.add(Box.createHorizontalStrut(10));
+		JScrollPane visitTablePane = new JScrollPane();
+		visitTablePane.setPreferredSize(new Dimension(1000, 1000));
+		visitTablePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		visitTablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		hBox.add(visitTablePane);
+		hBox.add(Box.createHorizontalStrut(20)); */    
+        
+    }
+
+
+    /**
+     * Create a helper bar to have a description of the buttons and labels when hovered with the mouse
+     * @return JLabel of the helper bar
+     */
     protected JPanel createHelpLabel(){
 		helpLabel = help.getHelpLabel();
         helpLabel.setBorder(BorderFactory.createEtchedBorder());

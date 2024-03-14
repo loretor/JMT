@@ -27,12 +27,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import jmt.framework.gui.help.HoverHelp;
+import jmt.framework.gui.listeners.AbstractJMTAction;
 import jmt.jteach.MediatorTeach;
 
 
@@ -54,13 +57,10 @@ public class SelectPanel extends JPanel{
     private JLabel algorithmLabel;
     private JComboBox<String> algorithmJComboBox;
 
-    //ELIMINA, SOLO PER DEBUG
-    private JLabel selection;
-    private String selezione = "null"; 
-
     //those two Lists correspond to the possible policies (first JComboBox), and for each policy a List of possible algoirithms (second JComboBox)
     private List<String> policiesList;
     private List<List<String>> algorithmsList; //List of algorithms at position x correspond to policy at position x in polices
+
 
     /*
      * ActionListener associated to the policyJComboBox
@@ -69,11 +69,26 @@ public class SelectPanel extends JPanel{
         @Override
         public void actionPerformed(ActionEvent e) {
             //JComboBox<?> algorithmList = (JComboBox<?>) e.getSource();
-            selezione = algorithmsList.get(policyJComboBox.getSelectedIndex()).get(0);
+            //selezione = algorithmsList.get(policyJComboBox.getSelectedIndex()).get(0);
             updateAlgorithmJComboBox(); //based on the value chosen, update the list of possible algorithms
-            update();
+            //update();
         }
     };
+
+    /*
+     * AbstractJMTAction associated to the JButton
+     */
+    protected AbstractJMTAction ACTION_CREATE = new AbstractJMTAction("Create") {
+
+		private static final long serialVersionUID = 1L;
+		{
+			setTooltipText("Create Model");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			//TODO: create a new animation
+		}
+	};
 
     public SelectPanel(MediatorTeach mediator) {
         super(new BorderLayout());
@@ -97,10 +112,15 @@ public class SelectPanel extends JPanel{
         mainPanel.add(policyLabel("Policy")); //policy label + JComboBox
         mainPanel.add(policyList());
 
+        mainPanel.add(Box.createHorizontalStrut(10)); //add some spacing
         mainPanel.add(algLabel("Algorithm")); //algorithms label + JComboBox
         mainPanel.add(algList());
 
-        mainPanel.add(prova(selezione)); //to debug
+        //then add the button to create the animation
+        mainPanel.add(Box.createHorizontalStrut(15)); //add some spacing
+        JButton createAnimation = new JButton(ACTION_CREATE);
+        mainPanel.add(createAnimation);
+        help.addHelp(createAnimation, "Press this button when you are ready to set up the environment of the simulation");
 
         /*mainPanel.add(maxSampleLabel());
         mainPanel.add(maxSamples()); */
@@ -130,7 +150,6 @@ public class SelectPanel extends JPanel{
         Dimension d = new Dimension(160, 30);
         policyJComboBox.setMaximumSize(d);
         policyJComboBox.setSelectedIndex(0);
-        selezione = algorithmsList.get(policyJComboBox.getSelectedIndex()).get(0);
         policyJComboBox.addActionListener(ACTION_CHANGE_POLICY);
         policyJComboBox.setVisible(true);
         
@@ -183,18 +202,6 @@ public class SelectPanel extends JPanel{
         for(String s: algorithmsList.get(selectedPolicy)){
             algorithmJComboBox.addItem(s);
         }
-    }
-
-    /*only for debug */
-    private JComponent prova(String labelString) {
-        Dimension d = new Dimension(65, 30);
-        selection = new JLabel(labelString);
-        selection.setMaximumSize(d);
-        selection.setFocusable(false);
-        return selection;
-    }
-    private void update(){
-        selection.setText(selezione);
     }
 
     /*

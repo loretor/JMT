@@ -20,15 +20,17 @@ package jmt.jteach;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.io.File;
 
+import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import jmt.framework.gui.components.JMTFrame;
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
-import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.layouts.MultiBorderLayout;
 import jmt.gui.common.Defaults;
 
@@ -71,19 +73,24 @@ public class JTeachMain extends JMTFrame {
         getContentPane().setLayout(new MultiBorderLayout());
         getContentPane().add(toolbar, BorderLayout.NORTH);
         
+        //add the panel that contains the text and also the possible animation 
+        //the JPanel is defined here and not in Mediator only because in the other way around it is not working properly
+		defineMainJPanel();
 
-        mainPane = new JPanel(new BorderLayout());
-		getContentPane().add(mainPane, BorderLayout.CENTER);
-
-        JPanel description = new JPanel();
-        description.setBackground(Color.WHITE);
-        mainPane.add(description, BorderLayout.NORTH);
-
+        //add the helper bar on the bottom
         mainPane.add(mediator.createHelpLabel(), BorderLayout.SOUTH);
-        
+       
         //If I want to change the size of the window create new values inside Defaults or CommonCostant
         centerWindow(Defaults.getAsInteger("JSIMWindowWidth").intValue(), Defaults.getAsInteger("JSIMWindowHeight").intValue());
         setVisible(true); 
+    }
+
+    public void defineMainJPanel(){
+        mainPane = new JPanel(new BorderLayout());
+        mainPane.setBackground(Color.BLUE);
+        mediator.setAnimationPanel(mainPane);
+
+        getContentPane().add(mainPane, BorderLayout.CENTER);
     }
     
 

@@ -20,19 +20,17 @@ package jmt.jteach;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.io.File;
 
-import javax.swing.Box;
-import javax.swing.JLabel;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import jmt.framework.gui.components.JMTFrame;
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
+import jmt.framework.gui.controller.Manager;
 import jmt.framework.gui.layouts.MultiBorderLayout;
 import jmt.gui.common.Defaults;
+
 
  
 /**
@@ -47,6 +45,8 @@ public class JTeachMain extends JMTFrame {
     private static final long serialVersionUID = 1L;
  
     private static final String TITLE = "JTeach - A tool for helping new users";
+
+    public JFrame thisFrame;
     
     protected MediatorTeach mediator; // mediator between components of the application
     protected JMTMenuBar menu; //main menu
@@ -58,8 +58,21 @@ public class JTeachMain extends JMTFrame {
      */
     public JTeachMain() {
         super(true);
+        thisFrame = this;
+        
+        initGUI();
+        setVisible(true); 
+
+        initPanelvariables();    
+    }
+
+    /**
+     * Initialize all the GUI of the JTeach
+     */
+    public void initGUI(){   
         //setIconImage(JMTImageLoader.loadImage("JMODELIcon").getImage()); /* prepare the icon for JTeach */
-        setTitle(TITLE);
+        setTitle(TITLE);  
+        centerWindow(Defaults.getAsInteger("JSIMWindowWidth").intValue(), Defaults.getAsInteger("JSIMWindowHeight").intValue()); //If I want to change the size of the window create new values inside Defaults or CommonCostant
 
         //object responsible for all the GUI components
         mediator = new MediatorTeach(this); 
@@ -79,18 +92,24 @@ public class JTeachMain extends JMTFrame {
 
         //add the helper bar on the bottom
         mainPane.add(mediator.createHelpLabel(), BorderLayout.SOUTH);
-       
-        //If I want to change the size of the window create new values inside Defaults or CommonCostant
-        centerWindow(Defaults.getAsInteger("JSIMWindowWidth").intValue(), Defaults.getAsInteger("JSIMWindowHeight").intValue());
-        setVisible(true); 
     }
 
+    /**
+     * Define the main Panel with Text and animaiton
+     */
     public void defineMainJPanel(){
         mainPane = new JPanel(new BorderLayout());
         mainPane.setBackground(Color.BLUE);
         mediator.setAnimationPanel(mainPane);
 
         getContentPane().add(mainPane, BorderLayout.CENTER);
+    }
+
+    /**
+     * Create the Dialog for the static variables, displayed on top of the main panel of JTeach
+     */
+    public void initPanelvariables(){
+        new DialogStaticVariables(this);
     }
     
 
@@ -99,13 +118,12 @@ public class JTeachMain extends JMTFrame {
      * @param args
     */
     public static void main(String[] args) {
-        new JTeachMain();
-        if (args != null && args.length > 0) {
-			File file = new File(args[0]);
-			if (!file.isFile()) {
-				System.err.print("Invalid model file: " + file.getAbsolutePath());
-				System.exit(1);
-			}
+        try {
+			JTeachMain inst = new JTeachMain();
+			inst.setVisible(true);
+			Manager.addWindow(inst);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
     } 
 }

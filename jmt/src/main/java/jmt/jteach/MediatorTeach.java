@@ -41,6 +41,8 @@ public class MediatorTeach {
 
     private JTeachMain mainWindow;
 
+    private SimInformation information;
+
     //all the Actions of the Mediator
     private AbstractTeachAction exit;
     private AbstractTeachAction start;
@@ -202,9 +204,27 @@ public class MediatorTeach {
     
     /**
      * Retrieve HoverHelp from another class created in the Mediator, like the SelectPanel
+     * @return HoverHelp
      */
     public HoverHelp getHelp(){
         return help;
+    }
+
+    /**
+     * Retrieve the information for the simualation
+     * @return
+     */
+    public SimInformation geInformation(){
+        return information;
+    }
+
+    /**
+     * Sets the information for the simualation
+     * @param info SimInformation
+     */
+    public void setInformation(SimInformation info){
+        information = info;
+        selectPanel.updateGraphics();
     }
 
     //from this point we define all the methods called from the actions performed by the buttons in JMTMenuBar or JMTToolBar

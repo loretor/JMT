@@ -52,7 +52,7 @@ public class JTeachMain extends JMTFrame {
     protected JMTMenuBar menu; //main menu
     protected JMTToolBar toolbar;//main toolbar
     protected JPanel mainPane; //panel to display the animation
- 
+
     /** 
      * Creates the new Main window of the application.
      */
@@ -109,7 +109,7 @@ public class JTeachMain extends JMTFrame {
      * Create the Dialog for the static variables, displayed on top of the main panel of JTeach
      */
     public void initPanelvariables(){
-        new DialogStaticVariables(this);
+        new DialogStaticVariables(this, this);
     }
     
 
@@ -126,5 +126,13 @@ public class JTeachMain extends JMTFrame {
 			e.printStackTrace();
 		}
     } 
+
+    /**
+     * Call this method from JDialog to save the parameters setted in the JDialog inside the class in the Main
+     * @param info object containing all the information of the simulation
+     */
+    protected void setInformation(SimInformation info){
+        mediator.setInformation(info);
+    }
 }
  

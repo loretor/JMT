@@ -51,7 +51,9 @@ public class JTeachMain extends JMTFrame {
     protected MediatorTeach mediator; // mediator between components of the application
     protected JMTMenuBar menu; //main menu
     protected JMTToolBar toolbar;//main toolbar
-    protected JPanel mainPane; //panel to display the animation
+
+    protected JPanel mainPane; //panel that contains the animationPanel and the helpBar (animPanel CENTER + helpBar SOUTH)
+    private JPanel animPanel; //panel of the animations
 
     /** 
      * Creates the new Main window of the application.
@@ -99,10 +101,11 @@ public class JTeachMain extends JMTFrame {
      */
     public void defineMainJPanel(){
         mainPane = new JPanel(new BorderLayout());
-        mainPane.setBackground(Color.BLUE);
-        mediator.setAnimationPanel(mainPane);
+        animPanel = new JPanel();
+        mediator.setAnimationPanel(animPanel); //call this method of the mediator, since all the logic is done by the mediator not here
 
         getContentPane().add(mainPane, BorderLayout.CENTER);
+        mainPane.add(animPanel, BorderLayout.CENTER);
     }
 
     /**

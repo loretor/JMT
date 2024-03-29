@@ -3,6 +3,7 @@ package jmt.jteach;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -10,11 +11,10 @@ import java.util.ArrayList;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
@@ -22,7 +22,9 @@ import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.gui.common.JMTImageLoader;
 import jmt.gui.common.panels.AboutDialogFactory;
+import jmt.gui.common.startScreen.sampleAnimation.SampleQNAnimation;
 import jmt.jteach.actions.*;
+import jmt.jteach.animations.QNASingleQueue;
 import jmt.jteach.panels.SelectPanel;
 
 
@@ -55,8 +57,6 @@ public class MediatorTeach {
     //reference of components defined inside this class
     private SelectPanel selectPanel;
 
-    private JPanel animdescrPanel;
-    private JPanel descriptionPanel;
     private JPanel animationPanel;
 
     private JLabel helpLabel;
@@ -129,58 +129,32 @@ public class MediatorTeach {
 	}
 
     /**
-     * Create the JPanel containing the text and the animation. The creation is perfomed in the MediatorTech to separate the logic around this panel from the class JTeachMain
+     * Set the Panel for the animation, created in JTeachMain, also here.
      * @return JPanel containing the text and the animation
      */
     protected void setAnimationPanel(JPanel panel){
-        animdescrPanel = panel;
-        animdescrPanel.setBackground(Color.RED);
-        /*animdescrPanel = new JPanel(new BorderLayout());
-        animdescrPanel.setBackground(Color.BLUE);
-        animdescrPanel.setBorder(BorderFactory.createEtchedBorder());
-        
-         
-        descriptionPanel = new JPanel();
-        descriptionPanel.setBackground(Color.RED);
-        animdescrPanel.add(descriptionPanel, BorderLayout.NORTH);
+        animationPanel = panel;   
+    }
 
+    /**
+     * Paint the animation panel with the text and the animation when the Create Button is pressed
+     */
+    public void paintAnimationPanel(){
+        animationPanel.removeAll(); //do not remove this line
 
-        animationPanel = new JPanel();
-        animationPanel.setBackground(Color.WHITE);
-        animdescrPanel.add(animationPanel, BorderLayout.CENTER);
+        //animationPanel.setBackground(Color.PINK);
+        animationPanel.setBorder(new TitledBorder(new EtchedBorder(), information.getPolicy()+"-"+information.getAlgorithm()));
 
-        
-        return animdescrPanel; */
+        animationPanel.setLayout(new BorderLayout());
 
-        
-/* Box hBox = Box.createHorizontalBox();
-        hBox.setBackground(Color.RED);
-		hBox.add(Box.createHorizontalStrut(20));
-		//Horizontal box containing Description label and buttons
-		Box descrBox = Box.createVerticalBox();
-		descrBox.add(new JLabel("ciao questa sarebbe la descrizione"));
-		descrBox.add(Box.createHorizontalStrut(10));
-		descrBox.setPreferredSize(new Dimension(220, 1000));
-		descrBox.setMinimumSize(new Dimension(200, 200));
-        descrBoxBox.setBackground(Color.YELLOW);
-        hBox.add(descrBox);
-        
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(Color.BLUE);
+        QNASingleQueue anim = new QNASingleQueue();
+        anim.setPreferredSize(new Dimension(200, 120));
+        p.add(anim, BorderLayout.CENTER);
+        animationPanel.add(p);
 
-        Box totalBox = Box.createVerticalBox();
-		totalBox.add(Box.createVerticalStrut(30));
-		totalBox.add(hBox);
-		totalBox.add(Box.createVerticalStrut(30));	
-        totalBox.setBackground(Color.BLUE);	
-		mainPane.add(totalBox);
-		hBox.add(descrBox);
-		hBox.add(Box.createHorizontalStrut(10));
-		JScrollPane visitTablePane = new JScrollPane();
-		visitTablePane.setPreferredSize(new Dimension(1000, 1000));
-		visitTablePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		visitTablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		hBox.add(visitTablePane);
-		hBox.add(Box.createHorizontalStrut(20)); */    
-        
+        anim.start();
     }
 
 

@@ -48,6 +48,5 @@ public class Exit extends AbstractTeachAction {
     public void actionPerformed(ActionEvent e) {
         mediator.exit();
     }
-
 }
 

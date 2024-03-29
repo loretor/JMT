@@ -18,25 +18,17 @@
 
 package jmt.jteach.panels;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -66,21 +58,28 @@ public class SelectPanel extends JPanel{
 			setTooltipText("Create Model");
 		}
 
+        //add the new algorithm chosen to the SimInformation and repaint the animationPanel of Mediator
 		public void actionPerformed(ActionEvent e) {
-			//TODO: create a new animation
+			String algo = String.valueOf(algorithmJComboBox.getSelectedItem());
+            mediator.geInformation().setAlgorithmChosen(algo);
+            mediator.paintAnimationPanel();
 		}
 	};
 
     protected MediatorTeach mediator;
+    private SimInformation info;
     private HoverHelp help;
 
     private int panelHeight = 30;
     private int spaceBetweenPanels = 10;
 
     private JComboBox<String> algorithmJComboBox;
+    private List<String> algorithmsList; 
 
-    private SimInformation info;
-    private List<String> algorithmsList; //List of algorithms 
+    //-- help strings
+    private final String shelpPolicy = "Policy chosen for the simulation";
+    private final String shelpAlgorithm = "List of possible algorithms for the type of policy selected";
+    private final String shelpCreate = "After selecting the type of algorithm, press this button to create the animation. Then press the Start button";
 
     /**
      * Create the SelectPanel.
@@ -103,16 +102,28 @@ public class SelectPanel extends JPanel{
         
         //----- Policy Panel
         JPanel c1 = new JPanel(new GridBagLayout());
+        help.addHelp(c1, shelpPolicy);
         populatePolicyPanel(c1);
-        this.add(Box.createVerticalStrut(spaceBetweenPanels));
+        this.add(Box.createHorizontalStrut(spaceBetweenPanels));
 
         //----- Algorithms Panel
         JPanel c2 = new JPanel(new GridBagLayout());
+        help.addHelp(c2, shelpAlgorithm);
         populateAlgorithmPanel(c2);
-        
+        this.add(Box.createHorizontalStrut(spaceBetweenPanels));
+
+        //----- Create button
+        JPanel c3 = new JPanel();
+        JButton createButton = new JButton(ACTION_CREATE);
+        c3.add(createButton);
+        help.addHelp(createButton, shelpCreate);   
+        this.add(c3);
     }
 
-
+    /**
+     * Populate the JPanel with policy label and a label with the policy chosen
+     * @param c1 JPanel to populate
+     */
     private void populatePolicyPanel(JPanel c1){
         //Policy Label
         GridBagConstraints gbc = new GridBagConstraints();
@@ -137,6 +148,10 @@ public class SelectPanel extends JPanel{
         this.add(c1);
     }
 
+    /**
+     * Populate the JPanel with algorithm label and a Jcombobox with the list of algorithms associated to the policy chosen
+     * @param c1 JPanel to populate
+     */
     private void populateAlgorithmPanel(JPanel c2){
         //Algorithm Label
         GridBagConstraints gbc = new GridBagConstraints();

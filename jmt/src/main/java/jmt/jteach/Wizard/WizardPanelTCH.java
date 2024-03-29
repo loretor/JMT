@@ -1,0 +1,17 @@
+package jmt.jteach.Wizard;
+
+/**
+ * This interface is for all the methods associated to the actions.
+ * Each WizardPanel has to implement those methods. If one panel does not support an action, then method can remain empty.
+ *
+ * @author Lorenzo Torri
+ * Date: 29-mar-2024
+ * Time: 15.43
+ */
+public interface WizardPanelTCH{
+    /**
+     * Opens the panel for help
+     */
+    public void openHelp();
+
+}

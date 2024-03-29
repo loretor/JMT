@@ -32,12 +32,17 @@ import jmt.gui.common.distributions.Distribution;
  * Time: 14.36
  */
 public class SimInformation {
+    //list of parameters setted in the JDialog
     private String policy;
     private List<String> algorithms;
     private int nServers = 0;
     private Distribution distribution;
     private int N;
     private int Z;
+
+    //parameters setted after the JDialog when pressing the Create button
+    private String algorithmChosen;
+
 
     public SimInformation(String p, List<String> algorithms, int n, Distribution d, int N, int Z){
         this.policy = p;
@@ -63,4 +68,23 @@ public class SimInformation {
     public List<String> getAlgorithms(){
         return algorithms;
     }
+
+    /**
+     * Retrieve the algorithm chosen. Use this method only after the create button is pressed.
+     * Othterwise the algorithm is not yet setted.
+     * @return type of algorithm
+     */
+    public String getAlgorithm(){
+        return algorithmChosen;
+    }
+
+    /**
+     * Chose the type of algorithm
+     * @param algo algorithm chosen
+     */
+    public void setAlgorithmChosen(String algo){
+        this.algorithmChosen = algo;
+    }
+
+    
 }

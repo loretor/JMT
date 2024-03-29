@@ -132,12 +132,12 @@ public class DialogStaticVariables extends JDialog implements PropertyChangeList
 
     //---------------------help strings------------------------
     //search for "addHelp" to see where these strings are used
-    private String shelpMain = "Set the parameters for the simulation. Once ready, click the Enter button";
-    private String shelpPolicy = "Select the policy to be viewed in the simulation";
-    private String shelpServ = "Select the number of available servers for each station";
-    private String shelpDistr = "Select the type of distribution for the time each job needs for completion";
-    private String shelpN = "Select the number of jobs in the system";
-    private String shelpZ = "Select the Think time of the system";
+    private final String shelpMain = "Set the parameters for the simulation. Once ready, click the Enter button";
+    private final String shelpPolicy = "Select the policy to be viewed in the simulation";
+    private final String shelpServ = "Select the number of available servers for each station";
+    private final String shelpDistr = "Select the type of distribution for the time each job needs for completion";
+    private final String shelpN = "Select the number of jobs in the system";
+    private final String shelpZ = "Select the Think time of the system";
 
 
     /**

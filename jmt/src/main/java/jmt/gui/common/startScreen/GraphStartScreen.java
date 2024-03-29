@@ -59,6 +59,7 @@ import jmt.gui.jwat.MainJwatWizard;
 import jmt.jmarkov.MMQueues;
 import jmt.jmva.gui.exact.ExactWizard;
 import jmt.jteach.JTeachMain;
+import jmt.jteach.Wizard.MainWizard;
 import jmt.manual.ChapterIdentifier;
 import jmt.manual.PDFViewer;
 
@@ -224,6 +225,7 @@ public class GraphStartScreen extends JMTFrame {
 		}
 
 	};
+	
 	// -----------------------------------------------------------------------------------------------------
 
 	// --- Buttons to be created ---------------------------------------------------------------------------
@@ -261,6 +263,7 @@ public class GraphStartScreen extends JMTFrame {
 		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(440, 400)));
 		imageLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		imageLabel.setVerticalAlignment(SwingConstants.NORTH);
+		imageLabel.setBackground(Color.ORANGE);
 		mainPanel.add(imageLabel, BorderLayout.CENTER);
 
 		// Adds buttons taking them from buttonActions[]
@@ -362,7 +365,7 @@ public class GraphStartScreen extends JMTFrame {
 		jTeach.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JTeachMain.main(args);
+				MainWizard.main(args); /////////////////////////////////////////////////
 			}
 			
 		}); 

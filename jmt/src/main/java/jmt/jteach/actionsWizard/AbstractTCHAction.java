@@ -20,7 +20,6 @@ package jmt.jteach.actionsWizard;
 
 import jmt.framework.gui.listeners.AbstractJMTAction;
 import jmt.gui.common.JMTImageLoader;
-import jmt.jteach.MediatorTeach;
 import jmt.jteach.Wizard.WizardPanelTCH;
 
 /**

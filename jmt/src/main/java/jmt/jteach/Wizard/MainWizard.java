@@ -20,19 +20,12 @@ package jmt.jteach.Wizard;
 
 import jmt.gui.common.CommonConstants;
 import jmt.gui.common.JMTImageLoader;
-import jmt.gui.jwat.JWatMainPanel;
-import jmt.gui.jwat.JWatWizard;
-import jmt.gui.jwat.MainJwatWizard;
-import jmt.jteach.JTeachMain;
-import jmt.jteach.MediatorTeach;
-import jmt.jteach.actions.AbstractTeachAction;
-import jmt.jteach.panels.SelectPanel;
+import jmt.jteach.Wizard.panels.MainPanel;
+import jmt.jteach.Wizard.panels.SchedulingPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.util.ArrayList;
 
-import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -43,15 +36,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import jmt.framework.gui.components.JMTFrame;
-import jmt.framework.gui.components.JMTMenuBar;
-import jmt.framework.gui.components.JMTToolBar;
-import jmt.framework.gui.controller.Manager;
 import jmt.framework.gui.help.HoverHelp;
-import jmt.framework.gui.layouts.MultiBorderLayout;
-import jmt.framework.gui.listeners.MenuAction;
-import jmt.framework.gui.wizard.Wizard;
 import jmt.framework.gui.wizard.WizardPanel;
+
 
 /**
  * Main Wizard that contains all the panels for JTeach Models and Markov chains
@@ -60,26 +47,21 @@ import jmt.framework.gui.wizard.WizardPanel;
  * Date: 29-mar-2024
  * Time: 15.04
  */
-public class MainWizard extends Wizard{
+public class MainWizard extends JTchWizard{
 
     //general variables for the JMTFrame
     private String IMG_JWATICON = "JMCHIcon";
     private static final String TITLE = "JTCH";
+	private static final String TITLE_SCHEDULING = "Scheduling";
 
     //components of the panel
     private JPanel menus;
-    private JMenuBar menuBar = null;
-    private JToolBar toolBar = null;
 
     private MainPanel mainPanel;
 
-    private JButton[] btnList;
 
     private HoverHelp help;
-	private JLabel helpLabel;
 	
-    
-
     
 	public MainWizard() {
         this.setIconImage(JMTImageLoader.loadImage(IMG_JWATICON).getImage());
@@ -101,59 +83,25 @@ public class MainWizard extends Wizard{
 		getContentPane().add(menus, BorderLayout.NORTH);
 		mainPanel = new MainPanel(this);
 		this.addPanel(mainPanel);
+		setEnableButton("Solve", false);
 	}
 
     public static void main(String[] args) {
 		new MainWizard().setVisible(true);
 	}
 
-    /**
-     * Method of Wizard of creating the Button Panel.
-     * Ovveride it to add also the helpLabel.
-     * 
-	 * @return the button panel
+    
+	/**
+	 * Method called by the MainPanel to set the scheduling environment when one of the buttons of the scheduling is pressed
 	 */
-	@Override
-	protected JComponent makeButtons() {
-		help = new HoverHelp();
-		helpLabel = help.getHelpLabel();
+	public void setSchedulingEnv(){
+		this.setTitle(TITLE + " - "+ TITLE_SCHEDULING);
 
-		helpLabel.setBorder(BorderFactory.createEtchedBorder());
+		WizardPanel p = new SchedulingPanel(this);
 
-		ACTION_FINISH.putValue(Action.NAME, "Solve");
-		ACTION_CANCEL.putValue(Action.NAME, "Exit");
-
-		JPanel buttons = new JPanel();
-		btnList = new JButton[5];
-
-		/* Added first pane of all */
-
-		JButton button_finish = new JButton(ACTION_FINISH);
-		help.addHelp(button_finish, "Validates choices and start selected clustering");
-		JButton button_cancel = new JButton(ACTION_CANCEL);
-		help.addHelp(button_cancel, "Exits the wizard discarding all changes");
-		JButton button_next = new JButton(ACTION_NEXT);
-		help.addHelp(button_next, "Moves on to the next step");
-		JButton button_previous = new JButton(ACTION_PREV);
-		help.addHelp(button_previous, "Goes back to the previous step");
-		buttons.add(button_previous);
-		btnList[0] = button_previous;
-		buttons.add(button_next);
-		btnList[1] = button_next;
-		buttons.add(button_finish);
-		btnList[2] = button_finish;
-		buttons.add(button_cancel);
-		btnList[3] = button_cancel;
-		
-		JPanel labelbox = new JPanel();
-		labelbox.setLayout(new BorderLayout());
-		labelbox.add(Box.createVerticalStrut(30), BorderLayout.WEST);
-		labelbox.add(helpLabel, BorderLayout.CENTER);
-
-		Box buttonBox = Box.createVerticalBox();
-		buttonBox.add(buttons);
-		buttonBox.add(labelbox);
-		return buttonBox;
+		this.addPanel(p);
+		this.showNext();
+		setEnableButton("Solve", true);
 	}
 
 
@@ -183,9 +131,15 @@ public class MainWizard extends Wizard{
 		menuBar = bar;
 	}
 
-    public HoverHelp getHelp() {
-        return help;
-    }
-   
-
+	/**
+	 * To remove all the panels and to go back to the MainPanel.
+	 * It is called by all the panels in the CanGoBack()
+	 */
+	public void resetScreen() {
+		this.removePanel(currentPanel); //remove the last panel
+		this.setTitle(TITLE);
+		mainPanel.createMenu(); //update the menu and toolbar
+		mainPanel.createToolBar();
+		this.validate();
+	}
 }

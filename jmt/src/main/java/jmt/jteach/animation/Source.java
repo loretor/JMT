@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-package jmt.jteach.animation;
+ package jmt.jteach.animation;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -35,35 +35,46 @@ import jmt.gui.common.JMTImageLoader;
  * Time: 11.30
  */
 public class Source extends JComponent implements JobContainer{
-	//infromation about the Source
 	private JPanel parent;
+	private Point pos;
 	private JobContainer next;
 	private Job routeJob;
-
-	//information about the image of the Source
-	private Image sourceImg;
-	private Point pos;
-	private boolean centered = false;
-	private int size = 50;
-
+	
 	private long start; //solo per debug, sarà da eliminare
 	
-	/** Constructor. If the Source has to be in the center of the y axis of the screen, then define pos = (0, 0) and centered = true, otherwise set centered = false and then set the position as you want */
-	public Source(JPanel container,boolean centered, Point pos, JobContainer next) {
+	private Image sourceImg;
+	private boolean centered = false;
+	private int size = 50;
+	
+	AnimationClass anim;
+	
+	
+	/**
+     * Constructor
+     * @param container, JPanel that contains this sink
+     * @param centered, if the component is centered with respect to the Jpanel
+     * @param pos, position of the component. If it is centered then this pos is not important, it can be anything
+     * @param next, next JContainer linked to the source
+     * @param anim, AnimationClass associated to this component. It is needed in order to remove the job arrived to the sink also from the list of jobs of the AnimationClass
+     */
+	public Source(JPanel container,boolean centered, Point pos, JobContainer next, AnimationClass anim) {
 		this.parent = container;
 		this.pos = pos;
 		this.next = next;	
 		this.centered = centered;
+		this.anim = anim;
+		
 		sourceImg = JMTImageLoader.loadImageAwt("Source");
 	}
-
-	public void paint(Graphics g){
+	
+	public void paint(Graphics g) {
 		super.paint(g);
-
+		
 		if(centered) {
+			//int widthPanel = parent.getWidth();
 			int heightPanel = parent.getHeight();	
-			pos.x = parent.getX() + 20;
-			pos.y = parent.getY()+(heightPanel-size)/2;
+			pos.y = parent.getY()+(heightPanel- size)/2 ;
+			pos.x = 20;
 		}
 		
 		g.drawImage(sourceImg, pos.x, pos.y, size, size, null);
@@ -76,6 +87,7 @@ public class Source extends JComponent implements JobContainer{
 			routeJob = new Job();
 			routeJob(0);
 			start = System.currentTimeMillis();
+			anim.addNewJob(routeJob);
 		}
 		
 	}
@@ -84,14 +96,20 @@ public class Source extends JComponent implements JobContainer{
 		start = time;
 	}
 
-	@Override
-	public void addJob(Job newJob) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	public void routeJob(int i) {
+		if(next instanceof Edge) {
+			routeJob.setOnEdge();
+		}
+		else {
+			routeJob.unsetOnEdge();
+		}
 		next.addJob(routeJob);
+	}
+
+	@Override
+	public void addJob(Job newJob) {
+		
 	}
 	
 	

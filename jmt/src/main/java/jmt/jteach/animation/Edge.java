@@ -19,10 +19,13 @@
 package jmt.jteach.animation;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -32,7 +35,34 @@ import javax.swing.JPanel;
  * It is also useful for painting the circle of the Job on top of the edge
  */
 enum Direction{
-	UP,DOWN,LEFT,RIGHT;
+	UP{
+		@Override
+		public int direction() {
+			return -1;
+		}
+	},
+	DOWN{
+		@Override
+		public int direction() {
+			return 1;
+		}
+	},
+	LEFT{
+		@Override
+		public int direction() {
+			return -1;
+		}
+	},
+	RIGHT{
+		@Override
+		public int direction() {
+			// TODO Auto-generated method stub
+			return 1;
+		}
+	};
+	
+	//method for understanding the direction 1 or -1
+	public abstract int direction();
 }
 
 /**
@@ -49,6 +79,7 @@ public class Edge extends JComponent implements JobContainer{
 	
 	//--variables of the edge
 	private boolean centered;
+	private boolean isArrow;
 	private Point start;
 	private Point finish;
 	private Direction direction;
@@ -56,10 +87,23 @@ public class Edge extends JComponent implements JobContainer{
 	private List<Job> jobList;
 	private JobContainer nextContainer = null;
 	
-	/** Constructor for the Queue Policy where edges must be centered in the JPanel */
-	public Edge(JPanel container, boolean centered, Point start, Point finish, JobContainer next) {
+	//for the probabilistic routing
+	private boolean paintPercentage = false;
+	private double percentage = 0.00;
+	
+	/**
+	 * Constructor
+	 * @param container, JPanel that contains this edge
+	 * @param centered, if the edge is y centered with respect to the JPanel or not
+	 * @param isArrow, if the edge is an arrow and not a simple line
+	 * @param start point of the edge
+	 * @param finish point of the edge
+	 * @param next, JobContainer next to this edge
+	 */
+	public Edge(JPanel container, boolean centered, boolean isArrow, Point start, Point finish, JobContainer next) {
 		this.parent = container;
 		this.centered = centered;
+		this.isArrow = isArrow;
 		this.start = start;
 		this.finish = finish;
 		this.nextContainer = next;
@@ -74,28 +118,54 @@ public class Edge extends JComponent implements JobContainer{
 		
 		if(centered) {
 			int heightPanel = parent.getHeight();	
-			start.y = parent.getY()+(heightPanel)/2; //need to add -30 which is half of the height of the station
+			start.y = parent.getY()+(heightPanel)/2;
 			finish.y = start.y;
 		}
-		
+				
 		g.setColor(Color.BLACK);
-		g.drawLine(start.x, start.y, finish.x, finish.y);
+		g.drawLine(start.x, start.y, finish.x, finish.y);	
 		
-		for(Job j: jobList) {
-			j.paint(g);
-		}	
+		//only if the routing policy with probability is chosen
+		if(paintPercentage) {
+			g.setFont(new Font("Arial", Font.PLAIN, 10));
+			String value = "prob: "+percentage;
+			if(direction == Direction.UP || direction == Direction.DOWN) {
+				g.drawString(value, start.x - 50,  start.y + direction.direction() * 20);
+			}
+			else {
+				g.drawString(value, start.x,  start.y + direction.direction() * 20);
+			}
+		}
+
+		//only if the edge is an arrow (for now the arrow is only for a direction = right)
+		if(isArrow) {
+			Graphics2D g2d = (Graphics2D) g;
+			int[] xPoints = {finish.x+5, finish.x, finish.x}; // x coordinates
+		    int[] yPoints = {finish.y, finish.y-5, finish.y+5};   // y coordinates
+
+		    g2d.setColor(Color.BLACK);
+	        g2d.fillPolygon(xPoints, yPoints, 3); //draw the triangle
+		}
 	}
 	
 	/**
-	 * Method to understand the direction of the edge based on the values of start and finish point
+	 * Method to paint the percentage near the edge. 
+	 * This method is useful for Routing Probabilistic policy
+	 * @param p
 	 */
+	public void paintPercentage(double p) {
+		paintPercentage = true;
+		percentage = p;
+	}
+	
+	/** Method to understand the direction of the edge based on the values of start and finish point */
 	public void setDirection() {
 		if(start.x == finish.x) { //two vertical points
 			if(start.y > finish.y) {
-				direction = Direction.DOWN;
+				direction = Direction.UP;
 			}
 			else {
-				direction = Direction.UP;
+				direction = Direction.DOWN;
 			}
 		}
 		else { //two horizontal points
@@ -123,19 +193,17 @@ public class Edge extends JComponent implements JobContainer{
 	}
 	
 	/**
-	 * Method to update the current position of a job.
-	 * First check if the current job position is over the finish point, if yes, then route the job to the nextJobContainer, otherwise update its position
-	 * The new position of the job depends on the direction where the Edge is going and the velocity of the Job
+	 * Method to update the current position of a job based on the direction of the edge
 	 * @param j Job that has to update its position inside the edge
 	 */
 	private void moveJob(Job j) {
 		Point current = j.getPosition();
 		switch(direction) {
 			case UP: 
-				j.updatePosition(current.x, current.y + j.getSpeed());
+				j.updatePosition(current.x, current.y - j.getSpeed());
 				break;
 			case DOWN:
-				j.updatePosition(current.x, current.y - j.getSpeed());
+				j.updatePosition(current.x, current.y + j.getSpeed());
 				break;
 			case RIGHT:
 				j.updatePosition(current.x + j.getSpeed(), current.y);
@@ -150,28 +218,30 @@ public class Edge extends JComponent implements JobContainer{
 	 * Check whether the Job has completed its path along the edge.
 	 * The check is performed based on the direction of the edge and on the position of the job
 	 * @param j Job to check
-	 * @return a boolean, true if the job has reached the finish point, false otherwise
+	 * @return boolean, true if the job has reached the finish point, false otherwise
 	 */
 	private boolean checkFinish(Job j) {
 		Point current = j.getPosition();
+		//add to current half of the circleSize, in order to consider the center of the circle as the position of the job, and not the start drawing point
+		int circleSize = j.getCircleSize();
 		switch(direction) {
 			case LEFT:
-				if(current.x <= finish.x) {
+				if(current.x + circleSize/2 <= finish.x) {
 					return true;
 				}
 				break;
 			case RIGHT:
-				if(current.x >= finish.x) {
+				if(current.x + circleSize/2 >= finish.x) {
 					return true;
 				}
 				break;
 			case UP:
-				if(current.y >= finish.y) {
+				if(current.y + circleSize/2 <= finish.y) {
 					return true;
 				}
 				break;
 			case DOWN:
-				if(current.y <= finish.y) {
+				if(current.y + circleSize/2 >= finish.y) {
 					return true;
 				}
 				break;
@@ -185,10 +255,23 @@ public class Edge extends JComponent implements JobContainer{
 		jobList.add(newJob);
 	}
 
+	/**
+	 * Route a job to the next JobContainer since it has arrived to the final point of the edge
+	 * @param i, index of the job inside the JobList of the edge
+	 */
 	public void routeJob(int i) {
 		Job job = jobList.remove(i);
 		if(nextContainer != null) {
+			if(nextContainer instanceof Edge) {
+				job.setOnEdge();
+			}
+			else {
+				job.unsetOnEdge();
+			}
 			nextContainer.addJob(job);	
-		}		
+		}
+		else {
+			job.unsetOnEdge();			
+		}
 	}
 }

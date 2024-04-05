@@ -22,10 +22,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.util.Random;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 /**
  * Class that represents a single space inside the queue of the station
@@ -55,6 +53,11 @@ public class BoxStation extends JComponent implements JobContainer{
 	private boolean isWorking = false; //to know if there is a job in this BoxStation or not to print the circle above
 	private int sizeCircle = 10; //circle above the box if there is a job 
 	
+	/**
+	 * Constructor
+	 * @param st, station of this boxstation
+	 * @param i, index in the list of boxstations
+	 */
 	public BoxStation(Station st, int i) {
 		this.station = st;
 		this.index = i;
@@ -112,7 +115,7 @@ public class BoxStation extends JComponent implements JobContainer{
 	public void refresh() {
 		
 	}
-
+	
 	public void setPosition(Point pos) {
 		sPos = pos;
 	}

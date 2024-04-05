@@ -21,7 +21,9 @@ package jmt.jteach.Wizard;
 import jmt.gui.common.CommonConstants;
 import jmt.gui.common.JMTImageLoader;
 import jmt.jteach.Wizard.panels.MainPanel;
-import jmt.jteach.Wizard.panels.SchedulingPanel;
+import jmt.jteach.animation.QueuePolicy;
+import jmt.jteach.animation.RoutingPolicy;
+import jmt.jteach.Wizard.panels.AnimationPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,6 +49,7 @@ public class MainWizard extends JTchWizard{
     private String IMG_JWATICON = "JMCHIcon";
     private static final String TITLE = "JTCH";
 	private static final String TITLE_SCHEDULING = "Scheduling";
+	private static final String TITLE_ROUTING = "Routing";
 
     //components of the panel
     private JPanel menus;
@@ -86,12 +89,27 @@ public class MainWizard extends JTchWizard{
 
     
 	/**
-	 * Method called by the MainPanel to set the scheduling environment when one of the buttons of the scheduling is pressed
+	 * Method to create a new AnimationPanel with the type of scheduling policy (queue policy) selected with one of the buttons of the MainPanel
+	 * @param policy the type of Queue Policy
 	 */
-	public void setSchedulingEnv(){
+	public void setAnimationPanelEnv(QueuePolicy policy){
 		this.setTitle(TITLE + " - "+ TITLE_SCHEDULING);
 
-		WizardPanel p = new SchedulingPanel(this);
+		WizardPanel p = new AnimationPanel(this, policy);
+
+		this.addPanel(p);
+		this.showNext();
+		setEnableButton("Solve", true);
+	}
+
+	/**
+	 * Same method as before, but with a Routing policy
+	 * @param policy the type of Routing Policy
+	 */
+	public void setAnimationPanelEnv(RoutingPolicy policy){
+		this.setTitle(TITLE + " - "+ TITLE_ROUTING);
+
+		WizardPanel p = new AnimationPanel(this, policy);
 
 		this.addPanel(p);
 		this.showNext();

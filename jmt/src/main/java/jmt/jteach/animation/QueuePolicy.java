@@ -18,6 +18,8 @@
 
 package jmt.jteach.animation;
 
+import jmt.jteach.ConstantsJTch;
+
 /**
  * Enum for the type of Queue Policy.
  * Those types of queue are then implemented with one of the classes that extends the CustomCollection interface
@@ -27,5 +29,63 @@ package jmt.jteach.animation;
  * Time: 12.19
  */
 public enum QueuePolicy {
-	FIFO, LIFO, PRIO, SJF, LJF;
+	FIFO{
+		@Override
+		public String toString() {
+			return "Fifo";
+		}
+
+		@Override
+		public String getDescription() {
+			return ConstantsJTch.FIFO_DESCRIPTION;
+		}
+		
+	}, 
+	LIFO{
+		@Override
+		public String toString() {
+			return "Lifo";
+		}
+
+		@Override
+		public String getDescription() {
+			return ConstantsJTch.LIFO_DESCRIPTION;
+		}
+	}, 
+	PRIO{
+		@Override
+		public String toString() {
+			return "Priority";
+		}
+
+		@Override
+		public String getDescription() {
+			return ConstantsJTch.PRIO_DESCRIPTION;
+		}
+	},
+	SJF{
+		@Override
+		public String toString() {
+			return "Shortest Job First";
+		}
+
+		@Override
+		public String getDescription() {
+			return ConstantsJTch.SJF_DESCRIPTION;
+		}
+	},
+	LJF{
+		@Override
+		public String toString() {
+			return "Longest Job First";
+		}
+
+		@Override
+		public String getDescription() {
+			return ConstantsJTch.LJF_DESCRIPTION;
+		}
+	};
+	
+	public abstract String toString(); //to covert each enum to its policy name
+	public abstract String getDescription(); //to get for each enum a description on how the policy works
 }

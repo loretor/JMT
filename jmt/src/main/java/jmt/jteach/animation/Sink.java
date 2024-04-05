@@ -34,19 +34,28 @@ import jmt.gui.common.JMTImageLoader;
  * Date: 01-apr-2024
  * Time: 11.31
  */
-public class Sink extends JComponent{
+public class Sink extends JComponent implements JobContainer{
     private JPanel parent;
     
     private Image sinkImg;
     private boolean centered = false;
     private Point pos;
     private int size = 50;
+    
+    AnimationClass anim;
 
-    /** Constructor. If the sink has to be in the center of the y axis of the screen, then define pos = (x, 0) and centered = true, otherwise set centered = false and then set the position as you want */
-    public Sink(JPanel container, boolean centered, Point pos){
+    /**
+     * Constructor
+     * @param container, JPanel that contains this sink
+     * @param centered, if the component is centered with respect to the Jpanel
+     * @param pos, position of the component. If it is centered then this pos is not important, it can be anything
+     * @param anim, AnimationClass associated to this component. It is needed in order to remove the job arrived to the sink also from the list of jobs of the AnimationClass
+     */
+    public Sink(JPanel container, boolean centered, Point pos, AnimationClass anim){
         this.parent = container;
         this.centered = centered;
         this.pos = pos;
+        this.anim = anim;
 
         sinkImg = JMTImageLoader.loadImageAwt("Sink");
     }
@@ -54,14 +63,25 @@ public class Sink extends JComponent{
     public void paint(Graphics g){
         super.paint(g);
 
-		if(centered) {
-			int heightPanel = parent.getHeight();	
-            int widthPanel = parent.getWidth();
-            pos.x = parent.getX() + widthPanel - size - 20;
-			pos.y = parent.getY()+(heightPanel-size)/2;
-		}
-		
-		g.drawImage(sinkImg, pos.x, pos.y, size, size, null);
+        if(centered) {
+          int widthPanel = parent.getWidth();
+          int heightPanel = parent.getHeight();	
+          pos.y = parent.getY()+(heightPanel - size)/2 ;
+          pos.x = parent.getX()+ widthPanel - 20 - size;
+        }
+        
+        g.drawImage(sinkImg, pos.x, pos.y, size, size, null);
     }
+    
 
+	@Override
+	public void refresh() {
+		//nothing to refresh
+	}
+
+	@Override
+	public void addJob(Job newJob) {
+		//here the addJob is removing the job from the list of jobs
+		anim.removeJob(newJob);
+	}
 }

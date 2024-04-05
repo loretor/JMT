@@ -1,21 +1,3 @@
-/**
- * Copyright (C) 2016, Laboratorio di Valutazione delle Prestazioni - Politecnico di Milano
-
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- */
-
 package jmt.jteach.animation;
 
 import java.awt.Color;
@@ -56,8 +38,12 @@ public class CircleStation extends JComponent implements JobContainer{
 	private long pauseTime; //this variable is important if we are processing a job and then the animator is paused, we need to know how much time the job remained paused and remove this value from the passedTime
 	//then set this value = 0 when the job gets out from this class
 	
-	
-	public CircleStation(Station st, int nServers, float position) { //float position is to know if the circle has to be moved from the normal position or not, since with 2 servers the circle has to be up or down
+	/**
+	 * Constructor
+	 * @param st, Station that has this circle
+	 * @param position, set it = 0.0f if it is a single server station. Otherwise set it equal to the correct position for multiple servers
+	 */
+	public CircleStation(Station st, float position) {
 		station = st;
 		sPos = st.getPosition();
 		sHeight = st.getHeight();
@@ -95,7 +81,7 @@ public class CircleStation extends JComponent implements JobContainer{
 				progression = 0; //to avoid printing another cycle of the circle
 				pauseTime = 0;
 				
-				routeJob(0);
+				routeJob();
 			}
 		}	
 	}
@@ -126,13 +112,25 @@ public class CircleStation extends JComponent implements JobContainer{
 		}	
 	}
 	
-	public void routeJob(int i) {
-		currentJob.setDuration();
+	/**
+	 * Once the job is processed, then it must be routed to the next JobContainer
+	 */
+	public void routeJob() {
+		currentJob.setDuration(); //set the duration = 0 since the job is completely processed
+		//then if the next element is an edge, the job must be painted as a green circle, otherwise do not paint it
+		if(station.getNextContainer() instanceof Edge) {
+			currentJob.setOnEdge();
+		}
+		else {
+			currentJob.unsetOnEdge();
+		}
 		station.getNextContainer().addJob(currentJob);
 	}
 
+	
 	public void setPosition(Point pos) {
 		sPos = pos;
 	}
+
 	
 }

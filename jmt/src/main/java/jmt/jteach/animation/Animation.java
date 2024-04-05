@@ -17,30 +17,29 @@
  */
 
 package jmt.jteach.animation;
-
 import java.awt.Graphics;
 
 /**
  * Interface that must be implemented by the class that represent the Animation
- *
- * @author Lorenzo Torri
- * Date: 22-mar-2024
- * Time: 10.30
- */
-public interface Animation{
+*
+* @author Lorenzo Torri
+* Date: 22-mar-2024
+* Time: 10.30
+*/
+public interface Animation {
 	/**
 	 * Method for updating some values inside the class.
-	 * It is crucial since when we call the repaint() method and start the chain of calls of the paint() methods of each JComponent, those paint() method use some local variables of the clasess.
-	 * If we change those variables with this method, then we can obtain some changes also in the graphics
-	 */
+	* It is crucial since when we call the repaint() method and start the chain of calls of the paint() methods of each JComponent, those paint() method use some local variables of the clasess.
+	* If we change those variables with this method, then we can obtain some changes also in the graphics
+	*/
 	public void refresh();
 
 	/**
 	 * Paint is a method for all JComponents. It is called when the class is istanciated, and called again when the repaint() method is invoked inside the class.
-	 * Each paint of an animation recall then all the paint() of the subcomponents of an Animation.
-	 * Repaint() must be called only once inside the Animation class, never on the subcomponents
-	 * @param g
-	 */
+	* Each paint of an animation recall then all the paint() of the subcomponents of an Animation.
+	* Repaint() must be called only once inside the Animation class, never on the subcomponents
+	* @param g
+	*/
 	public void paint(Graphics g);
 	
 	/* The next three methods are related to the methods of the Animator associated to the Animation */
@@ -55,10 +54,11 @@ public interface Animation{
 		
 	/**
 	 * This method is important for udpdating all those components inside the Animation that are affected by a pause of the Animator.
-	 * One example is the CircleStation, in which the amount of progression is computed as the difference between the current time and the time of entrance of the job in the circle.
-	 * But if the animator was paused, then this amount does not have to be computed in the difference of before, so it is crucial to pass to the Circle this value and remove it from the difference
-	 * @param pause the amount of time during which the animator was paused
-	 */
+	* One example is the CircleStation, in which the amount of progression is computed as the difference between the current time and the time of entrance of the job in the circle.
+	* But if the animator was paused, then this amount does not have to be computed in the difference of before, so it is crucial to pass to the Circle this value and remove it from the difference
+	* @param pause the amount of time during which the animator was paused
+	*/
 	public void updatePause(long pause);
 
 }
+ 

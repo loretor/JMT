@@ -40,10 +40,13 @@ import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.JMTImageLoader;
+import jmt.jteach.ConstantsJTch;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
 import jmt.jteach.actionsWizard.AbstractTCHAction;
 import jmt.jteach.actionsWizard.Help;
+import jmt.jteach.animation.QueuePolicy;
+import jmt.jteach.animation.RoutingPolicy;
 
 /**
  * Main Panel of the MainWizard. This panel offers the possibility of choosing between a JTeach Model or Markov chain.
@@ -57,18 +60,6 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
     private static final String PANEL_NAME = "Main Panel";
     private static final String IMG_STARTSCREEN = "StartScreenJTeach";
     private static final int BUTTONSIZE = 15;
-	private static final String[] helpString = {"Opens a new panel with a First In First Out scheduling simulation",
-												"Opens a new panel with a Last In First Out Scheduling simulation",
-												"Opens a new panel with a Shortest Job First Scheduling simulation",
-												"Opens a new panel with a Longest Job First Scheduling simulation",
-												"Opens a new panel with a Priority Scheduling simulation",
-												"Opens a new panel with a Probabilistic Routing simulation",
-												"Opens a new panel with a Join Shortest Job Queue Routing simulation",
-												"Opens a new panel with a Round Robin simulation",
-												"Opens a new panel with a M/M/1 Queue Markov Chain",
-												"Opens a new panel with a M/M/1/k Queue Markov Chain",
-												"Opens a new panel with a M/M/c Queue Markov Chain",
-												"Opens a new panel with a M/M/c/k Queue Markov Chain"};
 
     private MainWizard parent;
 	private JMTMenuBar menu;
@@ -87,7 +78,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			parent.setAnimationPanelEnv(QueuePolicy.FIFO);
 		}
 	};
 
@@ -98,7 +89,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			parent.setAnimationPanelEnv(QueuePolicy.LIFO);
 		}
 	};
 
@@ -109,7 +100,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			parent.setAnimationPanelEnv(QueuePolicy.SJF);
 		}
 	};
 
@@ -120,7 +111,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			parent.setAnimationPanelEnv(QueuePolicy.LJF);
 		}
 	};
 
@@ -131,7 +122,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			parent.setAnimationPanelEnv(QueuePolicy.PRIO);
 		}
 	};
 
@@ -142,7 +133,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			parent.setAnimationPanelEnv(RoutingPolicy.PROBABILISTIC);
 		}
 	};
 
@@ -153,7 +144,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			parent.setAnimationPanelEnv(RoutingPolicy.JSQ);
 		}
 	};
 
@@ -164,7 +155,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			parent.setAnimationPanelEnv(RoutingPolicy.RR);
 		}
 	};
 
@@ -175,7 +166,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+	
 		}
 	};
 
@@ -186,7 +177,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			
 		}
 	};
 
@@ -197,7 +188,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			
 		}
 	};
 
@@ -208,7 +199,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setSchedulingEnv();
+			
 		}
 	};
 
@@ -247,13 +238,13 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
 		/* TODO */
 		for (int i = 0; i < actions.length; i++) {
-			buttonPanel.add(createButton(actions[i], helpString[i]));
+			buttonPanel.add(createButton(actions[i], ConstantsJTch.HELP_BUTTONS_MAINPANEL[i]));
 		}
 
         //flow chart schema
 		JLabel imageLabel = new JLabel();
 		imageLabel.setBorder(BorderFactory.createEmptyBorder(BUTTONSIZE, 1, 0, 0));
-		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(475, 500)));
+		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(452, 500)));
 		imageLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		imageLabel.setVerticalAlignment(SwingConstants.NORTH);
 

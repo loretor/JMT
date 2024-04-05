@@ -18,7 +18,9 @@
 
 package jmt.jteach.animation;
 
+
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.Comparator;
@@ -30,7 +32,6 @@ import jmt.jteach.animation.customQueue.CustomCollection;
 import jmt.jteach.animation.customQueue.FIFOQueue;
 import jmt.jteach.animation.customQueue.LIFOQueue;
 import jmt.jteach.animation.customQueue.PRIOQueue;
-
 
 /**
  * Class for representing a Node inside the Animation
@@ -44,11 +45,13 @@ public class Station extends JComponent implements JobContainer{
 	
 	//general information about the station
 	private Point pos;
-	private boolean centered;
+	private boolean xcentered;
+	private boolean ycentered;
 	private int height = 60;
 	private int length = 120;
 	private QueuePolicy policyType;
 	private int nServers;
+	private boolean paintQueueSize = false; //this parameter is used to know if it is needed to paint the size of the queue above the station (useful for polices like JSQ
 	
 	//this is the queue of Jobs, see CustomCollection to understand why this and not a general Collection
 	private CustomCollection<Job> jobQueue; 
@@ -59,11 +62,21 @@ public class Station extends JComponent implements JobContainer{
 	private final int sizeQueue = 5;	
 	private CircleStation[] circles;
 	
-	
-	public Station(JPanel parent, boolean centered, Point pos, JobContainer next, QueuePolicy type, int servers) {
+	/**
+	 * Constructor
+	 * @param parent, JPanel that contains this station
+	 * @param xcentered, if the station is x centered with respect to the parent
+	 * @param ycentered, if the station is y centered with respect to the parent
+	 * @param pos, position of the station, if it is x-y centered then the respective coordinates are not considered
+	 * @param next, Jobcontainer connected to this station
+	 * @param type, queue policy type
+	 * @param servers, number of servers
+	 */
+	public Station(JPanel parent, boolean xcentered, boolean ycentered, Point pos, JobContainer next, QueuePolicy type, int servers) {
 		this.parent = parent;
-		this.centered = centered;
-		this.pos = pos;
+		this.pos = pos; 
+		this.xcentered = xcentered;
+		this.ycentered = ycentered;
 		
 		this.nServers = servers;
 		this.next = next;
@@ -80,7 +93,7 @@ public class Station extends JComponent implements JobContainer{
 		}
 		circles = new CircleStation[nServers];
 		for(int i = 0; i < nServers; i++) {
-			circles[i] = new CircleStation(this, nServers, position);
+			circles[i] = new CircleStation(this, position);
 			position *= -1;
 		}
 				
@@ -136,18 +149,21 @@ public class Station extends JComponent implements JobContainer{
 		super.paint(g);
 		
 		//get the correct position for centering the station in the panel
-		if(centered){
-			int widthPanel = parent.getWidth();
-			int heightPanel = parent.getHeight();	
-			pos = new Point(parent.getX()+(widthPanel - (length + height))/2, parent.getY()+(heightPanel- height)/2 );
-
-			for(BoxStation box: boxes) {
-				box.setPosition(pos);
-			}
-			for(CircleStation circle: circles){
-				circle.setPosition(pos);
-			}
-		}	
+		if(xcentered) {
+			int widthPanel = parent.getWidth();	
+			pos.x = parent.getX()+(widthPanel - length - height)/2;;		
+		}
+		if(ycentered) {
+			int heightPanel = parent.getHeight();
+			pos.y = parent.getY()+(heightPanel- height)/2;
+		}
+		
+		for(BoxStation box: boxes) {
+			box.setPosition(pos);
+		}
+		for(CircleStation circle: circles){
+			circle.setPosition(pos);
+		}
 		
 		g.setColor(Color.BLACK);
         g.drawRect(pos.x, pos.y, length, height); //create the box of the station centered in the panel
@@ -175,6 +191,12 @@ public class Station extends JComponent implements JobContainer{
         for(int i = 0; i < nServers; i++) {
         	circles[i].paint(g);
         }  
+        
+        if(paintQueueSize) {
+        	g.setColor(Color.BLACK);
+        	g.setFont(new Font("Arial", Font.PLAIN, 10));
+        	g.drawString("Queue Size: "+String.valueOf(jobQueue.size()), pos.x,  pos.y-20);
+        }
 	}
 	
 	@Override
@@ -219,6 +241,16 @@ public class Station extends JComponent implements JobContainer{
 			circles[i].setPauseTime(pause);
 		}	
 	}
+	
+	@Override
+	public void addJob(Job newJob) {
+		newJob.setEntrance(); //update the entrance in the queue
+		
+		//try to add the job inside the queue, if the queue is full, then drop the job
+		if(jobQueue.size() != sizeQueue) {
+			jobQueue.addNew(newJob);
+		}	
+	}
 
 	public Point getPosition() {
 		return pos;
@@ -236,10 +268,8 @@ public class Station extends JComponent implements JobContainer{
 		return sizeQueue;
 	}
 	
-	@Override
-	public void addJob(Job newJob) {
-		newJob.setEntrance(); //update the entrance in the queue
-		jobQueue.addNew(newJob);
+	public int getNumberWaitingJobs() {
+		return jobQueue.size();
 	}
 	
 	public QueuePolicy getQueuePolicy() {
@@ -248,6 +278,10 @@ public class Station extends JComponent implements JobContainer{
 	
 	public JobContainer getNextContainer() {
 		return next;
+	}
+	
+	public void paintQueueSize() {
+		paintQueueSize = true;
 	}
 
 }

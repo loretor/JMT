@@ -23,6 +23,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
@@ -43,25 +44,27 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	private List<Edge> edgeList;
 	
 	//--all the characteristics of the Animation
-	private QueuePolicy type = QueuePolicy.FIFO;
-	int nServers = 1;
+	private QueuePolicy queuePolicy;
+	private int nServers = 1;
 	
 	
 	/** Constructor. One note, define the elements of the Animation from the last to the first, since each element must have a reference to the next one */
-	public SingleQueueNetAnimation(JPanel container) {
+	public SingleQueueNetAnimation(JPanel container, QueuePolicy queuePolicy) {
 		this.parent = container;
+		this.queuePolicy = queuePolicy;
 		initGUI(container);
 	}
-
-	public void initGUI(JPanel container){
+	
+	public void initGUI(JPanel container) {
 		anim = new Animator(30, this);
 		edgeList = new ArrayList<>();
+		jobList = new ArrayList<>();
 		
-		edgeList.add(new Edge(container, true, new Point(435,250), new Point(580,250), null));
-		station = new Station(container, true, new Point(0,0), edgeList.get(0), type, nServers);
-		edgeList.add(new Edge(container, true,new Point(80,250), new Point(230,250), station));
-		source = new Source(container, true, new Point(0,0), edgeList.get(edgeList.size()-1));
-		sink = new Sink(container, true, new Point(0,0));
+		sink = new Sink(container, true, new Point(0,0), this);
+		edgeList.add(new Edge(container, true, true, new Point(435,0), new Point(580,0), sink));
+		station = new Station(container, true, true, new Point(0,0), edgeList.get(0), queuePolicy, nServers);
+		edgeList.add(new Edge(container, true, true, new Point(80,0), new Point(230,0), station));
+		source = new Source(container, true, new Point(0,0), edgeList.get(edgeList.size()-1),this);
 	}
 	
 	/**
@@ -74,11 +77,14 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		super.paint(g);
 		
 		source.paint(g);
-		sink.paint(g);
 		station.paint(g);
+		sink.paint(g);
 		
 		for(Edge e: edgeList) {
 			e.paint(g);
+		}
+		for(Job j: jobList) {
+			j.paint(g);
 		}
 	}
 	

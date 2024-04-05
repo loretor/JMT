@@ -29,6 +29,7 @@ public class Job extends JComponent{
 	//--variables needed only for the movement along the edges
 	private Point pos;
 	private int speed = 2;
+	private boolean onEdge = false; //this parameter is used to know if the current job is on a Edge or not
 	
 	private int circleSize = 15;
 	private int boxWidth = 12;
@@ -49,25 +50,27 @@ public class Job extends JComponent{
 		priority = new Random().nextInt(5)+1; //set priority always > 1 otherwise it does not work properly in the BoxStation
 	}
 	
-	/** This paint is called only by the edges, since when the job is in a node it is already painted as a box (BoxStation) or as a circle (CircleStation) */
+	/** This paint needs to know if we are on an edge or not, because if we are not on an edge, then we do not need to paint anything */
 	public void paint(Graphics g) {
 		super.paint(g);
 		
-		g.setColor(Color.GREEN);
-		g.fillOval(pos.x, pos.y, circleSize, circleSize);		
-		
-		//then draw also the box with the filled rectangle
-		g.setColor(Color.BLACK);
-		g.drawRect(pos.x + 15, pos.y - 30, boxWidth, boxHeight);
-		
-		//to convert the duration to the size of the above box
-		g.setColor(color);
-		int factor = boxHeight/maxValue;
-		int result = duration*factor >= boxHeight? boxHeight-1: duration*factor; //this solution provides the problem of having jobs with duration > maximum height of the box
-		g.fillRect(pos.x + 16, pos.y - 30 + (boxHeight-result), boxWidth-1, result);
-		
+		if(onEdge) {
+			g.setColor(Color.GREEN);
+			g.fillOval(pos.x, pos.y, circleSize, circleSize);		
+			
+			//then draw also the box with the filled rectangle
+			g.setColor(Color.BLACK);
+			g.drawRect(pos.x + 15, pos.y - 30, boxWidth, boxHeight);
+			
+			//to convert the duration to the size of the above box
+			g.setColor(color);
+			int factor = boxHeight/maxValue;
+			int result = duration*factor >= boxHeight? boxHeight-1: duration*factor; //this solution provides the problem of having jobs with duration > maximum height of the box
+			g.fillRect(pos.x + 16, pos.y - 30 + (boxHeight-result), boxWidth-1, result);
+		}	
 	}
 
+	/** Create a random color associated to each job */
     private Color getRandomColor() {
         Random rand = new Random();
         int r = rand.nextInt(256);
@@ -123,8 +126,20 @@ public class Job extends JComponent{
     	return speed;
     }
     
+    public int getCircleSize() {
+    	return circleSize;
+    }
+    
     /** Called once the Job is going outside of a station */
     public void setDuration() {
     	duration = 0;
+    }
+    
+    public void setOnEdge() {
+    	onEdge = true;
+    }
+    
+    public void unsetOnEdge() {
+    	onEdge = false;
     }
 }

@@ -26,12 +26,6 @@ import jmt.jteach.Wizard.panels.SchedulingPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;

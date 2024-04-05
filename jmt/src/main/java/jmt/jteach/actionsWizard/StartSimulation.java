@@ -44,14 +44,13 @@ public class StartSimulation extends AbstractTCHAction {
         putValue(SHORT_DESCRIPTION, "Start simulation");
         putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_MASK));
-        //setEnabled(false);
     }
 
     /**
      * Invoked when an action occurs.
      */
     public void actionPerformed(ActionEvent e) {
-    //TODO
+        panel.startAnimation();
     }
 
 }

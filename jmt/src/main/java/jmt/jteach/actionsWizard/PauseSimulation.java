@@ -39,14 +39,13 @@ public class PauseSimulation extends AbstractTCHAction {
         super("Pause Simulation", "Pause", panel);
         putValue(SHORT_DESCRIPTION, "Pause simulation");
         //putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
-        //setEnabled(false);
     }
 
     /**
      * Invoked when an action occurs.
      */
     public void actionPerformed(ActionEvent e) {
-    //TODO
+        panel.pauseAnimation();
     }
 
 }

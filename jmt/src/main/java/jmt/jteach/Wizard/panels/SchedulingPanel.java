@@ -17,10 +17,21 @@
  */
 package jmt.jteach.Wizard.panels;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
@@ -28,11 +39,13 @@ import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.JMTImageLoader;
+
+import jmt.jteach.ConstantsJTch;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
-import jmt.jteach.actions.AbstractTeachAction;
 import jmt.jteach.actionsWizard.*;
-import jmt.jteach.panels.SelectPanel;
+import jmt.jteach.animation.AnimationClass;
+import jmt.jteach.animation.SingleQueueNetAnimation;
 
 /**
  * One of the panels for the JTeach Models. It is the panel for the scheduling techniques
@@ -45,14 +58,14 @@ public class SchedulingPanel extends WizardPanel implements WizardPanelTCH{
     private static final String PANEL_NAME = "Scheduling";
 
     private MainWizard parent;
+    private AnimationClass animation;
     private HoverHelp help;
 
     //all the Actions of this panel
     private AbstractTCHAction exit;
     private AbstractTCHAction start;
-    private AbstractTCHAction doublevelocity;
     private AbstractTCHAction pause;
-    private AbstractTCHAction stop;
+    private AbstractTCHAction reload;
     private AbstractTCHAction openHelp;
     private AbstractTCHAction about;
 
@@ -63,17 +76,62 @@ public class SchedulingPanel extends WizardPanel implements WizardPanelTCH{
         //define all the AbstractTeachAction
         exit = new Exit(this);
         start = new StartSimulation(this);
-        doublevelocity = new DoubleSimulationVelocity(this);
         pause = new PauseSimulation(this);
-        stop = new StopSimulation(this);
+        reload = new ReloadSimulation(this);
         openHelp = new Help(this);
         about = new About(this);
+
+        pause.setEnabled(false);
+        reload.setEnabled(false);
 
         initGUI();
     }
 
     public void initGUI(){
+        this.setLayout(new BorderLayout());
+        this.setBorder(BorderFactory.createEmptyBorder(20,10,20,10));
+        JPanel mainPanel = new JPanel();
+        mainPanel.setBorder(new TitledBorder(new EtchedBorder(), "FIFO"));
+        mainPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
+        //divide the main panels in two columns
+        JPanel leftPanel = new JPanel();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.30; //description panel occupies only 30% of the horizontal component of mainPanel
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        mainPanel.add(leftPanel, gbc);
+       
+        JPanel rightPanel = new JPanel();
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0.70;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        mainPanel.add(rightPanel, gbc);
+
+        //add all the things on the left part
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(10,5,10,5));
+        leftPanel.setLayout(new BorderLayout());
+        JEditorPane descrLabel = new JEditorPane("text/html", "<html><p style='text-align:justify;'>"+ConstantsJTch.FIFO_DESCRIPTION+"</p></html>");
+        descrLabel.setEditable(false);
+        descrLabel.setPreferredSize(leftPanel.getSize());
+        descrLabel.setBackground(null);
+        leftPanel.add(descrLabel, BorderLayout.CENTER);
+
+        //add all the things on the right part
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0)); //handle padding correctly, since it seems to move all the objects of the animation in one direction
+        rightPanel.setLayout(new BorderLayout());
+
+        JPanel animationPanel = new JPanel(new BorderLayout());
+        animation = new SingleQueueNetAnimation(animationPanel);
+        animationPanel.add(animation, BorderLayout.CENTER);
+        animationPanel.setBackground(Color.WHITE);
+        rightPanel.add(animationPanel, BorderLayout.CENTER);
+
+        this.add(mainPanel, BorderLayout.CENTER);
         createMenu();
         createToolbar();
     }
@@ -89,7 +147,7 @@ public class SchedulingPanel extends WizardPanel implements WizardPanelTCH{
 		menu.addMenu(action);
 
         //Solve window
-		action = new MenuAction("Solve", new AbstractTCHAction[] {start, doublevelocity, pause, stop, null});
+		action = new MenuAction("Solve", new AbstractTCHAction[] {start, pause, reload, null});
 		menu.addMenu(action);
 
         //Help window
@@ -106,10 +164,7 @@ public class SchedulingPanel extends WizardPanel implements WizardPanelTCH{
         JMTToolBar toolbar = new JMTToolBar(JMTImageLoader.getImageLoader());	
 
         //first add all the icons with their actions
-        AbstractTCHAction[] actions = new AbstractTCHAction[] {start, doublevelocity, pause, stop, null, openHelp}; // Builds an array with all actions to be put in the toolbar
-		String[] helpText = {"Start the simulation","Double the velocity of the simulation (perform this action only if there is an active simulation)",
-        "Pause the simulation (perform this action only if there is an active simulation)","Stop the simulation (perform this action only if there is an active simulation)", 
-        "Open the help page"};
+        AbstractTCHAction[] actions = new AbstractTCHAction[] {start, pause, reload, null, openHelp}; // Builds an array with all actions to be put in the toolbar	
         toolbar.populateToolbar(actions);
         ArrayList<AbstractButton> buttons = new ArrayList<AbstractButton>(); //create a list of AbstractButtons for the helpLabel
 		buttons.addAll(toolbar.populateToolbar(actions));
@@ -117,7 +172,7 @@ public class SchedulingPanel extends WizardPanel implements WizardPanelTCH{
         //add help for each Action/JComboBox with helpLabel
 		for (int i = 0; i < buttons.size(); i++) {
 			AbstractButton button = buttons.get(i);
-			help.addHelp(button, helpText[i]);
+			help.addHelp(button, ConstantsJTch.HELP_BUTTONS_ANIMATIONS[i]);
 		}
 		  
 		parent.setToolBar(toolbar);
@@ -142,6 +197,30 @@ public class SchedulingPanel extends WizardPanel implements WizardPanelTCH{
     @Override
     public void openHelp() {
         //TODO
+    }
+
+    @Override
+    public void startAnimation() {
+        animation.start();
+        start.setEnabled(false);
+        pause.setEnabled(true);
+        reload.setEnabled(false);      
+    }
+
+    @Override
+    public void pauseAnimation() {
+        animation.pause();
+        start.setEnabled(true);
+        pause.setEnabled(false);
+        reload.setEnabled(true);
+    }
+
+    @Override
+    public void reloadAnimation() {
+        animation.reload();
+        start.setEnabled(true);
+        pause.setEnabled(false);
+        reload.setEnabled(false);
     }
 
 }

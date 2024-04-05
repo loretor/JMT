@@ -149,12 +149,12 @@ public class MediatorTeach {
 
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(Color.BLUE);
-        QNASingleQueue anim = new QNASingleQueue();
-        anim.setPreferredSize(new Dimension(200, 120));
-        p.add(anim, BorderLayout.CENTER);
-        animationPanel.add(p);
+        //QNASingleQueue anim = new QNASingleQueue();
+        //anim.setPreferredSize(new Dimension(200, 120));
+        //p.add(anim, BorderLayout.CENTER);
+        //nimationPanel.add(p);
 
-        anim.start();
+        //anim.start();
     }
 
 

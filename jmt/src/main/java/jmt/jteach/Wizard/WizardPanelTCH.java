@@ -15,6 +15,13 @@ public interface WizardPanelTCH{
     /** Opens the panel for help */
     public void openHelp();
 
+    /** Starts the animation */
+    public void startAnimation();
 
+    /** Pauses the animation */
+    public void pauseAnimation();
+
+    /** Reloads the animation */
+    public void reloadAnimation();
 
 }

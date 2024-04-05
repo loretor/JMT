@@ -32,7 +32,6 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
 import jmt.framework.gui.components.JMTMenuBar;
@@ -58,6 +57,18 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
     private static final String PANEL_NAME = "Main Panel";
     private static final String IMG_STARTSCREEN = "StartScreenJTeach";
     private static final int BUTTONSIZE = 15;
+	private static final String[] helpString = {"Opens a new panel with a First In First Out scheduling simulation",
+												"Opens a new panel with a Last In First Out Scheduling simulation",
+												"Opens a new panel with a Shortest Job First Scheduling simulation",
+												"Opens a new panel with a Longest Job First Scheduling simulation",
+												"Opens a new panel with a Priority Scheduling simulation",
+												"Opens a new panel with a Probabilistic Routing simulation",
+												"Opens a new panel with a Join Shortest Job Queue Routing simulation",
+												"Opens a new panel with a Round Robin simulation",
+												"Opens a new panel with a M/M/1 Queue Markov Chain",
+												"Opens a new panel with a M/M/1/k Queue Markov Chain",
+												"Opens a new panel with a M/M/c Queue Markov Chain",
+												"Opens a new panel with a M/M/c/k Queue Markov Chain"};
 
     private MainWizard parent;
 	private JMTMenuBar menu;
@@ -70,9 +81,6 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
 	//all the AbstractActions associated to the buttons related of this panel only
 	protected AbstractAction FIFO = new AbstractAction("FIFO") {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, "First In First Out Scheduling Policy");
@@ -83,8 +91,129 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
+	protected AbstractAction LIFO = new AbstractAction("LIFO") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "Last In First Out Scheduling Policy");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction SJF = new AbstractAction("SJF") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "Shortest Job First Scheduling Policy");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction LJF = new AbstractAction("LJF") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "Longest Job First Scheduling Policy");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction PRIORITY = new AbstractAction("PRIORIY") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "Priority Scheduling Policy");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction PROBABILISTIC = new AbstractAction("PROBABILISTIC") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "Probabilistic Routing Policy");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction JSJQ = new AbstractAction("JSJQ") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "Join Shortest Job Queue Routing Policy");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction RR = new AbstractAction("RR") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "Round Robin Routing Policy");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction MM1 = new AbstractAction("M/M/1") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "M/M/1 Station, 1 Server");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction MM1K = new AbstractAction("M/M/1/k") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "M/M/1/k Finite Capacity Station, 1 Server");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction MMC = new AbstractAction("M/M/c") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "M/M/c Station, c Servers");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
+	protected AbstractAction MMCK = new AbstractAction("M/M/c/k") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "M/M/c/k Finite Capaicty Station, c Servers");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setSchedulingEnv();
+		}
+	};
+
 	//array of all the AbstractActions in this panel
-	private AbstractAction[] actions = {FIFO};
+	private AbstractAction[] actions = {FIFO, LIFO, SJF, LJF, PRIORITY, PROBABILISTIC, JSJQ, RR, MM1, MM1K, MMC, MMCK};
 
     public MainPanel(MainWizard main){
         this.parent = main;
@@ -115,11 +244,11 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		eastPanel.add(Box.createVerticalStrut(5), BorderLayout.NORTH);
         JPanel buttonPanel = new JPanel(new GridLayout(12, 1, 2, 15));
 		eastPanel.add(buttonPanel, BorderLayout.CENTER);
-		/* TODO
-		for (int i = 0; i < 12; i++) {
-			buttonPanel.add(createButton());
-		} */
-		buttonPanel.add(createButton(actions[0], "Open a panel with a First In First Out scheduling simulation"));
+
+		/* TODO */
+		for (int i = 0; i < actions.length; i++) {
+			buttonPanel.add(createButton(actions[i], helpString[i]));
+		}
 
         //flow chart schema
 		JLabel imageLabel = new JLabel();
@@ -138,7 +267,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
     private JButton createButton(AbstractAction action, String helpString) {
 		JButton button = new JButton(action);
-		button.setPreferredSize(new Dimension((int) (BUTTONSIZE * 6), (int) (BUTTONSIZE * 2)));
+		button.setPreferredSize(new Dimension((int) (BUTTONSIZE * 8), (int) (BUTTONSIZE * 2)));
 		help.addHelp(button, helpString);
 		return button;
 	}
@@ -191,5 +320,17 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
     @Override
     public void openHelp() {
         
-    }    
+    }
+
+	@Override
+	public void startAnimation() {
+	}
+
+	@Override
+	public void pauseAnimation() {
+	}
+
+	@Override
+	public void reloadAnimation() {
+	}    
 }

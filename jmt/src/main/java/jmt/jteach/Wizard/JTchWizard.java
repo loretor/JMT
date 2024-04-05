@@ -16,7 +16,13 @@ import javax.swing.JToolBar;
 import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.wizard.Wizard;
 
-
+/**
+ * SuperClass of the MainWizard. It contains some methods of Wizard that are Overrided to fit the needs of this type of Wizard
+ *
+ * @author Lorenzo Torri
+ * Date: 31-mar-2024
+ * Time: 16.22
+ */
 public class JTchWizard extends Wizard{
 
     private static final long serialVersionUID = 1L;
@@ -27,9 +33,6 @@ public class JTchWizard extends Wizard{
 	protected JMenuBar menuBar;
     protected JToolBar toolBar;
 
-	public HoverHelp getHelp() {
-		return help;
-	}
 
     /**
      * Method of Wizard of creating the Button Panel.
@@ -42,16 +45,16 @@ public class JTchWizard extends Wizard{
 
 		helpLabel.setBorder(BorderFactory.createEtchedBorder());
 
-		ACTION_FINISH.putValue(Action.NAME, "Solve");
+		//ACTION_FINISH.putValue(Action.NAME, "Solve");
 		ACTION_CANCEL.putValue(Action.NAME, "Exit");
 
 		JPanel buttons = new JPanel();
-		btnList = new JButton[5];
+		btnList = new JButton[3];
 
 		/* Added first pane of all */
 
-		JButton button_finish = new JButton(ACTION_FINISH);
-		help.addHelp(button_finish, "Validates choices and solve");
+		//JButton button_finish = new JButton(ACTION_FINISH);
+		//help.addHelp(button_finish, "Validates choices and solve");
 		JButton button_cancel = new JButton(ACTION_CANCEL);
 		help.addHelp(button_cancel, "Exits the wizard discarding all changes");
 		JButton button_next = new JButton(ACTION_NEXT);
@@ -62,10 +65,10 @@ public class JTchWizard extends Wizard{
 		btnList[0] = button_previous;
 		buttons.add(button_next);
 		btnList[1] = button_next;
-		buttons.add(button_finish);
-		btnList[2] = button_finish;
+		//buttons.add(button_finish);
+		//btnList[2] = button_finish;
 		buttons.add(button_cancel);
-		btnList[3] = button_cancel;
+		btnList[2] = button_cancel;
 		
 		JPanel labelbox = new JPanel();
 		labelbox.setLayout(new BorderLayout());
@@ -78,6 +81,11 @@ public class JTchWizard extends Wizard{
 		return buttonBox;
 	}
 
+	/**
+	 * Set a button working or not based on the value or enabled
+	 * @param button the string that represents the button
+	 * @param enabled true or false
+	 */
     public void setEnableButton(String button, boolean enabled) {
 		for (JButton element : btnList) {
 			if (element.getText().equals(button)) {
@@ -87,6 +95,7 @@ public class JTchWizard extends Wizard{
 		}
     }
 
+	/** Return the HoverHelp of this Wizard */
     public HoverHelp getHoverHelp(){
         return help;
     }

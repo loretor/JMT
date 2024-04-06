@@ -22,11 +22,8 @@ public class ConstantsJTch {
         
     //help text
     public static final String[] HELP_BUTTONS_ANIMATIONS = {"Start the simulation or reload it, if it was paused", "Pause the running simulation","Reload the simulation",  "Open the help page"};
-    public static final String[] HELP_BUTTONS_MAINPANEL = {"Opens a new panel with a First In First Out scheduling simulation",
-												"Opens a new panel with a Last In First Out Scheduling simulation",
-												"Opens a new panel with a Shortest Job First Scheduling simulation",
-												"Opens a new panel with a Longest Job First Scheduling simulation",
-												"Opens a new panel with a Priority Scheduling simulation",
+    public static final String[] HELP_BUTTONS_MAINPANEL = {"Opens a new panel with Preemptive Scheduling Simulation",
+                                                "Opens a new panel with Non Preemptive Scheduling Simulation",
 												"Opens a new panel with a Probabilistic Routing simulation",
 												"Opens a new panel with a Join Shortest Job Queue Routing simulation",
 												"Opens a new panel with a Round Robin simulation",

@@ -59,7 +59,8 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
     private static final String PANEL_NAME = "Main Panel";
     private static final String IMG_STARTSCREEN = "StartScreenJTeach";
-    private static final int BUTTONSIZE = 15;
+    private static final int BUTTONSIZE_X = 15;
+	private static final int BUTTONSIZE_Y = 12;
 
     private MainWizard parent;
 	private JMTMenuBar menu;
@@ -71,10 +72,10 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
 
 	//all the AbstractActions associated to the buttons related of this panel only
-	protected AbstractAction FIFO = new AbstractAction("FIFO") {
+	protected AbstractAction PREEMPTIVE = new AbstractAction("PREEMPTIVE") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "First In First Out Scheduling Policy");
+			putValue(Action.SHORT_DESCRIPTION, "All preemptive scheduling policies");
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -82,47 +83,14 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction LIFO = new AbstractAction("LIFO") {
+	protected AbstractAction NON_PREEMPTIVE = new AbstractAction("NON PREEMPTIVE") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "Last In First Out Scheduling Policy");
+			putValue(Action.SHORT_DESCRIPTION, "All non preemptive scheduling policies");
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			parent.setAnimationPanelEnv(QueuePolicy.LIFO);
-		}
-	};
-
-	protected AbstractAction SJF = new AbstractAction("SJF") {
-		private static final long serialVersionUID = 1L;
-		{
-			putValue(Action.SHORT_DESCRIPTION, "Shortest Job First Scheduling Policy");
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicy.SJF);
-		}
-	};
-
-	protected AbstractAction LJF = new AbstractAction("LJF") {
-		private static final long serialVersionUID = 1L;
-		{
-			putValue(Action.SHORT_DESCRIPTION, "Longest Job First Scheduling Policy");
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicy.LJF);
-		}
-	};
-
-	protected AbstractAction PRIORITY = new AbstractAction("PRIORIY") {
-		private static final long serialVersionUID = 1L;
-		{
-			putValue(Action.SHORT_DESCRIPTION, "Priority Scheduling Policy");
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicy.PRIO);
 		}
 	};
 
@@ -204,7 +172,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	};
 
 	//array of all the AbstractActions in this panel
-	private AbstractAction[] actions = {FIFO, LIFO, SJF, LJF, PRIORITY, PROBABILISTIC, JSJQ, RR, MM1, MM1K, MMC, MMCK};
+	private AbstractAction[] actions = {PREEMPTIVE, NON_PREEMPTIVE, PROBABILISTIC, JSJQ, RR, MM1, MM1K, MMC, MMCK};
 
     public MainPanel(MainWizard main){
         this.parent = main;
@@ -232,8 +200,8 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
         //panel with all the buttons
 		JPanel eastPanel = new JPanel(new FlowLayout());
-		eastPanel.add(Box.createVerticalStrut(5), BorderLayout.NORTH);
-        JPanel buttonPanel = new JPanel(new GridLayout(12, 1, 2, 15));
+		eastPanel.add(Box.createVerticalStrut(1), BorderLayout.NORTH);
+        JPanel buttonPanel = new JPanel(new GridLayout(12, 1, 2, 25));
 		eastPanel.add(buttonPanel, BorderLayout.CENTER);
 
 		/* TODO */
@@ -243,7 +211,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
         //flow chart schema
 		JLabel imageLabel = new JLabel();
-		imageLabel.setBorder(BorderFactory.createEmptyBorder(BUTTONSIZE, 1, 0, 0));
+		imageLabel.setBorder(BorderFactory.createEmptyBorder(BUTTONSIZE_X, 1, 0, 0));
 		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(452, 500)));
 		imageLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		imageLabel.setVerticalAlignment(SwingConstants.NORTH);
@@ -258,7 +226,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
     private JButton createButton(AbstractAction action, String helpString) {
 		JButton button = new JButton(action);
-		button.setPreferredSize(new Dimension((int) (BUTTONSIZE * 8), (int) (BUTTONSIZE * 2)));
+		button.setPreferredSize(new Dimension((int) (BUTTONSIZE_X * 8), (int) (BUTTONSIZE_Y * 3)));
 		help.addHelp(button, helpString);
 		return button;
 	}

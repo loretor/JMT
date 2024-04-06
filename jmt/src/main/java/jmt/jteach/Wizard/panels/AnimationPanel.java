@@ -19,18 +19,24 @@ package jmt.jteach.Wizard.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Queue;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -64,6 +70,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     private MainWizard parent;
     private AnimationClass animation;
     private HoverHelp help;
+
+    //------------ variables for parameters JPanel ---------------
+    private JPanel parametersPanel;
+    private int spaceBetweenPanels = 5;
+    private int heightPanels = 20;
 
     //all the Actions of this panel
     private AbstractTCHAction exit;
@@ -148,11 +159,14 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         else{
             descrLabel = new JEditorPane("text/html", "<html><p style='text-align:justify;'>"+routingPolicy.getDescription()+"</p></html>");
         }
-        
         descrLabel.setEditable(false);
         descrLabel.setPreferredSize(leftPanel.getSize());
         descrLabel.setBackground(null);
         leftPanel.add(descrLabel, BorderLayout.CENTER);
+
+        //paramters panel
+        createParameters(leftPanel);;
+        leftPanel.add(parametersPanel, BorderLayout.SOUTH);
 
         //add all the things on the right part
         rightPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0)); //handle padding correctly, since it seems to move all the objects of the animation in one direction
@@ -174,6 +188,47 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         createMenu();
         createToolbar();
     }
+
+    /**
+     * Update the JPanel of the paramters in the left panel of this window
+     */
+    private void createParameters(JPanel container){
+        parametersPanel = new JPanel();
+        parametersPanel.setBorder(new TitledBorder(new EtchedBorder(), "Parameters"));
+        parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS));
+
+        EmptyBorder paddingBorder = new EmptyBorder(0, 10, 0, 10); //padding right and left for all the panels inside the JPanel (top and bottom = 0 otherwise it does not show other panels)
+        
+        //algorithm Panel
+        JPanel algorithmPanel = new JPanel();
+        //algorithmPanel.setLayout(new GridLayout(1,2));
+        algorithmPanel.add(new JLabel("Algorithm :"));
+        /*algorithmPanel.add(new JComboBox<String>());
+        algorithmPanel.setBackground(Color.BLUE); */
+        algorithmPanel.setBackground(Color.BLUE);
+        //parametersPanel.add(algorithmPanel);
+
+        //N servers panel
+        /*JPanel p2 = createPanel(paddingBorder, null);
+        p2.setBackground(Color.RED); */
+
+    }
+
+    /**
+     * Create a new JPanel inside the ParamtersPanel
+     * @param paddingBorder border left and right for all the panels
+     * @param helpText the string to be displayed on the bottom of the JDialog
+     * @return a new Panel
+     */
+    private JPanel createPanel(EmptyBorder paddingBorder, String helpText) {
+        parametersPanel.add(Box.createVerticalStrut(spaceBetweenPanels));
+        JPanel p = new JPanel();  
+        p.setMaximumSize(new Dimension(parametersPanel.getWidth(), heightPanels));
+        p.setBorder(paddingBorder);
+        parametersPanel.add(p);
+        help.addHelp(p, helpText);
+        return p;
+	}
 
     /**
 	 * Update the menuBar for the Scheduling Window

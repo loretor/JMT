@@ -49,7 +49,7 @@ public class Station extends JComponent implements JobContainer{
 	private boolean ycentered;
 	private int height = 60;
 	private int length = 120;
-	private QueuePolicy policyType;
+	private QueuePolicyNonPreemptive policyType;
 	private int nServers;
 	private boolean paintQueueSize = false; //this parameter is used to know if it is needed to paint the size of the queue above the station (useful for polices like JSQ
 	
@@ -72,7 +72,7 @@ public class Station extends JComponent implements JobContainer{
 	 * @param type, queue policy type
 	 * @param servers, number of servers
 	 */
-	public Station(JPanel parent, boolean xcentered, boolean ycentered, Point pos, JobContainer next, QueuePolicy type, int servers) {
+	public Station(JPanel parent, boolean xcentered, boolean ycentered, Point pos, JobContainer next, QueuePolicyNonPreemptive type, int servers) {
 		this.parent = parent;
 		this.pos = pos; 
 		this.xcentered = xcentered;
@@ -105,7 +105,7 @@ public class Station extends JComponent implements JobContainer{
 	 * @param type
 	 */
 	@SuppressWarnings("unchecked")
-	private void typeOfQueue(QueuePolicy type) {
+	protected void typeOfQueue(QueuePolicyNonPreemptive type) {
 		this.policyType = type;
 		switch(type) {
 		case FIFO:
@@ -272,7 +272,7 @@ public class Station extends JComponent implements JobContainer{
 		return jobQueue.size();
 	}
 	
-	public QueuePolicy getQueuePolicy() {
+	public QueuePolicyNonPreemptive getQueuePolicy() {
 		return policyType;
 	}
 	

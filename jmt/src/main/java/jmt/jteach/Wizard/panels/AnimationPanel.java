@@ -21,24 +21,35 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.lang.invoke.ConstantCallSite;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Queue;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import com.jhlabs.image.EmbossFilter;
 
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
@@ -53,7 +64,8 @@ import jmt.jteach.Wizard.WizardPanelTCH;
 import jmt.jteach.actionsWizard.*;
 import jmt.jteach.animation.AnimationClass;
 import jmt.jteach.animation.MultipleQueueNetAnimation;
-import jmt.jteach.animation.QueuePolicy;
+import jmt.jteach.animation.Policy;
+import jmt.jteach.animation.QueuePolicyNonPreemptive;
 import jmt.jteach.animation.RoutingPolicy;
 import jmt.jteach.animation.SingleQueueNetAnimation;
 
@@ -68,6 +80,10 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     private static final String PANEL_NAME = "Scheduling";
 
     private MainWizard parent;
+    private JPanel mainPanel;
+    private JEditorPane descrLabel;
+    private JComboBox<String> algorithmJComboBox = null;
+    private JPanel animationPanel;
     private AnimationClass animation;
     private HoverHelp help;
 
@@ -85,8 +101,24 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     private AbstractTCHAction about;
 
     //properties of the animation
-    private QueuePolicy queuePolicy = null;
+    private Policy policy = null;
+    private QueuePolicyNonPreemptive[] nonPreemptivePolicies; //array of all possible nonPreemptive policies
+    private QueuePolicyNonPreemptive queuePolicyNonPreemptive = null;
+    
     private RoutingPolicy routingPolicy = null;
+
+
+    //Action associated to the button Create
+    protected AbstractAction CREATE = new AbstractAction("Create") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, "Create a new policy with the parameters chosen");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			updateAnimationPanel();
+		}
+	};
 
     private AnimationPanel(MainWizard main){
         this.parent = main;
@@ -104,60 +136,75 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         reload.setEnabled(false);
     }
 
-    public AnimationPanel(MainWizard main, QueuePolicy queuepolicy){
+    /**
+     * To create a new AnimationPanel, call this constructor only if Policy = PREEMPTIVE or NON_PREEMPTIVE
+     * @param main the main wizard
+     * @param policy the type of policy
+     */
+    public AnimationPanel(MainWizard main, Policy policy){
         this(main);
-        this.queuePolicy = queuepolicy;
+        this.policy = policy;
+        this.queuePolicyNonPreemptive = QueuePolicyNonPreemptive.FIFO; //set this equal to FIFO by default
         this.routingPolicy = null;
+        start.setEnabled(false); //cannot start a simulation without setting the parameters
         initGUI();
     }
 
+    /**
+     * To create a new AnimationPanel, call this constructor for routing policies
+     * @param main the main wizard
+     * @param policy the type of policy
+     */
     public AnimationPanel(MainWizard main, RoutingPolicy routingpolicy){
         this(main);
         this.routingPolicy = routingpolicy;
-        this.queuePolicy = null;
+        this.policy = Policy.ROUTING;
         initGUI();
     }
 
     public void initGUI(){
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(20,10,20,10));
-        JPanel mainPanel = new JPanel();
-        if(queuePolicy != null){
-            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), queuePolicy.toString()));
+        mainPanel = new JPanel();
+        if(policy == Policy.NON_PREEMPTIVE){
+            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling"));
+        }
+        else if(policy == Policy.PREEMPTIVE){
+
         }
         else{
-            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), routingPolicy.toString()));
+            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + "-" + routingPolicy.toString()));
         }
         
-        mainPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        mainPanel.setLayout(new BorderLayout());
 
-        //divide the main panels in two columns
+        //divide the main panels in three columns
         JPanel leftPanel = new JPanel();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0.30; //description panel occupies only 30% of the horizontal component of mainPanel
-        gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        mainPanel.add(leftPanel, gbc);
+        leftPanel.setMaximumSize(new Dimension(275, mainPanel.getHeight()));
+        leftPanel.setPreferredSize(new Dimension(275, mainPanel.getHeight()));
+        mainPanel.add(leftPanel, BorderLayout.WEST);
        
         JPanel rightPanel = new JPanel();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 0.70;
-        gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        mainPanel.add(rightPanel, gbc);
+        mainPanel.add(rightPanel, BorderLayout.CENTER);
 
-        //add all the things on the left part
+        JPanel paddingPanel = new JPanel(); //this one is used only to create some padding on the left part
+        paddingPanel.setMaximumSize(new Dimension(10, mainPanel.getHeight()));
+        paddingPanel.setPreferredSize(new Dimension(10, mainPanel.getHeight()));
+        mainPanel.add(paddingPanel, BorderLayout.EAST);
+        
+
+        //------------------LEFT PART
         leftPanel.setBorder(BorderFactory.createEmptyBorder(10,5,10,5));
         leftPanel.setLayout(new BorderLayout());
-        JEditorPane descrLabel;
-        if(queuePolicy != null){
-            descrLabel = new JEditorPane("text/html", "<html><p style='text-align:justify;'>"+queuePolicy.getDescription()+"</p></html>");
+
+        //description of the policy
+        descrLabel = new JEditorPane();
+        descrLabel.setContentType("text/html");
+        if(policy == Policy.ROUTING){
+            descrLabel.setText("<html><p style='text-align:justify;'>"+routingPolicy.getDescription()+"</p></html>");
         }
         else{
-            descrLabel = new JEditorPane("text/html", "<html><p style='text-align:justify;'>"+routingPolicy.getDescription()+"</p></html>");
+            descrLabel.setText("<html><p style='text-align:justify;'> No description, set parameters first</p></html>");
         }
         descrLabel.setEditable(false);
         descrLabel.setPreferredSize(leftPanel.getSize());
@@ -168,14 +215,14 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         createParameters(leftPanel);;
         leftPanel.add(parametersPanel, BorderLayout.SOUTH);
 
-        //add all the things on the right part
+        //------------------RIGHT PART
         rightPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0)); //handle padding correctly, since it seems to move all the objects of the animation in one direction
         rightPanel.setLayout(new BorderLayout());
 
-        JPanel animationPanel = new JPanel(new BorderLayout());
+        animationPanel = new JPanel(new BorderLayout());
         //based on the type of Policy passed in the constructor, create a new Animation
-        if(queuePolicy != null){
-            animation = new SingleQueueNetAnimation(animationPanel, queuePolicy);
+        if(policy == Policy.NON_PREEMPTIVE){
+            animation = new SingleQueueNetAnimation(animationPanel, QueuePolicyNonPreemptive.FIFO);
         }
         else{
             animation = new MultipleQueueNetAnimation(animationPanel, routingPolicy);
@@ -190,6 +237,30 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     }
 
     /**
+     * Method called by the Create button to update this panel.
+     * It differenciates the changes based on the type of policy, three things have to be updated, the title, the description, the animation 
+     */
+    private void updateAnimationPanel(){
+        animation.pause();
+        reloadAnimation();
+        start.setEnabled(true);
+
+        if(policy == Policy.NON_PREEMPTIVE){
+            queuePolicyNonPreemptive = nonPreemptivePolicies[algorithmJComboBox.getSelectedIndex()]; //the index of the JComboBox is the same of the array of queue policies Non preemptive
+            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling - " + queuePolicyNonPreemptive.toString()));
+            descrLabel.setText("<html><p style='text-align:justify;'>"+queuePolicyNonPreemptive.getDescription()+"</p></html>");
+            animation.update(queuePolicyNonPreemptive);
+        }
+        else if(policy == Policy.PREEMPTIVE){
+
+        }
+        else{ //in case of routing only the animation must be updated
+            animation = new MultipleQueueNetAnimation(animationPanel, routingPolicy);
+        }
+    }
+
+
+    /**
      * Update the JPanel of the paramters in the left panel of this window
      */
     private void createParameters(JPanel container){
@@ -199,31 +270,72 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
 
         EmptyBorder paddingBorder = new EmptyBorder(0, 10, 0, 10); //padding right and left for all the panels inside the JPanel (top and bottom = 0 otherwise it does not show other panels)
         
-        //algorithm Panel
-        JPanel algorithmPanel = new JPanel();
-        //algorithmPanel.setLayout(new GridLayout(1,2));
-        algorithmPanel.add(new JLabel("Algorithm :"));
-        /*algorithmPanel.add(new JComboBox<String>());
-        algorithmPanel.setBackground(Color.BLUE); */
-        algorithmPanel.setBackground(Color.BLUE);
-        //parametersPanel.add(algorithmPanel);
+        //algorithm Panel (this one is displayed only for Scheduling Policies)
+        if(policy == Policy.NON_PREEMPTIVE || policy == Policy.PREEMPTIVE){
+            JPanel algorithmPanel = createPanel(paddingBorder, false, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[0]);
+            algorithmPanel.setLayout(new GridLayout(1,2));
+            algorithmPanel.add(new JLabel("Algorithm :"));
 
-        //N servers panel
-        /*JPanel p2 = createPanel(paddingBorder, null);
-        p2.setBackground(Color.RED); */
+            if(policy == Policy.NON_PREEMPTIVE){
+                nonPreemptivePolicies = QueuePolicyNonPreemptive.values();
+                String[] options = new String[nonPreemptivePolicies.length];
+                for (int i = 0; i < options.length; i++) {
+                    options[i] = nonPreemptivePolicies[i].toString();
+                }
+                algorithmJComboBox = new JComboBox<String>(options);
+                algorithmPanel.add(algorithmJComboBox);
+            }
+            
+            parametersPanel.add(algorithmPanel);
+        }
 
+        //N servers panel (this one is displayed only for Scheduling Policies)
+        if(policy == Policy.NON_PREEMPTIVE || policy == Policy.PREEMPTIVE){
+            JPanel nserversPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[1]);
+            nserversPanel.setLayout(new GridLayout(1,2));
+            nserversPanel.add(new JLabel("N.servers:"));
+            SpinnerNumberModel model = new SpinnerNumberModel(1,1,2,1);
+            JSpinner serversSpinner = new JSpinner(model);
+            nserversPanel.add(serversSpinner);
+        }
+
+        //Inter arrival time panel
+        JPanel interAPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[2]);
+        interAPanel.setLayout(new GridLayout(1,2));
+        interAPanel.add(new JLabel("Inter Arrival:"));
+        interAPanel.add(new JComboBox<String>());
+        parametersPanel.add(interAPanel);
+
+        //Service Time panel
+        JPanel serviceTPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[3]);
+        serviceTPanel.setLayout(new GridLayout(1,2));
+        serviceTPanel.add(new JLabel("Service Time:"));
+        serviceTPanel.add(new JComboBox<String>());
+        parametersPanel.add(serviceTPanel);
+
+        //create button
+        paddingBorder = new EmptyBorder(0,80,0,80);
+        JPanel createPanel = createPanel(paddingBorder, true, spaceBetweenPanels*2, null);
+        createPanel.setLayout(new BorderLayout());
+        JButton createButton = new JButton(CREATE);
+        help.addHelp(createButton, ConstantsJTch.HELP_PARAMETERS_PANELS[4]);
+        createPanel.add(createButton, BorderLayout.CENTER);
+        parametersPanel.add(Box.createVerticalStrut(spaceBetweenPanels));
     }
 
     /**
      * Create a new JPanel inside the ParamtersPanel
      * @param paddingBorder border left and right for all the panels
+     * @param padding boolean if it is needed to add a padding over the panel (the first panel does not need the padding)
+     * @param space how much padding with the upper panel
      * @param helpText the string to be displayed on the bottom of the JDialog
      * @return a new Panel
      */
-    private JPanel createPanel(EmptyBorder paddingBorder, String helpText) {
-        parametersPanel.add(Box.createVerticalStrut(spaceBetweenPanels));
+    private JPanel createPanel(EmptyBorder paddingBorder, boolean padding, int space, String helpText) {
+        if(padding){
+            parametersPanel.add(Box.createVerticalStrut(space));
+        }
         JPanel p = new JPanel();  
-        p.setMaximumSize(new Dimension(parametersPanel.getWidth(), heightPanels));
         p.setBorder(paddingBorder);
         parametersPanel.add(p);
         help.addHelp(p, helpText);
@@ -293,6 +405,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         //TODO
     }
 
+    //----------------- toolbar buttons actions
     @Override
     public void startAnimation() {
         animation.start();

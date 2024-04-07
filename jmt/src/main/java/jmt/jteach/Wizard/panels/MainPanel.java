@@ -45,7 +45,8 @@ import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
 import jmt.jteach.actionsWizard.AbstractTCHAction;
 import jmt.jteach.actionsWizard.Help;
-import jmt.jteach.animation.QueuePolicy;
+import jmt.jteach.animation.Policy;
+import jmt.jteach.animation.QueuePolicyNonPreemptive;
 import jmt.jteach.animation.RoutingPolicy;
 
 /**
@@ -79,7 +80,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicy.FIFO);
+			parent.setAnimationPanelEnv(Policy.PREEMPTIVE);
 		}
 	};
 
@@ -90,7 +91,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicy.LIFO);
+			parent.setAnimationPanelEnv(Policy.NON_PREEMPTIVE);
 		}
 	};
 

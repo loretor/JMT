@@ -55,4 +55,10 @@ public class AnimationClass extends JComponent implements Animation{
 		jobList.remove(job);
 	}
 
+	/**
+	 * This method is used to change the policy of the animation, only for singleQueuenet
+	 * @param policy
+	 */
+	public void update(QueuePolicyNonPreemptive policy){ }
+
 }

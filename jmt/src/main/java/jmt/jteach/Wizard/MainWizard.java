@@ -21,7 +21,8 @@ package jmt.jteach.Wizard;
 import jmt.gui.common.CommonConstants;
 import jmt.gui.common.JMTImageLoader;
 import jmt.jteach.Wizard.panels.MainPanel;
-import jmt.jteach.animation.QueuePolicy;
+import jmt.jteach.animation.Policy;
+import jmt.jteach.animation.QueuePolicyNonPreemptive;
 import jmt.jteach.animation.RoutingPolicy;
 import jmt.jteach.Wizard.panels.AnimationPanel;
 
@@ -89,10 +90,10 @@ public class MainWizard extends JTchWizard{
 
     
 	/**
-	 * Method to create a new AnimationPanel with the type of scheduling policy (queue policy) selected with one of the buttons of the MainPanel
+	 * Method to create a new AnimationPanel
 	 * @param policy the type of Queue Policy
 	 */
-	public void setAnimationPanelEnv(QueuePolicy policy){
+	public void setAnimationPanelEnv(Policy policy){
 		this.setTitle(TITLE + " - "+ TITLE_SCHEDULING);
 
 		WizardPanel p = new AnimationPanel(this, policy);

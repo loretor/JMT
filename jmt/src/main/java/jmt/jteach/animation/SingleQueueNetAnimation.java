@@ -18,10 +18,13 @@
 
 package jmt.jteach.animation;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -44,24 +47,25 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	private List<Edge> edgeList;
 	
 	//--all the characteristics of the Animation
-	private QueuePolicy queuePolicy;
+	private QueuePolicyNonPreemptive queuePolicy;
 	private int nServers = 1;
 	
 	
-	/** Constructor. One note, define the elements of the Animation from the last to the first, since each element must have a reference to the next one */
-	public SingleQueueNetAnimation(JPanel container, QueuePolicy queuePolicy) {
+	/** Constructor*/
+	public SingleQueueNetAnimation(JPanel container, QueuePolicyNonPreemptive queuePolicy) {		
 		this.parent = container;
 		this.queuePolicy = queuePolicy;
 		initGUI(container);
 	}
 	
 	public void initGUI(JPanel container) {
+		//Define the elements of the Animation from the last to the first, since each element must have a reference to the next one
 		anim = new Animator(30, this);
 		edgeList = new ArrayList<>();
 		jobList = new ArrayList<>();
 		
 		sink = new Sink(container, true, new Point(0,0), this);
-		edgeList.add(new Edge(container, true, true, new Point(435,0), new Point(580,0), sink));
+		edgeList.add(new Edge(container, true, true, new Point(450,0), new Point(590,0), sink));
 		station = new Station(container, true, true, new Point(0,0), edgeList.get(0), queuePolicy, nServers);
 		edgeList.add(new Edge(container, true, true, new Point(80,0), new Point(230,0), station));
 		source = new Source(container, true, new Point(0,0), edgeList.get(edgeList.size()-1),this);
@@ -122,6 +126,12 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		//update all those elements that work with System.currentMillis() like CircleStation
 		station.updatePause(pause);
 		
+	}
+
+	@Override
+	public void update(QueuePolicyNonPreemptive policy){
+		queuePolicy = policy;
+		station.typeOfQueue(policy);
 	}
 
 }

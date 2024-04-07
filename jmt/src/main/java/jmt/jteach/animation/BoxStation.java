@@ -87,7 +87,7 @@ public class BoxStation extends JComponent implements JobContainer{
 		}
 		
 		//if the queue is ordered with the priority algorithm, then display on the BoxStation also the priority of the job
-		if(station.getQueuePolicy() == QueuePolicy.PRIO && priority != 0) {
+		if(station.getQueuePolicy() == QueuePolicyNonPreemptive.PRIO && priority != 0) {
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial", Font.PLAIN, 20));
 			g.drawString(String.valueOf(priority), sPos.x + (queueSize-index-1)*size + 3,  sPos.y - 2); //+3 and -2 only for estetic purposes

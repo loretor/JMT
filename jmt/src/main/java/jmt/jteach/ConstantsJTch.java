@@ -21,14 +21,24 @@ public class ConstantsJTch {
         "The JSQ (Join the Shortes Job Queue) routing policy is a routing algorithm to distribute tasks when they arrive at the router. Jobs are routed based on the station connected to the router with less jobs in its queue";
         
     //help text
-    public static final String[] HELP_BUTTONS_ANIMATIONS = {"Start the simulation or reload it, if it was paused", "Pause the running simulation","Reload the simulation",  "Open the help page"};
-    public static final String[] HELP_BUTTONS_MAINPANEL = {"Opens a new panel with Preemptive Scheduling Simulation",
-                                                "Opens a new panel with Non Preemptive Scheduling Simulation",
-												"Opens a new panel with a Probabilistic Routing simulation",
-												"Opens a new panel with a Join Shortest Job Queue Routing simulation",
-												"Opens a new panel with a Round Robin simulation",
-												"Opens a new panel with a M/M/1 Queue Markov Chain",
-												"Opens a new panel with a M/M/1/k Queue Markov Chain",
-												"Opens a new panel with a M/M/c Queue Markov Chain",
-												"Opens a new panel with a M/M/c/k Queue Markov Chain"};
+    public static final String[] HELP_BUTTONS_ANIMATIONS = {
+        "Start the simulation or reload it, if it was paused", "Pause the running simulation","Reload the simulation",  "Open the help page"};
+    public static final String[] HELP_BUTTONS_MAINPANEL = {
+        "Opens a new panel with Preemptive Scheduling Simulation",
+        "Opens a new panel with Non Preemptive Scheduling Simulation",
+        "Opens a new panel with a Probabilistic Routing simulation",
+        "Opens a new panel with a Join Shortest Job Queue Routing simulation",
+        "Opens a new panel with a Round Robin simulation",
+        "Opens a new panel with a M/M/1 Queue Markov Chain",
+        "Opens a new panel with a M/M/1/k Queue Markov Chain",
+        "Opens a new panel with a M/M/c Queue Markov Chain",
+        "Opens a new panel with a M/M/c/k Queue Markov Chain"};
+    
+    public static final String[] HELP_PARAMETERS_PANELS = {
+        "Choose the type of Algorithm for the simulation",
+        "Select how many servers are available for each station",
+        "Select the type of distribution for the inter arrival time between jobs",
+        "Select the type of distribution for the service time for each station in the simulation",
+        "Once all the parameters are setted, click this button to create the animation. At this point you can start the animation."
+    };
 }

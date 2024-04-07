@@ -46,7 +46,7 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	
 	
 	//--all the characteristics of the Animation
-	private QueuePolicy queuePolicy = QueuePolicy.FIFO; //it is setted by default = FIFO
+	private QueuePolicyNonPreemptive queuePolicy = QueuePolicyNonPreemptive.FIFO; //it is setted by default = FIFO
 	private RoutingPolicy routingPolicy;
 	int nServers = 1;
 	

@@ -56,9 +56,16 @@ public class AnimationClass extends JComponent implements Animation{
 	}
 
 	/**
-	 * This method is used to change the policy of the animation, only for singleQueuenet
+	 * Method for updating the SingleQueue
 	 * @param policy
+	 * @param nservers
 	 */
-	public void update(QueuePolicyNonPreemptive policy){ }
+	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers){ }
+
+	/**
+	 * Method for updating the MultipleQueue
+	 * @param percentages
+	 */
+	public void updateMultiple(double[] percentages){}
 
 }

@@ -151,7 +151,7 @@ public class Router extends JComponent implements JobContainer{
 		if(r < percentages[0]) {
 			return 0;
 		}
-		else if(percentages[0] <= r && r < percentages[1]) {
+		else if(percentages[0] <= r && r < percentages[0]+percentages[1]) {
 			return 1;
 		}
 		else {
@@ -193,6 +193,18 @@ public class Router extends JComponent implements JobContainer{
 			nextEdges.get(index).addJob(job);	
 		}
 		
+	}
+
+	/**
+	 * Method to change probabilities of the router
+	 * @param probabilities new array of probabilities
+	 */
+	public void changeProbabilities(double[] probabilities){
+		percentages = probabilities;
+		//repaint all the edges
+		for(int i = 0; i < nextEdges.size(); i++) {
+			nextEdges.get(i).paintPercentage(percentages[i]);
+		}
 	}
 	
 	

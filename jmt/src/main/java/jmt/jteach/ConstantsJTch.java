@@ -19,10 +19,17 @@ public class ConstantsJTch {
         "The Probabilistic routing policy is a routing algorithm to distribute tasks when they arrive at the router. Jobs are routed based on probabilities to one of the edges connected to the router.";
     public static final String JSQ_DESCRIPTION =
         "The JSQ (Join the Shortes Job Queue) routing policy is a routing algorithm to distribute tasks when they arrive at the router. Jobs are routed based on the station connected to the router with less jobs in its queue";
+    
         
+    
     //help text
     public static final String[] HELP_BUTTONS_ANIMATIONS = {
-        "Start the simulation or reload it, if it was paused", "Pause the running simulation","Reload the simulation",  "Open the help page"};
+        "Start the simulation or reload it, if it was paused", 
+        "Pause the running simulation",
+        "Reload the simulation",  
+        "Perform a next step in the simulation",
+        "Open the help page"};
+        
     public static final String[] HELP_BUTTONS_MAINPANEL = {
         "Opens a new panel with Preemptive Scheduling Simulation",
         "Opens a new panel with Non Preemptive Scheduling Simulation",
@@ -40,5 +47,11 @@ public class ConstantsJTch {
         "Select the type of distribution for the inter arrival time between jobs",
         "Select the type of distribution for the service time for each station in the simulation",
         "Once all the parameters are setted, click this button to create the animation. At this point you can start the animation."
+    };
+
+    public static final String[] HELP_PROBABILITIES = {
+        "Set the first two probabilities associated to the three outgoing edges of the router. The third probability is computed by the tool as 1.00 - p1 - p2. The create button is blocked if p1 + p2 > 1",
+        "Set the probability associated to the first outgoing edge of the router. Probability = 0, means that no traffic is routed towards this edge, while = 1 means all the traffic is routed towards it",
+        "Set the probability associated to the second outgoing edge of the router. Probability = 0, means that no traffic is routed towards this edge, while = 1 means all the traffic is routed towards it"
     };
 }

@@ -9,9 +9,6 @@ package jmt.jteach.Wizard;
  * Time: 15.43
  */
 public interface WizardPanelTCH{
-
-    //TODO: add all the actions asssociated to the buttons of a JTeach Model like start, double velocity, pause...
-
     /** Opens the panel for help */
     public void openHelp();
 
@@ -23,5 +20,8 @@ public interface WizardPanelTCH{
 
     /** Reloads the animation */
     public void reloadAnimation();
+
+    /** Update the animation to the next step */
+    public void nextStepAnimation();
 
 }

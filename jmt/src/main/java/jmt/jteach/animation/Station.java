@@ -284,4 +284,17 @@ public class Station extends JComponent implements JobContainer{
 		paintQueueSize = true;
 	}
 
+	public void updateNServers(int nservers){
+		this.nServers = nservers;
+		float position = 0.0f;
+		if(nServers == 2) {
+			position = -height/2;
+		}
+		circles = new CircleStation[nServers];
+		for(int i = 0; i < nServers; i++) {
+			circles[i] = new CircleStation(this, position);
+			position *= -1;
+		}
+	}
+
 }

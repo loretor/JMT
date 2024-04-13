@@ -23,6 +23,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -34,6 +35,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import jmt.common.exception.IncorrectDistributionParameterException;
+import jmt.engine.random.Distribution;
+import jmt.engine.random.Exponential;
+import jmt.engine.random.ExponentialPar;
+import jmt.engine.random.Parameter;
+import jmt.engine.random.engine.MersenneTwister;
+import jmt.engine.random.engine.RandomEngine;
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
 import jmt.framework.gui.help.HoverHelp;
@@ -191,6 +199,17 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		upperLabel.setPreferredSize(new Dimension(300, 10));
 		upper.add(upperLabel);
 
+		/*try {
+			RandomEngine r = new MersenneTwister();
+			Parameter p = new ExponentialPar(20);
+			Exponential d = new Exponential();
+			d.setRandomEngine(r);
+			double val = d.nextRand(p);
+			upperLabel.setText(String.valueOf(val));
+		} catch (IncorrectDistributionParameterException e) {
+			e.printStackTrace();
+		} */
+			
 		JPanel bottom = new JPanel(new FlowLayout());
 		JLabel bottomLabel = new JLabel();
 		bottomLabel.setPreferredSize(new Dimension(300, 10));
@@ -292,5 +311,10 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
 	@Override
 	public void reloadAnimation() {
+	}
+
+	@Override
+	public void nextStepAnimation() {
+
 	}    
 }

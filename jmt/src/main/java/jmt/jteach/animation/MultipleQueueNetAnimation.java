@@ -43,6 +43,7 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	private Sink sink;
 	private List<Station> stationList;
 	private List<Edge> edgeList;
+	private double[] probabilities = {0.00,0.00,0.00};
 	
 	
 	//--all the characteristics of the Animation
@@ -68,8 +69,8 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		edgeList.add(new Edge(container, true, true, new Point(550,0), new Point(600,0), sink));
 		
 		//two vertical edges
-		edgeList.add(new Edge(container, false, false, new Point(550,100+30), new Point(550,262), edgeList.get(0)));
-		edgeList.add(new Edge(container, false, false, new Point(550,370+30), new Point(550,262), edgeList.get(0)));
+		edgeList.add(new Edge(container, false, false, new Point(550,100+30), new Point(550,230), edgeList.get(0)));
+		edgeList.add(new Edge(container, false, false, new Point(550,370+30), new Point(550,260), edgeList.get(0)));
 		
 		//three horizontal edges
 		edgeList.add(new Edge(container, false, false, new Point(500,100+30), new Point(550,100+30), edgeList.get(1)));		
@@ -93,8 +94,7 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		//create the two Lists for the router
 		int l = edgeList.size();
 		List<Edge> eList = new ArrayList<>(Arrays.asList(edgeList.get(l-2), edgeList.get(l-4), edgeList.get(l-1)));
-		double[] perc = {0.10,0.30,0.60};
-		router = new Router(container, false, true, new Point(160,0), eList, stationList, routingPolicy, perc);
+		router = new Router(container, false, true, new Point(160,0), eList, stationList, routingPolicy, probabilities);
 		
 		edgeList.add(new Edge(container, true, true, new Point(80,0), new Point(150,0), router));
 		
@@ -161,5 +161,13 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		for(Station st: stationList) {
 			st.updatePause(pause);
 		}
+	}
+
+	@Override
+	public void updateMultiple(double[] percentages){
+		probabilities[0] = percentages[0];
+		probabilities[1] = percentages[1];
+		probabilities[2] = 1.00 - percentages[0] - percentages[1];
+		router.changeProbabilities(probabilities);
 	}
 }

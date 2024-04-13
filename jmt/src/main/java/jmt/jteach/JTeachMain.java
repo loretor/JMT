@@ -59,11 +59,12 @@ public class JTeachMain extends JMTFrame {
      * Creates the new Main window of the application.
      */
     public JTeachMain() {
-        super(true);
+        //super(true);
         thisFrame = this;
         
         initGUI();
         setVisible(true); 
+        setResizable(false);
 
         initPanelvariables();    
     }
@@ -74,7 +75,7 @@ public class JTeachMain extends JMTFrame {
     public void initGUI(){   
         //setIconImage(JMTImageLoader.loadImage("JMODELIcon").getImage()); /* prepare the icon for JTeach */
         setTitle(TITLE);  
-        centerWindow(Defaults.getAsInteger("JSIMWindowWidth").intValue(), Defaults.getAsInteger("JSIMWindowHeight").intValue()); //If I want to change the size of the window create new values inside Defaults or CommonCostant
+        centerWindow(Defaults.getAsInteger("JSIMWindowWidth").intValue(), Defaults.getAsInteger("JSIMWindowHeight").intValue()); //If I want to change the size of the window create new values inside Defaults or CommonCostant     
 
         //object responsible for all the GUI components
         mediator = new MediatorTeach(this); 

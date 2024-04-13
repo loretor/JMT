@@ -23,6 +23,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -128,7 +129,8 @@ public class Edge extends JComponent implements JobContainer{
 		//only if the routing policy with probability is chosen
 		if(paintPercentage) {
 			g.setFont(new Font("Arial", Font.PLAIN, 10));
-			String value = "prob: "+percentage;
+			DecimalFormat df = new DecimalFormat("#.##");
+			String value = "prob: "+ df.format(percentage);
 			if(direction == Direction.UP || direction == Direction.DOWN) {
 				g.drawString(value, start.x - 50,  start.y + direction.direction() * 20);
 			}

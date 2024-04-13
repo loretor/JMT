@@ -48,6 +48,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.jhlabs.image.EmbossFilter;
 
@@ -79,32 +81,37 @@ import jmt.jteach.animation.SingleQueueNetAnimation;
 public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     private static final String PANEL_NAME = "Scheduling";
 
+    //------------ components of the panel -----------------------
     private MainWizard parent;
     private JPanel mainPanel;
     private JEditorPane descrLabel;
     private JComboBox<String> algorithmJComboBox = null;
+    private JSpinner serversSpinner;
+    private JSpinner prob1 = null; //those two spinners are instanciated only if Probabilisitic routing is selected
+    private JSpinner prob2 = null;
+    private JButton createButton;
     private JPanel animationPanel;
     private AnimationClass animation;
     private HoverHelp help;
 
     //------------ variables for parameters JPanel ---------------
     private JPanel parametersPanel;
-    private int spaceBetweenPanels = 5;
-    private int heightPanels = 20;
+    private final int spaceBetweenPanels = 5;
+    private final String[] distributions = {"Exponential", "Deterministic"}; 
 
-    //all the Actions of this panel
+    //-------------all the Actions of this panel------------------
     private AbstractTCHAction exit;
     private AbstractTCHAction start;
     private AbstractTCHAction pause;
     private AbstractTCHAction reload;
+    private AbstractTCHAction nextStep;
     private AbstractTCHAction openHelp;
     private AbstractTCHAction about;
 
-    //properties of the animation
+    //--------------properties of the animation------------------
     private Policy policy = null;
     private QueuePolicyNonPreemptive[] nonPreemptivePolicies; //array of all possible nonPreemptive policies
     private QueuePolicyNonPreemptive queuePolicyNonPreemptive = null;
-    
     private RoutingPolicy routingPolicy = null;
 
 
@@ -120,6 +127,24 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
+    //this is the change listener associated to the two spinner for the probabilities in routing prob
+    private ChangeListener changeListener = new ChangeListener() {
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            if(policy == Policy.ROUTING && routingPolicy == RoutingPolicy.PROBABILISTIC && prob1 != null && prob2 != null){
+                double value1 = (double) prob1.getValue();
+                double value2 = (double) prob2.getValue();
+                if (value1 + value2 <= 1) { 
+                    createButton.setEnabled(true);
+                } else {
+                    createButton.setEnabled(false);
+                }
+            }
+            
+            
+        }
+    };
+
     private AnimationPanel(MainWizard main){
         this.parent = main;
         help = parent.getHoverHelp();
@@ -129,6 +154,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         start = new StartSimulation(this);
         pause = new PauseSimulation(this);
         reload = new ReloadSimulation(this);
+        nextStep = new NextStepSimulation(this);
         openHelp = new Help(this);
         about = new About(this);
 
@@ -147,6 +173,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         this.queuePolicyNonPreemptive = QueuePolicyNonPreemptive.FIFO; //set this equal to FIFO by default
         this.routingPolicy = null;
         start.setEnabled(false); //cannot start a simulation without setting the parameters
+        nextStep.setEnabled(false);
         initGUI();
     }
 
@@ -159,6 +186,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         this(main);
         this.routingPolicy = routingpolicy;
         this.policy = Policy.ROUTING;
+        start.setEnabled(false);//cannot start a simulation without setting the parameters
         initGUI();
     }
 
@@ -237,30 +265,6 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     }
 
     /**
-     * Method called by the Create button to update this panel.
-     * It differenciates the changes based on the type of policy, three things have to be updated, the title, the description, the animation 
-     */
-    private void updateAnimationPanel(){
-        animation.pause();
-        reloadAnimation();
-        start.setEnabled(true);
-
-        if(policy == Policy.NON_PREEMPTIVE){
-            queuePolicyNonPreemptive = nonPreemptivePolicies[algorithmJComboBox.getSelectedIndex()]; //the index of the JComboBox is the same of the array of queue policies Non preemptive
-            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling - " + queuePolicyNonPreemptive.toString()));
-            descrLabel.setText("<html><p style='text-align:justify;'>"+queuePolicyNonPreemptive.getDescription()+"</p></html>");
-            animation.update(queuePolicyNonPreemptive);
-        }
-        else if(policy == Policy.PREEMPTIVE){
-
-        }
-        else{ //in case of routing only the animation must be updated
-            animation = new MultipleQueueNetAnimation(animationPanel, routingPolicy);
-        }
-    }
-
-
-    /**
      * Update the JPanel of the paramters in the left panel of this window
      */
     private void createParameters(JPanel container){
@@ -295,29 +299,60 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
             nserversPanel.setLayout(new GridLayout(1,2));
             nserversPanel.add(new JLabel("N.servers:"));
             SpinnerNumberModel model = new SpinnerNumberModel(1,1,2,1);
-            JSpinner serversSpinner = new JSpinner(model);
+            serversSpinner = new JSpinner(model);
             nserversPanel.add(serversSpinner);
+        }
+
+        //probability panel (displayed only for probabilistic routing)
+        if(routingPolicy == RoutingPolicy.PROBABILISTIC){
+            JPanel probabilitiesPanel = createPanel(paddingBorder, false, spaceBetweenPanels, ConstantsJTch.HELP_PROBABILITIES[0]);
+            probabilitiesPanel.setBorder(new TitledBorder(new EtchedBorder(), "Probabilities"));
+            probabilitiesPanel.setLayout(new BoxLayout(probabilitiesPanel, BoxLayout.Y_AXIS));
+
+            JPanel p1Panel = new JPanel();
+            p1Panel.setBorder(paddingBorder);
+            probabilitiesPanel.add(p1Panel);
+            help.addHelp(p1Panel, ConstantsJTch.HELP_PROBABILITIES[1]);
+            p1Panel.setLayout(new GridLayout(1,2));
+            p1Panel.add(new JLabel("P1:"));
+            SpinnerNumberModel model1 = new SpinnerNumberModel(0.5,0,1,0.01);
+            prob1 = new JSpinner(model1);
+            p1Panel.add(prob1);
+            probabilitiesPanel.add(Box.createVerticalStrut(spaceBetweenPanels));
+
+            JPanel p2Panel = new JPanel();
+            p2Panel.setBorder(paddingBorder);
+            probabilitiesPanel.add(p2Panel);
+            help.addHelp(p2Panel, ConstantsJTch.HELP_PROBABILITIES[2]);
+            p2Panel.setLayout(new GridLayout(1,2));
+            p2Panel.add(new JLabel("P2:"));
+            SpinnerNumberModel model2 = new SpinnerNumberModel(0.5,0,1,0.01);
+            prob2 = new JSpinner(model2);
+            p2Panel.add(prob2);
+
+            prob1.addChangeListener(changeListener);
+            prob2.addChangeListener(changeListener);
         }
 
         //Inter arrival time panel
         JPanel interAPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[2]);
         interAPanel.setLayout(new GridLayout(1,2));
         interAPanel.add(new JLabel("Inter Arrival:"));
-        interAPanel.add(new JComboBox<String>());
+        interAPanel.add(new JComboBox<String>(distributions));
         parametersPanel.add(interAPanel);
 
         //Service Time panel
         JPanel serviceTPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[3]);
         serviceTPanel.setLayout(new GridLayout(1,2));
         serviceTPanel.add(new JLabel("Service Time:"));
-        serviceTPanel.add(new JComboBox<String>());
+        serviceTPanel.add(new JComboBox<String>(distributions));
         parametersPanel.add(serviceTPanel);
 
         //create button
         paddingBorder = new EmptyBorder(0,80,0,80);
         JPanel createPanel = createPanel(paddingBorder, true, spaceBetweenPanels*2, null);
         createPanel.setLayout(new BorderLayout());
-        JButton createButton = new JButton(CREATE);
+        createButton = new JButton(CREATE);
         help.addHelp(createButton, ConstantsJTch.HELP_PARAMETERS_PANELS[4]);
         createPanel.add(createButton, BorderLayout.CENTER);
         parametersPanel.add(Box.createVerticalStrut(spaceBetweenPanels));
@@ -353,7 +388,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
 		menu.addMenu(action);
 
         //Solve window
-		action = new MenuAction("Solve", new AbstractTCHAction[] {start, pause, reload, null});
+		action = new MenuAction("Solve", new AbstractTCHAction[] {start, pause, reload, nextStep, null});
 		menu.addMenu(action);
 
         //Help window
@@ -370,7 +405,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         JMTToolBar toolbar = new JMTToolBar(JMTImageLoader.getImageLoader());	
 
         //first add all the icons with their actions
-        AbstractTCHAction[] actions = new AbstractTCHAction[] {start, pause, reload, null, openHelp}; // Builds an array with all actions to be put in the toolbar	
+        AbstractTCHAction[] actions = new AbstractTCHAction[] {start, pause, reload, nextStep, null, openHelp}; // Builds an array with all actions to be put in the toolbar	
         toolbar.populateToolbar(actions);
         ArrayList<AbstractButton> buttons = new ArrayList<AbstractButton>(); //create a list of AbstractButtons for the helpLabel
 		buttons.addAll(toolbar.populateToolbar(actions));
@@ -394,6 +429,31 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
 		return true;
 	}
 
+    /**
+     * Method called by the Create button to update this panel.
+     * It differenciates the changes based on the type of policy, three things have to be updated, the title, the description, the animation 
+     */
+    private void updateAnimationPanel(){
+        animation.pause();
+        reloadAnimation();
+        start.setEnabled(true);
+
+        if(policy == Policy.NON_PREEMPTIVE){
+            queuePolicyNonPreemptive = nonPreemptivePolicies[algorithmJComboBox.getSelectedIndex()]; //the index of the JComboBox is the same of the array of queue policies Non preemptive
+            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling - " + queuePolicyNonPreemptive.toString()));
+            descrLabel.setText("<html><p style='text-align:justify;'>"+queuePolicyNonPreemptive.getDescription()+"</p></html>");
+            animation.updateSingle(queuePolicyNonPreemptive, (int)serversSpinner.getValue());
+        }
+        else if(policy == Policy.PREEMPTIVE){
+
+        }
+        else{ //in case of routing only the animation must be updated
+            if(routingPolicy == RoutingPolicy.PROBABILISTIC){
+                animation.updateMultiple(new double[]{(double) prob1.getValue(), (double) prob2.getValue()});
+            }
+        }
+    }
+
     @Override
     public String getName() {
         return PANEL_NAME;
@@ -411,7 +471,8 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         animation.start();
         start.setEnabled(false);
         pause.setEnabled(true);
-        reload.setEnabled(false);      
+        reload.setEnabled(false);   
+        nextStep.setEnabled(false);   
     }
 
     @Override
@@ -420,6 +481,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         start.setEnabled(true);
         pause.setEnabled(false);
         reload.setEnabled(true);
+        nextStep.setEnabled(true);
     }
 
     @Override
@@ -428,6 +490,14 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         start.setEnabled(true);
         pause.setEnabled(false);
         reload.setEnabled(false);
+        nextStep.setEnabled(true);
+    }
+
+    public void nextStepAnimation(){
+        start.setEnabled(false);
+        pause.setEnabled(false);
+        reload.setEnabled(false);
+        nextStep.setEnabled(false);
     }
 
 }

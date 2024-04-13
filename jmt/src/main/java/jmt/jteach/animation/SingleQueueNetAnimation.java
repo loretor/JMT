@@ -129,9 +129,11 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	}
 
 	@Override
-	public void update(QueuePolicyNonPreemptive policy){
+	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers){
 		queuePolicy = policy;
 		station.typeOfQueue(policy);
+		this.nServers = nservers;
+		station.updateNServers(nservers);
 	}
 
 }

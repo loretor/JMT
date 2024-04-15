@@ -42,7 +42,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 /* 1.4 example used by DialogDemo.java. */
-class CustomDialogMethod extends JDialog implements ActionListener, PropertyChangeListener {
+public class CustomDialogMethod extends JDialog implements ActionListener, PropertyChangeListener {
 	/**
 	 * 
 	 */

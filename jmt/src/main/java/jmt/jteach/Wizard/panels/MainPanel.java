@@ -48,6 +48,7 @@ import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.JMTImageLoader;
+import jmt.jmarkov.MMQueues;
 import jmt.jteach.ConstantsJTch;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
@@ -151,7 +152,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-	
+			parent.setMMQueuesPanelEnv("mm1");	
 		}
 	};
 
@@ -162,7 +163,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			
+			parent.setMMQueuesPanelEnv("mm1k");
 		}
 	};
 
@@ -173,7 +174,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			
+			parent.setMMQueuesPanelEnv("mmn");
 		}
 	};
 
@@ -184,7 +185,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			
+			parent.setMMQueuesPanelEnv("mmnk");
 		}
 	};
 

@@ -25,6 +25,7 @@ import jmt.jteach.animation.Policy;
 import jmt.jteach.animation.QueuePolicyNonPreemptive;
 import jmt.jteach.animation.RoutingPolicy;
 import jmt.jteach.Wizard.panels.AnimationPanel;
+import jmt.jteach.Wizard.panels.MMQueuesPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -101,7 +102,6 @@ public class MainWizard extends JTchWizard{
 
 		this.addPanel(p);
 		this.showNext();
-		setEnableButton("Solve", true);
 	}
 
 	/**
@@ -115,7 +115,27 @@ public class MainWizard extends JTchWizard{
 
 		this.addPanel(p);
 		this.showNext();
-		setEnableButton("Solve", true);
+	}
+
+	/**
+	 * Method to create a new MMQueuesPanel
+	 */
+	public void setMMQueuesPanelEnv(String selectedMethod) {
+		WizardPanel p = new MMQueuesPanel(this, selectedMethod);
+		String title;
+		if (selectedMethod == "mm1") {
+			title = "Markov Chain M/M/1 Station";
+		} else if (selectedMethod == "mm1k") {
+			title = "Markov Chain M/M/1/k";
+		} else if (selectedMethod == "mmn Finite Capacity Station") {
+			title = "Markov Chain M/M/n Station";
+		} else{
+			title = "Markov Chain M/M/n/k Finite Capacity Station";
+		}
+		this.setTitle(TITLE + " - "+ title);
+
+		this.addPanel(p);
+		this.showNext();
 	}
 
 
@@ -156,4 +176,6 @@ public class MainWizard extends JTchWizard{
 		mainPanel.createToolBar();
 		this.validate();
 	}
+
+	
 }

@@ -4,9 +4,9 @@ public class ConstantsJTch {
 
     //descriptions of all the policies
     public static final String FIFO_DESCRIPTION = 
-        "The FIFO (First In First Out) sheduling Policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. The first task that arrives is the first to be executed and subsequent tasks are executed in the order of their arrival.";
+        "The FCFS (First come first served) sheduling Policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. The first task that arrives is the first to be executed and subsequent tasks are executed in the order of their arrival.";
     public static final String LIFO_DESCRIPTION = 
-        "The LIFO (Last In First Out) sheduling Policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. Most recently arrived tasks are executed before any others. It operates on a 'last come, first served' basis, similar to a stack data structure.";
+        "The LCFS (Last come first served) sheduling Policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. Most recently arrived tasks are executed before any others. It operates on a 'last come, first served' basis, similar to a stack data structure.";
     public static final String SJF_DESCRIPTION =
         "The SJF (Shortest Job First) scheduling Policy is a scheduling algorithm that orders the job inside the queue based on their service time. Jobs with smaller service time are prioritized with respect to the others inside the queue.";
     public static final String LJF_DESCRIPTION =
@@ -31,11 +31,11 @@ public class ConstantsJTch {
         "Open the help page"};
         
     public static final String[] HELP_BUTTONS_MAINPANEL = {
-        "Opens a new panel with Preemptive Scheduling Simulation",
         "Opens a new panel with Non Preemptive Scheduling Simulation",
-        "Opens a new panel with a Probabilistic Routing simulation",
-        "Opens a new panel with a Join Shortest Job Queue Routing simulation",
+        "Opens a new panel with Preemptive Scheduling Simulation",
         "Opens a new panel with a Round Robin simulation",
+        "Opens a new panel with a Probabilistic Routing simulation",
+        "Opens a new panel with a Routing simulation, the selection of the type of algorithm will be done in the next window",        
         "Opens a new panel with a M/M/1 Queue Markov Chain",
         "Opens a new panel with a M/M/1/k Queue Markov Chain",
         "Opens a new panel with a M/M/c Queue Markov Chain",

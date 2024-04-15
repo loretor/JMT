@@ -64,7 +64,6 @@ public class JTeachMain extends JMTFrame {
         
         initGUI();
         setVisible(true); 
-        setResizable(false);
 
         initPanelvariables();    
     }

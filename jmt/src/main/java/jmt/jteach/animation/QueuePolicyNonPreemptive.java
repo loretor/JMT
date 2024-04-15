@@ -32,7 +32,7 @@ public enum QueuePolicyNonPreemptive {
 	FIFO{
 		@Override
 		public String toString() {
-			return "Fifo";
+			return "FCFS";
 		}
 
 		@Override
@@ -44,7 +44,7 @@ public enum QueuePolicyNonPreemptive {
 	LIFO{
 		@Override
 		public String toString() {
-			return "Lifo";
+			return "LCFS";
 		}
 
 		@Override
@@ -66,7 +66,7 @@ public enum QueuePolicyNonPreemptive {
 	SJF{
 		@Override
 		public String toString() {
-			return "Shortest Job First";
+			return "SJF";
 		}
 
 		@Override
@@ -77,7 +77,7 @@ public enum QueuePolicyNonPreemptive {
 	LJF{
 		@Override
 		public String toString() {
-			return "Longest Job First";
+			return "LJF";
 		}
 
 		@Override

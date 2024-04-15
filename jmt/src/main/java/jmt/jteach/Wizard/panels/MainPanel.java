@@ -79,12 +79,20 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	//all actions associated to the buttons of the Menu and ToolBar
     private AbstractTCHAction openHelp;
 
+	private String toolTipPreemptive = "<html><ul>"
+	+ "<li>FCFS</li>"
+	+ "<li>LCFS</li>"
+	+ "<li>PRIORITY</li>"
+	+ "<li>SJF</li>"
+	+ "<li>LJF</li>"
+	+ "</ul></html>";
+
 
 	//all the AbstractActions associated to the buttons related of this panel only
 	protected AbstractAction PREEMPTIVE = new AbstractAction("PREEMPTIVE") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "All preemptive scheduling policies");
+			putValue(Action.SHORT_DESCRIPTION, toolTipPreemptive);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -95,7 +103,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction NON_PREEMPTIVE = new AbstractAction("NON PREEMPTIVE") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "All non preemptive scheduling policies");
+			putValue(Action.SHORT_DESCRIPTION, toolTipPreemptive);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -114,10 +122,10 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction JSJQ = new AbstractAction("JSJQ") {
+	protected AbstractAction OTHER = new AbstractAction("...") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "Join Shortest Job Queue Routing Policy");
+			putValue(Action.SHORT_DESCRIPTION, "Other routing policies");
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -181,7 +189,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	};
 
 	//array of all the AbstractActions in this panel
-	private AbstractAction[] actions = {PREEMPTIVE, NON_PREEMPTIVE, PROBABILISTIC, JSJQ, RR, MM1, MM1K, MMC, MMCK};
+	private AbstractAction[] actions = {NON_PREEMPTIVE, PREEMPTIVE, RR, PROBABILISTIC, OTHER, MM1, MM1K, MMC, MMCK};
 
     public MainPanel(MainWizard main){
         this.parent = main;

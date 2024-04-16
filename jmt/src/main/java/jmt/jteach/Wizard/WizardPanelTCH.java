@@ -21,7 +21,12 @@ public interface WizardPanelTCH{
     /** Reloads the animation */
     public void reloadAnimation();
 
-    /** Update the animation to the next step */
+    /** Updates the animation to the next step */
     public void nextStepAnimation();
 
+    /** Goes back to the main menu */
+    public void exit();
+
+    /** Stops the simulation, used only in Markov Chains */
+    public void stopAnimation();
 }

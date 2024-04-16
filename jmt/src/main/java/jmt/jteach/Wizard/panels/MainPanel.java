@@ -196,7 +196,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
         this.parent = main;
 		help = parent.getHoverHelp();
 
-        openHelp = new Help(this);
+        openHelp = new Help(this,"JTCH");
 
         initGUI();
     }
@@ -325,5 +325,13 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	@Override
 	public void nextStepAnimation() {
 
+	}
+
+	@Override
+	public void exit() {
+	}
+
+	@Override
+	public void stopAnimation() {
 	}    
 }

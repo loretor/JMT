@@ -46,7 +46,7 @@ public class Exit extends AbstractTCHAction {
      * Invoked when an action occurs.
      */
     public void actionPerformed(ActionEvent e) {
-    //TODO
+        panel.exit();
     }
 }
  

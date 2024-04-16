@@ -28,7 +28,8 @@ public class ConstantsJTch {
         "Pause the running simulation",
         "Reload the simulation",  
         "Perform a next step in the simulation",
-        "Open the help page"};
+        "Open the help page"
+    };
         
     public static final String[] HELP_BUTTONS_MAINPANEL = {
         "Opens a new panel with Non Preemptive Scheduling Simulation",
@@ -39,7 +40,8 @@ public class ConstantsJTch {
         "Opens a new panel with a M/M/1 Queue Markov Chain",
         "Opens a new panel with a M/M/1/k Queue Markov Chain",
         "Opens a new panel with a M/M/c Queue Markov Chain",
-        "Opens a new panel with a M/M/c/k Queue Markov Chain"};
+        "Opens a new panel with a M/M/c/k Queue Markov Chain"
+    };
     
     public static final String[] HELP_PARAMETERS_PANELS = {
         "Choose the type of Algorithm for the simulation",
@@ -53,5 +55,12 @@ public class ConstantsJTch {
         "Set the first two probabilities associated to the three outgoing edges of the router. The third probability is computed by the tool as 1.00 - p1 - p2. The create button is blocked if p1 + p2 > 1",
         "Set the probability associated to the first outgoing edge of the router. Probability = 0, means that no traffic is routed towards this edge, while = 1 means all the traffic is routed towards it",
         "Set the probability associated to the second outgoing edge of the router. Probability = 0, means that no traffic is routed towards this edge, while = 1 means all the traffic is routed towards it"
+    };
+
+    public static final String[] HELP_BUTTONS_MARKOV = {
+        "Start the simulation or reload it, if it was paused", 
+        "Pause the running simulation",
+        "Stop the running simulation",
+        "Open the help page"
     };
 }

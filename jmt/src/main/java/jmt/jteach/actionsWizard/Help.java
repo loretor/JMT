@@ -39,9 +39,9 @@ public class Help extends AbstractTCHAction {
     * Defines an <code>Action</code> object with a default
     * description string and default icon.
     */
-    public Help(WizardPanelTCH wizardpanel) {
-        super("JTeach Help", "Help", wizardpanel);
-        putValue(SHORT_DESCRIPTION, "JTeach help");
+    public Help(WizardPanelTCH wizardpanel, String help) {
+        super(help+" Help", "Help", wizardpanel);
+        putValue(SHORT_DESCRIPTION, help+" help");
         putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_H));
     }
 

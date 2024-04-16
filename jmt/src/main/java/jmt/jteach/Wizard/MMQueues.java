@@ -33,9 +33,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Dictionary;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -58,9 +60,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import jmt.framework.gui.components.JMTFrame;
+import jmt.framework.gui.components.JMTMenuBar;
+import jmt.framework.gui.components.JMTToolBar;
 import jmt.framework.gui.controller.Manager;
+import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.CommonConstants;
+import jmt.gui.common.JMTImageLoader;
 import jmt.gui.common.panels.AboutDialogFactory;
 import jmt.jmarkov.Simulator;
 import jmt.jmarkov.Graphics.JobsDrawer;
@@ -82,7 +88,12 @@ import jmt.jmarkov.Queues.MMNdLogic;
 import jmt.jmarkov.Queues.Processor;
 import jmt.jmarkov.Queues.Exceptions.NonErgodicException;
 import jmt.jmarkov.utils.Formatter;
+import jmt.jteach.ConstantsJTch;
 import jmt.jteach.DialogStaticVariables;
+import jmt.jteach.actionsWizard.AbstractTCHAction;
+import jmt.jteach.actionsWizard.PauseSimulation;
+import jmt.jteach.actionsWizard.ReloadSimulation;
+import jmt.jteach.actionsWizard.StartSimulation;
 import jmt.jmarkov.CustomDialog;
 import jmt.manual.ChapterIdentifier;
 import jmt.manual.PDFViewer;
@@ -92,7 +103,7 @@ import jmt.manual.PDFViewer;
  *
  */
 public class MMQueues extends JPanel {
-	private JMTFrame parent;
+	private MainWizard parent;
 	private WizardPanel parentPanel;
 
 	private static final long serialVersionUID = 1L;
@@ -234,10 +245,16 @@ public class MMQueues extends JPanel {
 	private boolean lambdaSChange = true;
 	private boolean sSChange = true;
 
+
+	//------ new feature
+	private HoverHelp help;
+	
+
 	public MMQueues(MainWizard main, WizardPanel panel, String selectedMethod) {
 		mf = this;
 		parent = main;
 		parentPanel = panel;
+		help = parent.getHoverHelp();
 		initGUI();
 
 		this.setVisible(true);
@@ -559,250 +576,229 @@ public class MMQueues extends JPanel {
 			c.gridy = 4;
 			c.fill = GridBagConstraints.HORIZONTAL;
 
-			/*simulationP.add(buttonsP, c);
-			playB.setText("start");
-			buttonsP.add(playB);
-			playB.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					playBActionPerformed(evt);
-				}
-			});
-			stopB.setEnabled(false);
-			stopB.setText("stop");
-			buttonsP.add(stopB);
-			stopB.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					stopBActionPerformed(evt);
-				}
-			});
-			pauseB.setEnabled(false);
-			pauseB.setText("pause");
-			buttonsP.add(pauseB);
-			pauseB.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					pauseBActionPerformed(evt);
-				}
-			}); */
-
-			// menu
-			/*menuB = new JMenuBar();
-			setJMenuBar(menuB);
-			// queue
-			queueMenu = new JMenu("Queue");
-
-			selectQueueRB = new AbstractAction("Select Station Type") {
-
-				private static final long serialVersionUID = 1L;
-
-				public void actionPerformed(ActionEvent event) {
-					// action code goes here
-					selectMethod();
-				}
-
-			};
-
-			queueMenu.add(selectQueueRB);
-
-			queueMenu.addSeparator();
-			// exitMenuItem = new JMenuItem();
-			Action exitAction = new AbstractAction("Exit") {
-
-				private static final long serialVersionUID = 1L;
-
-				public void actionPerformed(ActionEvent event) {
-					// action code goes here
-					dispose();
-					Manager.exit(MMQueues.this);
-				}
-
-			};
-			queueMenu.add(exitAction);
-			menuB.add(queueMenu);
-
-			// settings
-			settingsMenu = new JMenu("Settings");
-			colorsMenu = new JMenu("Colors");
-			Action queueCAction = new AbstractAction("Probability...") {
-
-				private static final long serialVersionUID = 1L;
-
-				public void actionPerformed(ActionEvent event) {
-					// action code goes here
-					Color tmpC;
-					tmpC = JColorChooser.showDialog(null, "Probability color", probC);
-					if (tmpC != null) {
-						if (DEBUG) {
-							System.out.println("queueC - R:" + tmpC.getRed() + " G:" + tmpC.getGreen() + " B:" + tmpC.getBlue());
-						}
-						probC = tmpC;
-						changeColors();
-					}
-				}
-
-			};
-			colorsMenu.add(queueCAction);
-			Action queueFCAction = new AbstractAction("Queue...") {
-
-				private static final long serialVersionUID = 1L;
-
-				public void actionPerformed(ActionEvent event) {
-					// action code goes here
-					Color tmpC;
-					tmpC = JColorChooser.showDialog(null, "Queue color", queueC);
-					if (tmpC != null) {
-						if (DEBUG) {
-							System.out.println("queueFC - R:" + tmpC.getRed() + " G:" + tmpC.getGreen() + " B:" + tmpC.getBlue());
-						}
-						queueC = tmpC;
-						changeColors();
-					}
-				}
-
-			};
-			colorsMenu.add(queueFCAction);
-			colorsMenu.addSeparator();
-			Action statusCAction = new AbstractAction("Empty state...") {
-
-				private static final long serialVersionUID = 1L;
-
-				public void actionPerformed(ActionEvent event) {
-					// action code goes here
-					Color tmpC;
-					tmpC = JColorChooser.showDialog(null, "Empty state color", emptyC);
-					if (tmpC != null) {
-						if (DEBUG) {
-							System.out.println("statusC - R:" + tmpC.getRed() + " G:" + tmpC.getGreen() + " B:" + tmpC.getBlue());
-						}
-						emptyC = tmpC;
-						changeColors();
-					}
-				}
-
-			};
-			colorsMenu.add(statusCAction);
-			Action animCAction = new AbstractAction("Animation...") {
-
-				private static final long serialVersionUID = 1L;
-
-				public void actionPerformed(ActionEvent event) {
-					// action code goes here
-					Color tmpC;
-					tmpC = JColorChooser.showDialog(null, "Animation color", animC);
-					if (tmpC != null) {
-						if (DEBUG) {
-							System.out.println("animC - R:" + tmpC.getRed() + " G:" + tmpC.getGreen() + " B:" + tmpC.getBlue());
-						}
-						animC = tmpC;
-						changeColors();
-					}
-				}
-
-			};
-			colorsMenu.add(animCAction);
-			colorsMenu.addSeparator();
-
-			// gradientItem = new JRadioButtonMenuItem("usa gradiente", false);
-			gradientItem = new JRadioButtonMenuItem("Use gradient", false);
-			gradientItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					gradientF = gradientItem.isSelected();
-					changeColors();
-				}
-			});
-			colorsMenu.add(gradientItem);
-			settingsMenu.add(colorsMenu);
-
-			// sizeMenu = new JMenu("Dimensioni");
-			sizeMenu = new JMenu("Icon size");
-
-			// Action drawSmallAction = new AbstractAction("Piccole") {
-			Action drawSmallAction = new AbstractAction("Small") {
-
-				private static final long serialVersionUID = 1L;
-
-				public void actionPerformed(ActionEvent event) {
-					// action code goes here
-					dCst = new DrawSmall();
-					changeSize();
-				}
-
-			};
-			sizeMenu.add(drawSmallAction);
-
-			// Action drawNormalAction = new AbstractAction("Normali") {
-			Action drawNormalAction = new AbstractAction("Normal") {
-
-				private static final long serialVersionUID = 1L;
-
-				public void actionPerformed(ActionEvent event) {
-					// action code goes here
-					dCst = new DrawNormal();
-					changeSize();
-				}
-
-			};
-			sizeMenu.add(drawNormalAction);
-			// Action drawBigAction = new AbstractAction("Grandi") {
-			Action drawBigAction = new AbstractAction("Large") {
-
-				private static final long serialVersionUID = 1L;
-
-				public void actionPerformed(ActionEvent event) {
-					// action code goes here
-					dCst = new DrawBig();
-					changeSize();
-				}
-
-			};
-			sizeMenu.add(drawBigAction);
-			settingsMenu.add(sizeMenu);
-
-			menuB.add(settingsMenu);
-
-			// help
-			helpMenu = new JMenu("Help");
-
-			JMenuItem help = new JMenuItem();
-			help.setText("JMCH Help");
-			help.setToolTipText("Show JMCH help");
-			help.addActionListener(new ActionListener() {
-				/**
-				 * Invoked when an action occurs.
-				 */
-				/*public void actionPerformed(ActionEvent e) {
-					Runnable r = new Runnable() {
-						public void run() {
-							try {
-								new PDFViewer("JMCH Manual", ChapterIdentifier.JMCH);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					};
-					EventQueue.invokeLater(r);
-				}
-			});
-			helpMenu.add(help);
-
-			helpMenu.addSeparator();
-
-			JMenuItem about = new JMenuItem();
-			about.setText("About JMCH");
-			about.setToolTipText("About JMCH");
-			about.addActionListener(new ActionListener() {
-				/**
-				 * Invoked when an action occurs.
-				 */
-				/*public void actionPerformed(ActionEvent e) {
-					AboutDialogFactory.showJMCH(MMQueues.this);
-				}
-			});
-			helpMenu.add(about);
-
-			menuB.add(helpMenu);*/
+			menu();
+			parent.setMenuBar(menuB);			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/** Create the menu of this panel */
+	public void menu(){
+		// menu
+		menuB = new JMenuBar();
+		// queue
+		queueMenu = new JMenu("Queue");
+
+		/*selectQueueRB = new AbstractAction("Select Station Type") {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event) {
+				// action code goes here
+				selectMethod();
+			}
+
+		}; */ //removed since now are all separated
+
+		//queueMenu.add(selectQueueRB);
+
+		queueMenu.addSeparator();
+		// exitMenuItem = new JMenuItem();
+		Action exitAction = new AbstractAction("Exit") {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event) {
+				parent.dispose();
+				parent.close();			
+			}
+
+		};
+		queueMenu.add(exitAction);
+		menuB.add(queueMenu);
+
+		// settings
+		settingsMenu = new JMenu("Settings");
+		colorsMenu = new JMenu("Colors");
+		Action queueCAction = new AbstractAction("Probability...") {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event) {
+				// action code goes here
+				Color tmpC;
+				tmpC = JColorChooser.showDialog(null, "Probability color", probC);
+				if (tmpC != null) {
+					if (DEBUG) {
+						System.out.println("queueC - R:" + tmpC.getRed() + " G:" + tmpC.getGreen() + " B:" + tmpC.getBlue());
+					}
+					probC = tmpC;
+					changeColors();
+				}
+			}
+
+		};
+		colorsMenu.add(queueCAction);
+		Action queueFCAction = new AbstractAction("Queue...") {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event) {
+				// action code goes here
+				Color tmpC;
+				tmpC = JColorChooser.showDialog(null, "Queue color", queueC);
+				if (tmpC != null) {
+					if (DEBUG) {
+						System.out.println("queueFC - R:" + tmpC.getRed() + " G:" + tmpC.getGreen() + " B:" + tmpC.getBlue());
+					}
+					queueC = tmpC;
+					changeColors();
+				}
+			}
+
+		};
+		colorsMenu.add(queueFCAction);
+		colorsMenu.addSeparator();
+		Action statusCAction = new AbstractAction("Empty state...") {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event) {
+				// action code goes here
+				Color tmpC;
+				tmpC = JColorChooser.showDialog(null, "Empty state color", emptyC);
+				if (tmpC != null) {
+					if (DEBUG) {
+						System.out.println("statusC - R:" + tmpC.getRed() + " G:" + tmpC.getGreen() + " B:" + tmpC.getBlue());
+					}
+					emptyC = tmpC;
+					changeColors();
+				}
+			}
+
+		};
+		colorsMenu.add(statusCAction);
+		Action animCAction = new AbstractAction("Animation...") {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event) {
+				// action code goes here
+				Color tmpC;
+				tmpC = JColorChooser.showDialog(null, "Animation color", animC);
+				if (tmpC != null) {
+					if (DEBUG) {
+						System.out.println("animC - R:" + tmpC.getRed() + " G:" + tmpC.getGreen() + " B:" + tmpC.getBlue());
+					}
+					animC = tmpC;
+					changeColors();
+				}
+			}
+
+		};
+		colorsMenu.add(animCAction);
+		colorsMenu.addSeparator();
+
+		// gradientItem = new JRadioButtonMenuItem("usa gradiente", false);
+		gradientItem = new JRadioButtonMenuItem("Use gradient", false);
+		gradientItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gradientF = gradientItem.isSelected();
+				changeColors();
+			}
+		});
+		colorsMenu.add(gradientItem);
+		settingsMenu.add(colorsMenu);
+
+		// sizeMenu = new JMenu("Dimensioni");
+		sizeMenu = new JMenu("Icon size");
+
+		// Action drawSmallAction = new AbstractAction("Piccole") {
+		Action drawSmallAction = new AbstractAction("Small") {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event) {
+				// action code goes here
+				dCst = new DrawSmall();
+				changeSize();
+			}
+
+		};
+		sizeMenu.add(drawSmallAction);
+
+		// Action drawNormalAction = new AbstractAction("Normali") {
+		Action drawNormalAction = new AbstractAction("Normal") {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event) {
+				// action code goes here
+				dCst = new DrawNormal();
+				changeSize();
+			}
+
+		};
+		sizeMenu.add(drawNormalAction);
+		// Action drawBigAction = new AbstractAction("Grandi") {
+		Action drawBigAction = new AbstractAction("Large") {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent event) {
+				// action code goes here
+				dCst = new DrawBig();
+				changeSize();
+			}
+
+		};
+		sizeMenu.add(drawBigAction);
+		settingsMenu.add(sizeMenu);
+
+		menuB.add(settingsMenu);
+
+		// help
+		helpMenu = new JMenu("Help");
+
+		JMenuItem help = new JMenuItem();
+		help.setText("JMCH Help");
+		help.setToolTipText("Show JMCH help");
+		help.addActionListener(new ActionListener() {
+			/**
+			 * Invoked when an action occurs.
+			 */
+			public void actionPerformed(ActionEvent e) {
+				Runnable r = new Runnable() {
+					public void run() {
+						try {
+							new PDFViewer("JMCH Manual", ChapterIdentifier.JMCH);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				};
+				EventQueue.invokeLater(r);
+			}
+		});
+		helpMenu.add(help);
+
+		helpMenu.addSeparator();
+
+		JMenuItem about = new JMenuItem();
+		about.setText("About JMCH");
+		about.setToolTipText("About JMCH");
+		about.addActionListener(new ActionListener() {
+			/**
+			 * Invoked when an action occurs.
+			 */
+			public void actionPerformed(ActionEvent e) {
+				AboutDialogFactory.showJMCH(parent);
+			}
+		});
+		helpMenu.add(about);
+
+		menuB.add(helpMenu);
 	}
 
 	/**
@@ -925,7 +921,7 @@ public class MMQueues extends JPanel {
 		}
 	}
 
-	protected void playBActionPerformed(ActionEvent evt) {
+	public void playBActionPerformed() {
 		boolean goOn = true;
 
 		if (nonErgodic) {
@@ -978,21 +974,16 @@ public class MMQueues extends JPanel {
 
 			sim.start();
 
-			playB.setEnabled(false);
-			stopB.setEnabled(true);
-			pauseB.setEnabled(true);
-			selectQueueRB.setEnabled(false);
-
 			setLogAnalyticalResults();
 		}
 	}
 
-	protected void stopBActionPerformed(ActionEvent evt) {
+	public void stopBActionPerformed() {
 		stopProcessing(true);
 	}
 
 	/** Auto-generated event handler method */
-	protected void pauseBActionPerformed(ActionEvent evt) {
+	public void pauseBActionPerformed() {
 		if (paused) {
 			paused = false;
 			sim.pause();

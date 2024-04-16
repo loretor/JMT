@@ -55,6 +55,7 @@ import com.jhlabs.image.EmbossFilter;
 
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
+import jmt.framework.gui.controller.Manager;
 import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
@@ -72,7 +73,8 @@ import jmt.jteach.animation.RoutingPolicy;
 import jmt.jteach.animation.SingleQueueNetAnimation;
 
 /**
- * One of the panels for the JTeach Models. It is the panel for the scheduling techniques
+ * Panel for JTeach models.
+ * It is the same class for all types of Queueing Network.
  *
  * @author Lorenzo Torri
  * Date: 30-mar-2024
@@ -155,7 +157,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         pause = new PauseSimulation(this);
         reload = new ReloadSimulation(this);
         nextStep = new NextStepSimulation(this);
-        openHelp = new Help(this);
+        openHelp = new Help(this,"JTCH");
         about = new About(this);
 
         pause.setEnabled(false);
@@ -201,7 +203,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
 
         }
         else{
-            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + "-" + routingPolicy.toString()));
+            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), routingPolicy.toString()));
         }
         
         mainPanel.setLayout(new BorderLayout());
@@ -405,7 +407,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         JMTToolBar toolbar = new JMTToolBar(JMTImageLoader.getImageLoader());	
 
         //first add all the icons with their actions
-        AbstractTCHAction[] actions = new AbstractTCHAction[] {start, pause, reload, nextStep, null, openHelp}; // Builds an array with all actions to be put in the toolbar	
+        AbstractTCHAction[] actions = new AbstractTCHAction[] {start, pause, reload, nextStep, null, openHelp}; // Builds an array with all actions	
         toolbar.populateToolbar(actions);
         ArrayList<AbstractButton> buttons = new ArrayList<AbstractButton>(); //create a list of AbstractButtons for the helpLabel
 		buttons.addAll(toolbar.populateToolbar(actions));
@@ -498,6 +500,16 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         pause.setEnabled(false);
         reload.setEnabled(false);
         nextStep.setEnabled(false);
+    }
+
+    @Override
+    public void exit(){
+        parent.close();
+    }
+
+    @Override
+    public void stopAnimation() {
+        
     }
 
 }

@@ -50,6 +50,7 @@ public class MainWizard extends JTchWizard{
     //general variables for the JMTFrame
     private String IMG_JWATICON = "JMCHIcon";
     private static final String TITLE = "JTCH";
+	private static final String TITLE_QUEUEING = "Queueing Network";
 	private static final String TITLE_SCHEDULING = "Scheduling";
 	private static final String TITLE_ROUTING = "Routing";
 
@@ -96,7 +97,7 @@ public class MainWizard extends JTchWizard{
 	 * @param policy the type of Queue Policy
 	 */
 	public void setAnimationPanelEnv(Policy policy){
-		this.setTitle(TITLE + " - "+ TITLE_SCHEDULING);
+		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+TITLE_SCHEDULING);
 
 		WizardPanel p = new AnimationPanel(this, policy);
 
@@ -109,7 +110,7 @@ public class MainWizard extends JTchWizard{
 	 * @param policy the type of Routing Policy
 	 */
 	public void setAnimationPanelEnv(RoutingPolicy policy){
-		this.setTitle(TITLE + " - "+ TITLE_ROUTING);
+		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+ TITLE_ROUTING);
 
 		WizardPanel p = new AnimationPanel(this, policy);
 

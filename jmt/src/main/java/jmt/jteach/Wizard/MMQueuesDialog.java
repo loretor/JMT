@@ -50,6 +50,7 @@ public class MMQueuesDialog extends JDialog implements PropertyChangeListener {
      * Initialize the GUI of the Dialog 
      */
     private void initGUI(){
+        setTitle("Select the Number of Servers");
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayout(1,2));
 
@@ -89,6 +90,12 @@ public class MMQueuesDialog extends JDialog implements PropertyChangeListener {
         if (isVisible() && (e.getSource() == optionPane)) {
             Object value = optionPane.getValue();
 
+            //Reset the JOptionPane's value.
+			//If you do not do this, then if the user
+			//presses the same button next time, no
+			//property change event will be fired.
+			optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+
             if (btnString1.equals(value)) {
                 try {
                     typedValue = Integer.parseInt(textField.getText());
@@ -105,7 +112,7 @@ public class MMQueuesDialog extends JDialog implements PropertyChangeListener {
                 } else {
                     clearAndHide();
                 }        
-            }            
+            }           
         }
     }
 

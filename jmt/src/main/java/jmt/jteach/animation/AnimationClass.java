@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
+import jmt.jteach.Distributions;
+
 /**
  * This class is a super class for all the animations.
  * It is needed, since it is a way of having a class that represents all the animations, being also in the same time a JComponent
@@ -56,16 +58,27 @@ public class AnimationClass extends JComponent implements Animation{
 	}
 
 	/**
-	 * Method for updating the SingleQueue
-	 * @param policy
-	 * @param nservers
+	 * Method for updating the SingleQueue (called when the create button is pressed)
+	 * @param policy new policy selected
+	 * @param nservers number of servers
+	 * @param serviceTime distribution of the service time
+	 * @param interArrivalTime distribution of the inter-arrival time
 	 */
-	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers){ }
+	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers, Distributions serviceTime, Distributions interArrivalTime){ }
 
 	/**
 	 * Method for updating the MultipleQueue
-	 * @param percentages
+	 * @param serviceTime distribution of the service time
+	 * @param interArrivalTime distribution of the inter-arrival time
 	 */
-	public void updateMultiple(double[] percentages){}
+	public void updateMultiple(Distributions serviceTime, Distributions interArrivalTime){}
+
+	/**
+	 * Method for updating the MultipleQueue with routing Policy = PROBABILISTIC
+	 * @param percentages new array of percentages associated to the outgoing arcs from the router
+	 * @param serviceTime distribution of the service time
+	 * @param interArrivalTime distribution of the inter-arrival time
+	 */
+	public void updateMultiple(double[] percentages, Distributions serviceTime, Distributions interArrivalTime){}
 
 }

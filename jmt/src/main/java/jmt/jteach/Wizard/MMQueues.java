@@ -89,7 +89,6 @@ import jmt.jmarkov.Queues.Processor;
 import jmt.jmarkov.Queues.Exceptions.NonErgodicException;
 import jmt.jmarkov.utils.Formatter;
 import jmt.jteach.ConstantsJTch;
-import jmt.jteach.DialogStaticVariables;
 import jmt.jteach.actionsWizard.AbstractTCHAction;
 import jmt.jteach.actionsWizard.PauseSimulation;
 import jmt.jteach.actionsWizard.ReloadSimulation;

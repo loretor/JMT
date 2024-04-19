@@ -19,11 +19,15 @@
 package jmt.jteach.animation;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.Random;
 
 import javax.swing.JComponent;
+
+import jmt.common.exception.IncorrectDistributionParameterException;
+import jmt.jteach.Distributions;
 
 public class Job extends JComponent{
 	//--variables needed only for the movement along the edges
@@ -35,19 +39,26 @@ public class Job extends JComponent{
 	private int boxWidth = 12;
 	private int boxHeight = 30;
 	
-	private int duration;
+	private double duration;
 	private Color color;
 	private int priority;
 	
 	//those values are only for debug now
-	public int maxValue = 10;
+	public int maxValue = 10; //this value is for the conversion from the duration to a colored box (try to select a max value accordingly to the type of distribution)
+	public Distributions service;
 	
 	private long entrance; //this value is the associated long value for the entrance of a job inside a JComponent
 	
-	public Job() {
-		duration = new Random().nextInt(maxValue+1) + 1;
+	public Job(Distributions service) {	
 		color = getRandomColor();
 		priority = new Random().nextInt(5)+1; //set priority always > 1 otherwise it does not work properly in the BoxStation
+		this.service = service;
+		try {
+			duration = service.nextRand(); //duration = new Random().nextInt(maxValue+1) + 1;
+		} catch (IncorrectDistributionParameterException e) {
+			//this will never happen if the parameters of the distribution are correclty chosen
+			duration = 0.0;
+		}
 	}
 	
 	/** This paint needs to know if we are on an edge or not, because if we are not on an edge, then we do not need to paint anything */
@@ -61,11 +72,15 @@ public class Job extends JComponent{
 			//then draw also the box with the filled rectangle
 			g.setColor(Color.BLACK);
 			g.drawRect(pos.x + 15, pos.y - 30, boxWidth, boxHeight);
+
+			//TODO:remove those two lines, only for debugging
+			g.setFont(new Font("Arial", Font.BOLD, 13));
+			g.drawString(String.valueOf(duration), pos.x - 15, pos.y-40);
 			
 			//to convert the duration to the size of the above box
 			g.setColor(color);
 			int factor = boxHeight/maxValue;
-			int result = duration*factor >= boxHeight? boxHeight-1: duration*factor; //this solution provides the problem of having jobs with duration > maximum height of the box
+			int result = (int) Math.round(duration*factor >= boxHeight? boxHeight-1: duration*factor); //this solution provides the problem of having jobs with duration > maximum height of the box
 			g.fillRect(pos.x + 16, pos.y - 30 + (boxHeight-result), boxWidth-1, result);
 		}	
 	}
@@ -95,7 +110,7 @@ public class Job extends JComponent{
     	return color;
     }
     
-    public int getDuration() {
+    public double getDuration() {
     	return duration;
     }
     

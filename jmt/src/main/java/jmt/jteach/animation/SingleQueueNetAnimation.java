@@ -29,6 +29,8 @@ import java.util.Random;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import jmt.jteach.Distributions;
+
 /**
  * Class with all the JComponents for the Animation
  *
@@ -49,6 +51,8 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	//--all the characteristics of the Animation
 	private QueuePolicyNonPreemptive queuePolicy;
 	private int nServers = 1;
+	private Distributions interArrival = Distributions.DETERMINISTIC; //by default the two distributions are DETERMINSTIC
+	private Distributions service = Distributions.DETERMINISTIC;
 	
 	
 	/** Constructor*/
@@ -68,7 +72,7 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		edgeList.add(new Edge(container, true, true, new Point(450,0), new Point(590,0), sink));
 		station = new Station(container, true, true, new Point(0,0), edgeList.get(0), queuePolicy, nServers);
 		edgeList.add(new Edge(container, true, true, new Point(80,0), new Point(230,0), station));
-		source = new Source(container, true, new Point(0,0), edgeList.get(edgeList.size()-1),this);
+		source = new Source(container, true, new Point(0,0), edgeList.get(edgeList.size()-1),this, interArrival, service);
 	}
 	
 	/**
@@ -129,11 +133,14 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	}
 
 	@Override
-	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers){
+	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers, Distributions service, Distributions interA){
 		queuePolicy = policy;
 		station.typeOfQueue(policy);
 		this.nServers = nservers;
 		station.updateNServers(nservers);
+
+		//TODO: update the distributions to jobs and sources
+		source.updateDistribution(service, interA);
 	}
 
 }

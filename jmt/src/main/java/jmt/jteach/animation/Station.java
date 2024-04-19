@@ -127,7 +127,7 @@ public class Station extends JComponent implements JobContainer{
 			jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
 				@Override
 				public int compare(Job o1, Job o2) {
-					return Integer.compare(o1.getDuration(), o2.getDuration());
+					return Double.compare(o1.getDuration(), o2.getDuration());
 				}
 				
 			});
@@ -136,7 +136,7 @@ public class Station extends JComponent implements JobContainer{
 			jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
 				@Override
 				public int compare(Job o1, Job o2) {
-					return Integer.compare(o2.getDuration(), o1.getDuration());
+					return Double.compare(o2.getDuration(), o1.getDuration());
 				}
 				
 			});

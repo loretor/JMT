@@ -47,7 +47,8 @@ public class BoxStation extends JComponent implements JobContainer{
 	
 	//information about the current Job inside the BoxStation
 	private Color color = Color.RED;
-	private int duration;
+	private double duration;
+	private int maxValue = 10; //this value is for the conversion from the duration to a colored box (try to select a max value accordingly to the type of distribution)
 	private int priority;
 	
 	private boolean isWorking = false; //to know if there is a job in this BoxStation or not to print the circle above
@@ -76,8 +77,8 @@ public class BoxStation extends JComponent implements JobContainer{
 		int size = sLength/queueSize;
 		
 		g.setColor(color); //set the color of the job
-		int factor = sHeight/10; //in futuro metti al posto del 10 il valore massimo che possiamo avere di duration del job
-		int result = duration * factor >= sHeight ? sHeight - 1: duration*factor; //this one provides the problem of having duration greater than the max size of the box
+		int factor = sHeight/maxValue; 
+		int result = (int) Math.round(duration * factor >= sHeight ? sHeight - 1: duration*factor); //this one provides the problem of having duration greater than the max size of the box
 		g.fillRect(sPos.x + (queueSize-index-1)*size + 1, sPos.y + (sHeight-result), size - 1, result); //+1 - 1 values are used to avoid clipping with other figures, remove *10
 		
 		//paint the circle above

@@ -18,6 +18,7 @@
 
  package jmt.jteach.animation;
 
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
@@ -25,7 +26,9 @@ import java.awt.Point;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import jmt.common.exception.IncorrectDistributionParameterException;
 import jmt.gui.common.JMTImageLoader;
+import jmt.jteach.Distributions;
 
 /**
  * This class is responsible for creating the jobs and routing them to the first edge of the animation
@@ -46,7 +49,10 @@ public class Source extends JComponent implements JobContainer{
 	private boolean centered = false;
 	private int size = 50;
 	
-	AnimationClass anim;
+	private AnimationClass anim;
+	private Distributions interArrival;
+	private Distributions service;
+	private double nextRandomValue = 0;
 	
 	
 	/**
@@ -56,13 +62,16 @@ public class Source extends JComponent implements JobContainer{
      * @param pos, position of the component. If it is centered then this pos is not important, it can be anything
      * @param next, next JContainer linked to the source
      * @param anim, AnimationClass associated to this component. It is needed in order to remove the job arrived to the sink also from the list of jobs of the AnimationClass
+	 * @param interArrival, distribution of the interarrival time
      */
-	public Source(JPanel container,boolean centered, Point pos, JobContainer next, AnimationClass anim) {
+	public Source(JPanel container,boolean centered, Point pos, JobContainer next, AnimationClass anim, Distributions interArrival, Distributions service) {
 		this.parent = container;
 		this.pos = pos;
 		this.next = next;	
 		this.centered = centered;
 		this.anim = anim;
+		this.interArrival = interArrival;
+		this.service = service;
 		
 		sourceImg = JMTImageLoader.loadImageAwt("Source");
 	}
@@ -78,22 +87,43 @@ public class Source extends JComponent implements JobContainer{
 		}
 		
 		g.drawImage(sourceImg, pos.x, pos.y, size, size, null);
+
+		//TODO: remove those two lines, only for debug
+		g.setFont(new Font("Arial", Font.BOLD, 13));
+		g.drawString(String.valueOf(nextRandomValue), pos.x, pos.y-20);
 	}
 
 	@Override
 	public void refresh() {
-		//every 3 seconds a new job arrives
-		if(System.currentTimeMillis() - start >= 3000) {
-			routeJob = new Job();
+		//every next random value of the distribution of the interarrival time, a new job arrives
+
+		if(System.currentTimeMillis() - start >= nextRandomValue*1000) {
+			routeJob = new Job(service);
 			routeJob(0);
 			start = System.currentTimeMillis();
+			try {
+				nextRandomValue = interArrival.nextRand();
+			} catch (IncorrectDistributionParameterException e) {
+				//this will never happen, since the parameters of the distribution of the interArrival are OK
+				nextRandomValue = 64.0;
+			}
 			anim.addNewJob(routeJob);
 		}
 		
 	}
 	
-	public void setStart(long time) {
+	/**
+	 * Method used by the AnimationClass to set the starting timer of the animation and to set the new randomValue
+	 * @param time start time of the animation
+	 */
+	public void setStart(long time){
 		start = time;
+		try {
+			nextRandomValue = interArrival.nextRand();
+		} catch (IncorrectDistributionParameterException e) {
+			//this will never happen, since the parameters of the distribution of the interArrival are OK
+			nextRandomValue = 64.0;
+		}
 	}
 
 	
@@ -110,6 +140,16 @@ public class Source extends JComponent implements JobContainer{
 	@Override
 	public void addJob(Job newJob) {
 		
+	}
+
+	/**
+	 * Update the Service time and InterArrival time distribution. Called from the AnimationClass
+	 * @param service new distribution for service time
+	 * @param interA new distribution for inter arrival time
+	 */
+	public void updateDistribution(Distributions service, Distributions interA){
+		this.service = service;
+		interArrival = interA;
 	}
 	
 	

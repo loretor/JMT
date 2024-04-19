@@ -58,7 +58,6 @@ import jmt.gui.jsimwiz.JSIMWizMain;
 import jmt.gui.jwat.MainJwatWizard;
 import jmt.jmarkov.MMQueues;
 import jmt.jmva.gui.exact.ExactWizard;
-import jmt.jteach.JTeachMain;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.manual.ChapterIdentifier;
 import jmt.manual.PDFViewer;

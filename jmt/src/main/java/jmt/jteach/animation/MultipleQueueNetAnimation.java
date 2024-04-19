@@ -26,6 +26,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import jmt.jteach.Distributions;
+
 /**
  * Class with all the JComponents for the Animation of Routing Policy
  *
@@ -49,7 +51,9 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	//--all the characteristics of the Animation
 	private QueuePolicyNonPreemptive queuePolicy = QueuePolicyNonPreemptive.FIFO; //it is setted by default = FIFO
 	private RoutingPolicy routingPolicy;
-	int nServers = 1;
+	private int nServers = 1; //by default = 1
+	private Distributions interArrival = Distributions.DETERMINISTIC; //by default the two distributions are DETERMINSTIC
+	private Distributions service = Distributions.DETERMINISTIC;
 	
 	/** Constructor */
 	public MultipleQueueNetAnimation(JPanel container, RoutingPolicy routingPolicy) {
@@ -98,7 +102,7 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		
 		edgeList.add(new Edge(container, true, true, new Point(80,0), new Point(150,0), router));
 		
-		source = new Source(container, true, new Point(10,0), edgeList.get(edgeList.size()-1), this);
+		source = new Source(container, true, new Point(10,0), edgeList.get(edgeList.size()-1), this, interArrival, service);
 		
 	}
 	
@@ -164,7 +168,14 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	}
 
 	@Override
-	public void updateMultiple(double[] percentages){
+	public void updateMultiple(Distributions service, Distributions interA){
+		//TODO: aggirona source e job
+		source.updateDistribution(service, interA);
+	}
+
+	@Override
+	public void updateMultiple(double[] percentages, Distributions service, Distributions interA){
+		updateMultiple(service, interA);
 		probabilities[0] = percentages[0];
 		probabilities[1] = percentages[1];
 		probabilities[2] = 1.00 - percentages[0] - percentages[1];

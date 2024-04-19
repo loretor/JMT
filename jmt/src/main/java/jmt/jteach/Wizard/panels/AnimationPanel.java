@@ -19,17 +19,11 @@ package jmt.jteach.Wizard.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.lang.invoke.ConstantCallSite;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Queue;
+
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -51,17 +45,16 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.jhlabs.image.EmbossFilter;
 
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
-import jmt.framework.gui.controller.Manager;
 import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.JMTImageLoader;
 
 import jmt.jteach.ConstantsJTch;
+import jmt.jteach.Distributions;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
 import jmt.jteach.actionsWizard.*;
@@ -88,6 +81,8 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     private JPanel mainPanel;
     private JEditorPane descrLabel;
     private JComboBox<String> algorithmJComboBox = null;
+    private JComboBox<Distributions> interAComboBox;
+    private JComboBox<Distributions> serviceComboBox;
     private JSpinner serversSpinner;
     private JSpinner prob1 = null; //those two spinners are instanciated only if Probabilisitic routing is selected
     private JSpinner prob2 = null;
@@ -99,7 +94,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     //------------ variables for parameters JPanel ---------------
     private JPanel parametersPanel;
     private final int spaceBetweenPanels = 5;
-    private final String[] distributions = {"Exponential", "Deterministic"}; 
+    private final Distributions[] distributions = Distributions.values(); 
 
     //-------------all the Actions of this panel------------------
     private AbstractTCHAction exit;
@@ -340,14 +335,16 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         JPanel interAPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[2]);
         interAPanel.setLayout(new GridLayout(1,2));
         interAPanel.add(new JLabel("Inter Arrival:"));
-        interAPanel.add(new JComboBox<String>(distributions));
+        interAComboBox = new JComboBox<Distributions>(distributions);
+        interAPanel.add(interAComboBox);
         parametersPanel.add(interAPanel);
 
         //Service Time panel
         JPanel serviceTPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[3]);
         serviceTPanel.setLayout(new GridLayout(1,2));
         serviceTPanel.add(new JLabel("Service Time:"));
-        serviceTPanel.add(new JComboBox<String>(distributions));
+        serviceComboBox = new JComboBox<Distributions>(distributions);
+        serviceTPanel.add(serviceComboBox);
         parametersPanel.add(serviceTPanel);
 
         //create button
@@ -444,14 +441,17 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
             queuePolicyNonPreemptive = nonPreemptivePolicies[algorithmJComboBox.getSelectedIndex()]; //the index of the JComboBox is the same of the array of queue policies Non preemptive
             mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling - " + queuePolicyNonPreemptive.toString()));
             descrLabel.setText("<html><p style='text-align:justify;'>"+queuePolicyNonPreemptive.getDescription()+"</p></html>");
-            animation.updateSingle(queuePolicyNonPreemptive, (int)serversSpinner.getValue());
+            animation.updateSingle(queuePolicyNonPreemptive, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
         }
         else if(policy == Policy.PREEMPTIVE){
 
         }
         else{ //in case of routing only the animation must be updated
             if(routingPolicy == RoutingPolicy.PROBABILISTIC){
-                animation.updateMultiple(new double[]{(double) prob1.getValue(), (double) prob2.getValue()});
+                animation.updateMultiple(new double[]{(double) prob1.getValue(), (double) prob2.getValue()}, (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
+            }
+            else{
+                animation.updateMultiple((Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
             }
         }
     }

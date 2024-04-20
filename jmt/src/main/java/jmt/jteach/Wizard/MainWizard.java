@@ -67,7 +67,7 @@ public class MainWizard extends JTchWizard{
         this.setIconImage(JMTImageLoader.loadImage(IMG_JWATICON).getImage());
 		this.setTitle(TITLE);
 		this.setSize(CommonConstants.MAX_GUI_WIDTH_JWAT, CommonConstants.MAX_GUI_HEIGHT_JWAT);
-		this.setResizable(false);
+		//this.setResizable(false);
 
         centerWindow();
 

@@ -18,8 +18,11 @@
 package jmt.jteach.Wizard.panels;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -30,6 +33,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -203,21 +207,12 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
     public void initGUI(){
 		this.setLayout(new BorderLayout());
+
+		//upper and bottom panels
 		JPanel upper = new JPanel(new FlowLayout());
 		JLabel upperLabel = new JLabel();
 		upperLabel.setPreferredSize(new Dimension(300, 10));
 		upper.add(upperLabel);
-
-		/*try {
-			RandomEngine r = new MersenneTwister();
-			Parameter p = new ExponentialPar(20);
-			Exponential d = new Exponential();
-			d.setRandomEngine(r);
-			double val = d.nextRand(p);
-			upperLabel.setText(String.valueOf(val));
-		} catch (IncorrectDistributionParameterException e) {
-			e.printStackTrace();
-		} */
 			
 		JPanel bottom = new JPanel(new FlowLayout());
 		JLabel bottomLabel = new JLabel();
@@ -227,27 +222,31 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		this.add(upper, BorderLayout.NORTH);
 		this.add(bottom, BorderLayout.SOUTH);
 
-        //panel with all the buttons
+		//central panel
+		JPanel centerPanel = new JPanel(new GridBagLayout());
+      
+        //flow chart schema
+		JLabel imageLabel = new JLabel();
+		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(452, 490)));
+		centerPanel.add(imageLabel);
+
+		//panel with all the buttons
 		JPanel eastPanel = new JPanel(new FlowLayout());
 		eastPanel.add(Box.createVerticalStrut(1), BorderLayout.NORTH);
-        JPanel buttonPanel = new JPanel(new GridLayout(12, 1, 2, 25));
+        JPanel buttonPanel = new JPanel(new GridLayout(9, 1, 2, 24));
 		eastPanel.add(buttonPanel, BorderLayout.CENTER);
 
-		/* TODO */
 		for (int i = 0; i < actions.length; i++) {
 			buttonPanel.add(createButton(actions[i], ConstantsJTch.HELP_BUTTONS_MAINPANEL[i]));
 		}
 
-        //flow chart schema
-		JLabel imageLabel = new JLabel();
-		imageLabel.setBorder(BorderFactory.createEmptyBorder(BUTTONSIZE_X, 1, 0, 0));
-		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(452, 500)));
-		imageLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		imageLabel.setVerticalAlignment(SwingConstants.NORTH);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.VERTICAL;
+		centerPanel.add(eastPanel, gbc);
 
-
-		this.add(imageLabel, BorderLayout.CENTER);
-		this.add(eastPanel, BorderLayout.EAST);
+		this.add(centerPanel, BorderLayout.CENTER);
 		
         createMenu();
         createToolBar();

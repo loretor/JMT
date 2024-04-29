@@ -19,46 +19,46 @@ package jmt.jteach.Wizard.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import javax.swing.plaf.basic.BasicMenuUI;
 
-import jmt.common.exception.IncorrectDistributionParameterException;
-import jmt.engine.random.Distribution;
-import jmt.engine.random.Exponential;
-import jmt.engine.random.ExponentialPar;
-import jmt.engine.random.Parameter;
-import jmt.engine.random.engine.MersenneTwister;
-import jmt.engine.random.engine.RandomEngine;
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
 import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.JMTImageLoader;
-import jmt.jmarkov.MMQueues;
 import jmt.jteach.ConstantsJTch;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
 import jmt.jteach.actionsWizard.AbstractTCHAction;
 import jmt.jteach.actionsWizard.Help;
-import jmt.jteach.animation.Policy;
 import jmt.jteach.animation.QueuePolicyNonPreemptive;
 import jmt.jteach.animation.RoutingPolicy;
 
@@ -73,75 +73,82 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
     private static final String PANEL_NAME = "Main Panel";
     private static final String IMG_STARTSCREEN = "StartScreenJTeach";
-    private static final int BUTTONSIZE_X = 15;
-	private static final int BUTTONSIZE_Y = 12;
 
     private MainWizard parent;
 	private JMTMenuBar menu;
 	private JMTToolBar toolbar;
     private HoverHelp help; //retrieve from parent the HoverHelp
 
+	//----------- variables for the panel with all the buttons of the graph
+	private final String[] data = {"NON-PREEMPTIVE", "", "PREEMPTIVE", "", "RR", "", "PROBABLISITC", "", "...", "", "MARKOV CHAINS"}; //some of them are empty because they represent the box empty between two elements of the list
+	private final JList<String> list = new JList<>(data);
+
 	//all actions associated to the buttons of the Menu and ToolBar
     private AbstractTCHAction openHelp;
 
-	private String toolTipPreemptive = "<html><ul>"
-	+ "<li>FCFS</li>"
-	+ "<li>LCFS</li>"
-	+ "<li>PRIORITY</li>"
-	+ "<li>SJF</li>"
-	+ "<li>LJF</li>"
-	+ "</ul></html>";
-
 
 	//all the AbstractActions associated to the buttons related of this panel only
-	protected AbstractAction PREEMPTIVE = new AbstractAction("PREEMPTIVE") {
+	protected AbstractAction FCFS = new AbstractAction("FCFS") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, toolTipPreemptive);
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[0]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(Policy.PREEMPTIVE);
+			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.FIFO);
 		}
 	};
 
-	protected AbstractAction NON_PREEMPTIVE = new AbstractAction("NON PREEMPTIVE") {
+	protected AbstractAction LCFS = new AbstractAction("LCFS") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, toolTipPreemptive);
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[1]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(Policy.NON_PREEMPTIVE);
+			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.LIFO);
 		}
 	};
 
-	protected AbstractAction PROBABILISTIC = new AbstractAction("PROBABILISTIC") {
+	protected AbstractAction PRIO = new AbstractAction("Priority") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "Probabilistic Routing Policy");
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[2]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(RoutingPolicy.PROBABILISTIC);
+			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.PRIO);
 		}
 	};
 
-	protected AbstractAction OTHER = new AbstractAction("...") {
+	protected AbstractAction SJF = new AbstractAction("SJF") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "Other routing policies");
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[3]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(RoutingPolicy.JSQ);
+			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.SJF);
 		}
 	};
 
-	protected AbstractAction RR = new AbstractAction("RR") {
+	protected AbstractAction LJF = new AbstractAction("LJF") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "Round Robin Routing Policy");
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[4]);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.LJF);
+		}
+	};
+
+	//TODO: preemptive buttons
+
+	protected AbstractAction RR = new AbstractAction("Rond Robin") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.ROUTING_TOOLTIPS[0]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -149,10 +156,32 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
+	protected AbstractAction PROBABILISTIC = new AbstractAction("Probabilistic") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.ROUTING_TOOLTIPS[1]);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setAnimationPanelEnv(RoutingPolicy.PROBABILISTIC);
+		}
+	};
+
+	protected AbstractAction JSQ = new AbstractAction("JSQ") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.ROUTING_TOOLTIPS[2]);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setAnimationPanelEnv(RoutingPolicy.JSQ);
+		}
+	};
+
 	protected AbstractAction MM1 = new AbstractAction("M/M/1") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "M/M/1 Station, 1 Server");
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.MARKOV_TOOLTIPS[0]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -163,7 +192,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction MM1K = new AbstractAction("M/M/1/k") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "M/M/1/k Finite Capacity Station, 1 Server");
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.MARKOV_TOOLTIPS[1]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -174,7 +203,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction MMC = new AbstractAction("M/M/c") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "M/M/c Station, c Servers");
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.MARKOV_TOOLTIPS[2]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -185,16 +214,13 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction MMCK = new AbstractAction("M/M/c/k") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, "M/M/c/k Finite Capaicty Station, c Servers");
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.MARKOV_TOOLTIPS[3]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			parent.setMMQueuesPanelEnv("mmnk");
 		}
 	};
-
-	//array of all the AbstractActions in this panel
-	private AbstractAction[] actions = {NON_PREEMPTIVE, PREEMPTIVE, RR, PROBABILISTIC, OTHER, MM1, MM1K, MMC, MMCK};
 
     public MainPanel(MainWizard main){
         this.parent = main;
@@ -208,7 +234,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
     public void initGUI(){
 		this.setLayout(new BorderLayout());
 
-		//upper and bottom panels
+		//---------------upper and bottom panels
 		JPanel upper = new JPanel(new FlowLayout());
 		JLabel upperLabel = new JLabel();
 		upperLabel.setPreferredSize(new Dimension(300, 10));
@@ -222,23 +248,69 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		this.add(upper, BorderLayout.NORTH);
 		this.add(bottom, BorderLayout.SOUTH);
 
-		//central panel
+		//---------------central panel
 		JPanel centerPanel = new JPanel(new GridBagLayout());
       
-        //flow chart schema
+        //---------------------flow chart schema
 		JLabel imageLabel = new JLabel();
-		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(452, 490)));
+		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(540, 455)));
 		centerPanel.add(imageLabel);
 
-		//panel with all the buttons
+		//---------------------panel with all the buttons
 		JPanel eastPanel = new JPanel(new FlowLayout());
-		eastPanel.add(Box.createVerticalStrut(1), BorderLayout.NORTH);
-        JPanel buttonPanel = new JPanel(new GridLayout(9, 1, 2, 24));
-		eastPanel.add(buttonPanel, BorderLayout.CENTER);
+		list.setCellRenderer(selectedRender(-1)); //-1 since no element is highlighted
+		list.setBackground(null);
 
-		for (int i = 0; i < actions.length; i++) {
-			buttonPanel.add(createButton(actions[i], ConstantsJTch.HELP_BUTTONS_MAINPANEL[i]));
+		//TODO: add help for each element of the list
+		ListModel<String> model = list.getModel();
+		ListCellRenderer<? super String> cellRenderer = list.getCellRenderer();
+		List<Component> components = new ArrayList<>();
+		for(int i = 0; i < model.getSize(); i++){
+			if(i % 2 == 0){
+				Component component = cellRenderer.getListCellRendererComponent(list, list.getModel().getElementAt(i), i, false, false);
+				if(component != null){
+					components.add(component);
+				}
+				
+			}
 		}
+
+		for(Component c: components){
+			c.setBackground(Color.RED);
+			help.addHelp(c, "ciao");
+		}
+
+		help.addHelp(list, "Select the JTCH Mode");
+
+		
+		eastPanel.add(list, BorderLayout.CENTER);
+
+		final JPopupMenu[] popupMenu = createSubMenus();
+
+		//change the type of subMenu each time the cursor moves
+        list.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int index = list.locationToIndex(e.getPoint());
+				//if the selected item in the list is -1 or is not a separator, or its subMenu has already at least one element, we can show its submenu, otherwise setVisible = false to all subMenus
+                if (index != -1 && index % 2 == 0 && popupMenu[index].getSubElements().length != 0) { 
+                    Rectangle cellBounds = list.getCellBounds(index, index);
+                    if (cellBounds != null && cellBounds.contains(e.getPoint())) {
+                        popupMenu[index].show(list, cellBounds.x + cellBounds.width, cellBounds.y);						
+                        list.setCellRenderer(selectedRender(index));
+                    } else {
+                        popupMenu[index].setVisible(false);
+						list.setCellRenderer(selectedRender(-1));
+                    }
+                } else {
+					list.setCellRenderer(selectedRender(-1));
+					for(int i = 0; i < popupMenu.length; i++){
+						popupMenu[i].setVisible(false);					
+					}                
+                }
+            }
+        });
+
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 1;
@@ -252,13 +324,92 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
         createToolBar();
     }
 
-    private JButton createButton(AbstractAction action, String helpString) {
-		JButton button = new JButton(action);
-		button.setPreferredSize(new Dimension((int) (BUTTONSIZE_X * 8), (int) (BUTTONSIZE_Y * 3)));
-		help.addHelp(button, helpString);
-		return button;
+	/**
+	 * To set the look of each element inside the JList.
+	 * @param i index of the element of the JList that needs to be rendered
+	 * @return ListCellRenderer, a class that is encharge of changing the look of the cell
+	 */
+	public ListCellRenderer<String> selectedRender(final int i){
+		return new ListCellRenderer<String>() {
+            @Override
+            public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
+            	JLabel label = new JLabel(value);
+            	
+            	if(index % 2 != 0) { //index odd are divisors
+            		label.setPreferredSize(new Dimension(150,40));
+            		label.setMinimumSize(new Dimension(150,40));
+            	}
+            	else {            		
+					label.setHorizontalAlignment(SwingConstants.CENTER);
+					Border borderEmpty = BorderFactory.createEmptyBorder(12, 5, 12, 5);
+					Border borderEtched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+					Border compoundBorder = BorderFactory.createCompoundBorder(borderEtched, borderEmpty);
+                    label.setBorder(compoundBorder);
+					if(index == i) { //if the label is selected then highlight it
+            			label.setBackground(Color.DARK_GRAY);
+            		}
+					else{
+						label.setBackground(null);
+					}
+            	}
+                
+                return label;
+            }
+        };
 	}
 
+	/**
+	 * To create all the subMenus for each element of the JList
+	 * @return the array of subMenus
+	 */
+	public JPopupMenu[] createSubMenus() {
+		JPopupMenu[] subMenus = new JPopupMenu[11];
+		
+		subMenus[0] = new JPopupMenu();
+		subMenus[0].add(new CustomMenuItem(FCFS, true));
+		subMenus[0].add(new CustomMenuItem(LCFS, true));
+		subMenus[0].add(new CustomMenuItem(PRIO, true));
+		subMenus[0].add(new CustomMenuItem(SJF, true));
+		subMenus[0].add(new CustomMenuItem(LJF, true));
+		
+		subMenus[1] = new JPopupMenu(); //subMenu for the separator
+		
+		subMenus[2] = new JPopupMenu();
+		
+		subMenus[3] = new JPopupMenu(); //subMenu for the separator
+		
+		subMenus[4] = new JPopupMenu();
+		subMenus[4].add(new CustomMenuItem(RR, true));
+		
+		subMenus[5] = new JPopupMenu(); //subMenu for the separator
+		
+		subMenus[6] = new JPopupMenu();
+		subMenus[6].add(new CustomMenuItem(PROBABILISTIC, true));
+		
+		subMenus[7] = new JPopupMenu(); //subMenu for the separator
+		
+		subMenus[8] = new JPopupMenu();
+		subMenus[8].add(new CustomMenuItem(JSQ, true));
+		subMenus[8].add(new CustomMenuItem("Random", false));
+		subMenus[8].add(new CustomMenuItem("Shortest Response Time", false));
+		subMenus[8].add(new CustomMenuItem("Least Utilization", false));
+		subMenus[8].add(new CustomMenuItem("Fastest Service", false));
+		subMenus[8].add(new CustomMenuItem("Load Dependend Routing", false));
+		subMenus[8].add(new CustomMenuItem("Power of K", false));
+		subMenus[8].add(new CustomMenuItem("Weighted Round Robin", false));
+		subMenus[8].add(new CustomMenuItem("Class Switch", false));
+
+
+		subMenus[9] = new JPopupMenu(); //subMenu for the separator
+
+		subMenus[10] = new JPopupMenu();
+		subMenus[10].add(new CustomMenuItem(MM1, true));
+		subMenus[10].add(new CustomMenuItem(MM1K, true));
+		subMenus[10].add(new CustomMenuItem(MMC, true));
+		subMenus[10].add(new CustomMenuItem(MMCK, true));
+		
+		return subMenus;	
+	}
 
     @Override
     public String getName() {
@@ -333,4 +484,30 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	@Override
 	public void stopAnimation() {
 	}    
+}
+
+
+/**
+ * Class for a custom item of the JPopMenu
+ * Two possible outcomes
+ *  - a cell that is selectable (if an animation panel with the correspondant algoritm is present)
+ *  - a cell that is not selectable
+ */
+class CustomMenuItem extends JMenuItem{
+	public CustomMenuItem(Action a, boolean implemented){
+		super(a);
+
+		if(!implemented){
+			this.setEnabled(false);
+		}
+	}
+
+	public CustomMenuItem(String txt, boolean implemented){
+		super(txt);
+
+		if(!implemented){
+			this.setEnabled(false);
+		}
+	}
+
 }

@@ -77,6 +77,7 @@ enum Direction{
  */
 public class Edge extends JComponent implements JobContainer{
 	private JPanel parent;
+	private AnimationClass animation;
 	
 	//--variables of the edge
 	private boolean centered;
@@ -91,9 +92,13 @@ public class Edge extends JComponent implements JobContainer{
 	//for the probabilistic routing
 	private boolean paintPercentage = false;
 	private double percentage = 0.00;
+
+	//for the nextEvent simulation
+	private boolean nextEvent = false;
 	
 	/**
 	 * Constructor
+	 * @param animation, AnimationClass which the edge is part of
 	 * @param container, JPanel that contains this edge
 	 * @param centered, if the edge is y centered with respect to the JPanel or not
 	 * @param isArrow, if the edge is an arrow and not a simple line
@@ -101,7 +106,8 @@ public class Edge extends JComponent implements JobContainer{
 	 * @param finish point of the edge
 	 * @param next, JobContainer next to this edge
 	 */
-	public Edge(JPanel container, boolean centered, boolean isArrow, Point start, Point finish, JobContainer next) {
+	public Edge(AnimationClass anim, JPanel container, boolean centered, boolean isArrow, Point start, Point finish, JobContainer next) {
+		this.animation = anim;
 		this.parent = container;
 		this.centered = centered;
 		this.isArrow = isArrow;
@@ -255,6 +261,11 @@ public class Edge extends JComponent implements JobContainer{
 	public void addJob(Job newJob) {
 		newJob.setStartingPosition(start.x, start.y); //when a new Job is added, then its position is the starting point of the edge
 		jobList.add(newJob);
+
+		if(nextEvent) {
+			animation.pause();
+			animation.resetNextEvent();
+		}
 	}
 
 	/**
@@ -275,5 +286,15 @@ public class Edge extends JComponent implements JobContainer{
 		else {
 			job.unsetOnEdge();			
 		}
+	}
+
+	/** Set the Step simulation on */
+	public void nextEvent() {
+		nextEvent = true;
+	}
+
+	/** Set the Step simulation off */
+	public void resetNextEvent() {
+		nextEvent = false;
 	}
 }

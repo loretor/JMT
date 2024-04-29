@@ -32,7 +32,7 @@ import jmt.jteach.Distributions;
 public class Job extends JComponent{
 	//--variables needed only for the movement along the edges
 	private Point pos;
-	private int speed = 2;
+	private int speed = 2;	
 	private boolean onEdge = false; //this parameter is used to know if the current job is on a Edge or not
 	
 	private int circleSize = 15;
@@ -48,6 +48,7 @@ public class Job extends JComponent{
 	public Distributions service;
 	
 	private long entrance; //this value is the associated long value for the entrance of a job inside a JComponent
+	private int velocityFactor = 1;
 	
 	public Job(Distributions service) {	
 		color = getRandomColor();
@@ -66,7 +67,7 @@ public class Job extends JComponent{
 		super.paint(g);
 		
 		if(onEdge) {
-			g.setColor(Color.GREEN);
+			g.setColor(color);
 			g.fillOval(pos.x, pos.y, circleSize, circleSize);		
 			
 			//then draw also the box with the filled rectangle
@@ -95,7 +96,7 @@ public class Job extends JComponent{
     }
     
     public void setEntrance() {
-    	entrance = System.currentTimeMillis();
+    	entrance = System.currentTimeMillis()*velocityFactor;
     }
     
     public long getEntrance() {
@@ -156,5 +157,15 @@ public class Job extends JComponent{
     
     public void unsetOnEdge() {
     	onEdge = false;
+    }
+
+	public void setVelocityFactor(int value) {
+    	speed *= value;
+    	velocityFactor = value;
+    }
+
+	public void resetVelocityFactor() {
+    	speed /= velocityFactor;
+    	velocityFactor = 1;
     }
 }

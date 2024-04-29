@@ -18,18 +18,15 @@
 
 package jmt.jteach.animation;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import jmt.jteach.Distributions;
+import jmt.jteach.Wizard.panels.AnimationPanel;
 
 /**
  * Class with all the JComponents for the Animation
@@ -39,6 +36,7 @@ import jmt.jteach.Distributions;
  * Time: 10.46
  */
 public class SingleQueueNetAnimation extends AnimationClass{
+	private AnimationPanel animPanel;
 	private JPanel parent;
 	
 	//-- all the classes contained in the Animation, like stations, edges...
@@ -56,7 +54,8 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	
 	
 	/** Constructor*/
-	public SingleQueueNetAnimation(JPanel container, QueuePolicyNonPreemptive queuePolicy) {		
+	public SingleQueueNetAnimation(AnimationPanel animPanel, JPanel container, QueuePolicyNonPreemptive queuePolicy) {		
+		this.animPanel = animPanel;
 		this.parent = container;
 		this.queuePolicy = queuePolicy;
 		initGUI(container);
@@ -69,10 +68,10 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		jobList = new ArrayList<>();
 		
 		sink = new Sink(container, true, new Point(0,0), this);
-		edgeList.add(new Edge(container, true, true, new Point(450,0), new Point(590,0), sink));
-		station = new Station(container, true, true, new Point(0,0), edgeList.get(0), queuePolicy, nServers);
-		edgeList.add(new Edge(container, true, true, new Point(80,0), new Point(230,0), station));
-		source = new Source(container, true, new Point(0,0), edgeList.get(edgeList.size()-1),this, interArrival, service);
+		edgeList.add(new Edge(this, container, true, true, new Point(450,0), new Point(590,0), sink));
+		station = new Station(this, container, true, true, new Point(0,0), edgeList.get(0), queuePolicy, nServers);
+		edgeList.add(new Edge(this, container, true, true, new Point(80,0), new Point(230,0), station));
+		source = new Source(this, container, true, new Point(0,0), edgeList.get(edgeList.size()-1), interArrival, service);
 	}
 	
 	/**
@@ -126,21 +125,64 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	}
 
 	@Override
-	public void updatePause(long pause) {
-		//update all those elements that work with System.currentMillis() like CircleStation
-		station.updatePause(pause);
-		
+	public void stop(){
+		anim.terminate();
+		animPanel.stopAnimation();
 	}
 
 	@Override
-	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers, Distributions service, Distributions interA){
-		queuePolicy = policy;
-		station.typeOfQueue(policy);
-		this.nServers = nservers;
-		station.updateNServers(nservers);
+	public void updatePause(long pause) {
+		//update all those elements that work with System.currentMillis()
+		station.updatePause(pause);
+		source.updatePause(pause);
+	}
 
-		//TODO: update the distributions to jobs and sources
-		source.updateDistribution(service, interA);
+	@Override
+	public void next() {
+		//first update the velocity of each component that works with time
+		source.setVelocityFactor(5);
+		station.setVelocityFactor(5);
+		for(Job j: jobList) {
+			j.setVelocityFactor(5);
+		}
+		
+		anim.start();
+		
+		for(Edge e: edgeList) {
+			e.nextEvent();
+		}
+		station.nextEvent();
+	}
+
+	public void resetNextEvent() {
+		//reset all the velocity factors
+		source.setVelocityFactor(1);
+		station.setVelocityFactor(1);
+		for(Job j: jobList) {
+			j.resetVelocityFactor();
+		}
+		
+		for(Edge e: edgeList) {
+			e.resetNextEvent();
+		}
+		station.resetNextEvent();
+
+		//reset the buttons of the animationPanel
+		animPanel.resetNextStepAnimation();
+	}
+
+	@Override
+	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers, Distributions service, Distributions interA, int maxjobs){
+		queuePolicy = policy;
+		interArrival = interA;
+		this.service = service;
+		this.nServers = nservers;
+
+		station.typeOfQueue(policy);
+		station.updateNServers(nservers);
+		source.updateDistribution(service, interA);	
+		source.setMaxJobs(maxjobs);
+		sink.setMaxJobs(maxjobs);
 	}
 
 }

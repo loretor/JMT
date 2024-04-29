@@ -46,6 +46,7 @@ public class Source extends JComponent implements JobContainer{
 	private long start; //solo per debug, sarà da eliminare
 	
 	private Image sourceImg;
+	private Image finishImg;
 	private boolean centered = false;
 	private int size = 50;
 	
@@ -53,18 +54,24 @@ public class Source extends JComponent implements JobContainer{
 	private Distributions interArrival;
 	private Distributions service;
 	private double nextRandomValue = 0;
+
+	private long pauseTime = 0; //keep track for how long the animation was paused
+	private int velocityFactor = 1; //to increase the velocity of the simulation
+
+	private int maxJobs = -1; //by default the source runs infinitely, if this value is > 0 then there is an upperbound
+	private int counterJobs = 0;
 	
 	
 	/**
      * Constructor
-     * @param container, JPanel that contains this sink
+     * @param anim, AnimationClass associated to this component. It is needed in order to remove the job arrived to the sink also from the list of jobs of the AnimationClass
+	 * @param container, JPanel that contains this sink
      * @param centered, if the component is centered with respect to the Jpanel
      * @param pos, position of the component. If it is centered then this pos is not important, it can be anything
      * @param next, next JContainer linked to the source
-     * @param anim, AnimationClass associated to this component. It is needed in order to remove the job arrived to the sink also from the list of jobs of the AnimationClass
 	 * @param interArrival, distribution of the interarrival time
      */
-	public Source(JPanel container,boolean centered, Point pos, JobContainer next, AnimationClass anim, Distributions interArrival, Distributions service) {
+	public Source(AnimationClass anim, JPanel container,boolean centered, Point pos, JobContainer next, Distributions interArrival, Distributions service) {
 		this.parent = container;
 		this.pos = pos;
 		this.next = next;	
@@ -74,6 +81,7 @@ public class Source extends JComponent implements JobContainer{
 		this.service = service;
 		
 		sourceImg = JMTImageLoader.loadImageAwt("Source");
+		finishImg = JMTImageLoader.loadImageAwt("Measure_ok");
 	}
 	
 	public void paint(Graphics g) {
@@ -85,6 +93,10 @@ public class Source extends JComponent implements JobContainer{
 			pos.y = parent.getY()+(heightPanel- size)/2 ;
 			pos.x = 20;
 		}
+
+		if(maxJobs != -1 && counterJobs == 0){ //animation finished
+			g.drawImage(finishImg, pos.x+size+5, pos.y, size/3, size/3, null);
+		}
 		
 		g.drawImage(sourceImg, pos.x, pos.y, size, size, null);
 
@@ -95,21 +107,23 @@ public class Source extends JComponent implements JobContainer{
 
 	@Override
 	public void refresh() {
-		//every next random value of the distribution of the interarrival time, a new job arrives
-
-		if(System.currentTimeMillis() - start >= nextRandomValue*1000) {
-			routeJob = new Job(service);
-			routeJob(0);
-			start = System.currentTimeMillis();
-			try {
-				nextRandomValue = interArrival.nextRand();
-			} catch (IncorrectDistributionParameterException e) {
-				//this will never happen, since the parameters of the distribution of the interArrival are OK
-				nextRandomValue = 64.0;
+		if(maxJobs == -1 || (maxJobs != -1 && counterJobs > 0)){
+			//every next random value of the distribution of the interarrival time, a new job arrives
+			if(System.currentTimeMillis() - pauseTime - start >= (nextRandomValue*1000)/velocityFactor) {
+				routeJob = new Job(service);
+				routeJob(0);
+				start = System.currentTimeMillis();
+				try {
+					nextRandomValue = interArrival.nextRand();
+				} catch (IncorrectDistributionParameterException e) {
+					//this will never happen, since the parameters of the distribution of the interArrival are OK
+					nextRandomValue = 64.0;
+				}
+				anim.addNewJob(routeJob);
+				pauseTime = 0;
+				counterJobs--;
 			}
-			anim.addNewJob(routeJob);
-		}
-		
+		}		
 	}
 	
 	/**
@@ -142,6 +156,10 @@ public class Source extends JComponent implements JobContainer{
 		
 	}
 
+	public void updatePause(long pause) {
+		pauseTime += pause;
+	}
+
 	/**
 	 * Update the Service time and InterArrival time distribution. Called from the AnimationClass
 	 * @param service new distribution for service time
@@ -150,6 +168,15 @@ public class Source extends JComponent implements JobContainer{
 	public void updateDistribution(Distributions service, Distributions interA){
 		this.service = service;
 		interArrival = interA;
+	}
+
+	public void setVelocityFactor(int value) {
+		velocityFactor = value;
+	}
+
+	public void setMaxJobs(int j) {
+		maxJobs = j;
+		counterJobs = j;
 	}
 	
 	

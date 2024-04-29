@@ -34,9 +34,11 @@ public class CircleStation extends JComponent implements JobContainer{
 	private Job currentJob;
 	private long entranceTime;
 	private boolean isWorking; //to know if it is processing a job or not
+	private long passedTime;
 	
 	private long pauseTime; //this variable is important if we are processing a job and then the animator is paused, we need to know how much time the job remained paused and remove this value from the passedTime
 	//then set this value = 0 when the job gets out from this class
+	private int velocityFactor = 1; //to increase the velocity of the simulation
 	
 	/**
 	 * Constructor
@@ -71,7 +73,9 @@ public class CircleStation extends JComponent implements JobContainer{
 	public void refresh() {
 		if(isWorking) {
 			long duration = (long) (currentJob.getDuration() * Math.pow(10, 3));
-			long passedTime = System.currentTimeMillis() - entranceTime - pauseTime;
+			passedTime += (System.currentTimeMillis() - entranceTime - pauseTime)*velocityFactor;
+			entranceTime = System.currentTimeMillis();
+			pauseTime = 0;
 			
 			long diff =  duration - passedTime;
 			progression = (float) diff/duration;
@@ -80,6 +84,7 @@ public class CircleStation extends JComponent implements JobContainer{
 				isWorking = false;
 				progression = 0; //to avoid printing another cycle of the circle
 				pauseTime = 0;
+				passedTime = 0;
 				
 				routeJob();
 			}
@@ -130,6 +135,10 @@ public class CircleStation extends JComponent implements JobContainer{
 	
 	public void setPosition(Point pos) {
 		sPos = pos;
+	}
+
+	public void setVelocityFactor(int value) {
+		velocityFactor = value;
 	}
 
 	

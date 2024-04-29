@@ -37,6 +37,15 @@ public class AnimationClass extends JComponent implements Animation{
 	public void reload() {}
 
 	@Override
+	public void stop() {}
+
+	@Override
+	public void next() {}
+
+	/** To set all the subcomponents with nextEvent = false (because we want, after an event, the possibility to continue the simulation in normal mode or with nextEvent way) */
+	public void resetNextEvent() { }
+
+	@Override
 	public void updatePause(long pause) {}
 	
 	/**
@@ -63,8 +72,9 @@ public class AnimationClass extends JComponent implements Animation{
 	 * @param nservers number of servers
 	 * @param serviceTime distribution of the service time
 	 * @param interArrivalTime distribution of the inter-arrival time
+	 * @param maxJobs -1 if the simulation has no upper limit, otherwise > 0 means a max number of jobs to simulate
 	 */
-	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers, Distributions serviceTime, Distributions interArrivalTime){ }
+	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers, Distributions serviceTime, Distributions interArrivalTime, int maxJobs){ }
 
 	/**
 	 * Method for updating the MultipleQueue

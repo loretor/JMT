@@ -20,8 +20,11 @@ package jmt.jteach.Wizard.panels;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 
@@ -32,6 +35,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -39,6 +43,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -88,13 +93,15 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     private JSpinner prob2 = null;
     private JButton createButton;
     private JPanel animationPanel;
-    private AnimationClass animation;
     private HoverHelp help;
 
     //------------ variables for parameters JPanel ---------------
     private JPanel parametersPanel;
     private final int spaceBetweenPanels = 5;
     private final Distributions[] distributions = Distributions.values(); 
+    private JCheckBox infDuration;
+    private JSpinner duration;
+    private int maxJobs = -1; //-1, means simulation runs infinitely, otherwise > 0 means an upper limit
 
     //-------------all the Actions of this panel------------------
     private AbstractTCHAction exit;
@@ -106,6 +113,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     private AbstractTCHAction about;
 
     //--------------properties of the animation------------------
+    private AnimationClass animation;
     private Policy policy = null;
     private QueuePolicyNonPreemptive[] nonPreemptivePolicies; //array of all possible nonPreemptive policies
     private QueuePolicyNonPreemptive queuePolicyNonPreemptive = null;
@@ -136,9 +144,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
                 } else {
                     createButton.setEnabled(false);
                 }
-            }
-            
-            
+            }           
         }
     };
 
@@ -164,10 +170,10 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
      * @param main the main wizard
      * @param policy the type of policy
      */
-    public AnimationPanel(MainWizard main, Policy policy){
+    public AnimationPanel(MainWizard main, Policy policy, QueuePolicyNonPreemptive algorithm){
         this(main);
         this.policy = policy;
-        this.queuePolicyNonPreemptive = QueuePolicyNonPreemptive.FIFO; //set this equal to FIFO by default
+        this.queuePolicyNonPreemptive = algorithm; 
         this.routingPolicy = null;
         start.setEnabled(false); //cannot start a simulation without setting the parameters
         nextStep.setEnabled(false);
@@ -247,7 +253,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         animationPanel = new JPanel(new BorderLayout());
         //based on the type of Policy passed in the constructor, create a new Animation
         if(policy == Policy.NON_PREEMPTIVE){
-            animation = new SingleQueueNetAnimation(animationPanel, QueuePolicyNonPreemptive.FIFO);
+            animation = new SingleQueueNetAnimation(this, animationPanel, QueuePolicyNonPreemptive.FIFO);
         }
         else{
             animation = new MultipleQueueNetAnimation(animationPanel, routingPolicy);
@@ -284,6 +290,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
                     options[i] = nonPreemptivePolicies[i].toString();
                 }
                 algorithmJComboBox = new JComboBox<String>(options);
+                algorithmJComboBox.setSelectedItem(queuePolicyNonPreemptive.toString()); //set as selected policy the one chosen in the MainPanel when the button was pressed
                 algorithmPanel.add(algorithmJComboBox);
             }
             
@@ -347,9 +354,37 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         serviceTPanel.add(serviceComboBox);
         parametersPanel.add(serviceTPanel);
 
+        //Simulation Duration
+        JPanel simulationDuration = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[4]);
+        simulationDuration.setLayout(new GridLayout(1,2));
+        simulationDuration.add(new JLabel("Max jobs generated:"));
+
+        JPanel valuePanel = new JPanel(new BorderLayout());
+        duration = new JSpinner(new SpinnerNumberModel(10, 1, 600, 1));
+        duration.setEnabled(false);
+        valuePanel.add(duration, BorderLayout.WEST);
+        valuePanel.add(Box.createHorizontalStrut(3), BorderLayout.CENTER);     
+        infDuration = new JCheckBox("infinite");
+        infDuration.setSelected(true);
+        infDuration.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(infDuration.isSelected()){
+                    duration.setEnabled(false);
+                    maxJobs = -1;
+                }
+                else{
+                    duration.setEnabled(true);
+                }
+            }           
+        });
+        valuePanel.add(infDuration, BorderLayout.EAST);
+        simulationDuration.add(valuePanel);
+        parametersPanel.add(simulationDuration);
+
         //create button
         paddingBorder = new EmptyBorder(0,80,0,80);
-        JPanel createPanel = createPanel(paddingBorder, true, spaceBetweenPanels*2, null);
+        JPanel createPanel = createPanel(paddingBorder, true, spaceBetweenPanels*2, ConstantsJTch.HELP_PARAMETERS_PANELS[5]);
         createPanel.setLayout(new BorderLayout());
         createButton = new JButton(CREATE);
         help.addHelp(createButton, ConstantsJTch.HELP_PARAMETERS_PANELS[4]);
@@ -439,9 +474,15 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
 
         if(policy == Policy.NON_PREEMPTIVE){
             queuePolicyNonPreemptive = nonPreemptivePolicies[algorithmJComboBox.getSelectedIndex()]; //the index of the JComboBox is the same of the array of queue policies Non preemptive
+            if(infDuration.isSelected()){
+                maxJobs = -1;
+            }
+            else{
+                maxJobs = (Integer) duration.getValue();
+            }
             mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling - " + queuePolicyNonPreemptive.toString()));
             descrLabel.setText("<html><p style='text-align:justify;'>"+queuePolicyNonPreemptive.getDescription()+"</p></html>");
-            animation.updateSingle(queuePolicyNonPreemptive, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
+            animation.updateSingle(queuePolicyNonPreemptive, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem(), maxJobs);
         }
         else if(policy == Policy.PREEMPTIVE){
 
@@ -495,11 +536,24 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         nextStep.setEnabled(true);
     }
 
+    @Override
     public void nextStepAnimation(){
-        start.setEnabled(false);
+        animation.next();
+        //disable all the buttons, they will be enabled by the AnimationClass when the step simulation is completed
+        disableAllButtons();
+    }
+
+    /** Set all the buttons correclty when the Step simulation is complete (called by AnimationClass) */
+    public void resetNextStepAnimation(){
+        start.setEnabled(true);
         pause.setEnabled(false);
-        reload.setEnabled(false);
-        nextStep.setEnabled(false);
+        reload.setEnabled(true);
+        nextStep.setEnabled(true);
+    }
+
+    @Override
+    public void stopAnimation() {
+        disableAllButtons();
     }
 
     @Override
@@ -507,9 +561,10 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         parent.close();
     }
 
-    @Override
-    public void stopAnimation() {
-        
+    public void disableAllButtons(){
+        start.setEnabled(false);
+        pause.setEnabled(false);
+        reload.setEnabled(false);
+        nextStep.setEnabled(false);
     }
-
 }

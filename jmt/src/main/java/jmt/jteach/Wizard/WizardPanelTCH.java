@@ -44,6 +44,9 @@ public interface WizardPanelTCH{
     /** Goes back to the main menu */
     public void exit();
 
-    /** Stops the simulation, used only in Markov Chains */
+    /** 
+     * Stops the simulation, 
+     * used in Markov Chain, but also in the Simulation Models in reverse mode (it's the simulation that decides when the animation has to be stopped and all the UI changes must be done) 
+     */
     public void stopAnimation();
 }

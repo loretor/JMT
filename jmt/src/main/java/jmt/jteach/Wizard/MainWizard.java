@@ -93,13 +93,13 @@ public class MainWizard extends JTchWizard{
 
     
 	/**
-	 * Method to create a new AnimationPanel
-	 * @param policy the type of Queue Policy
+	 * Method to create a new AnimationPanel for Non Preemptive Scheduling
+	 * @param algorithm the type of Non Preemptive algorithm
 	 */
-	public void setAnimationPanelEnv(Policy policy){
+	public void setAnimationPanelEnv(QueuePolicyNonPreemptive algorithm){
 		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+TITLE_SCHEDULING);
 
-		WizardPanel p = new AnimationPanel(this, policy);
+		WizardPanel p = new AnimationPanel(this, Policy.NON_PREEMPTIVE, algorithm);
 
 		this.addPanel(p);
 		this.showNext();

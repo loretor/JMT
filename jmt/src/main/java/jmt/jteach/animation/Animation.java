@@ -51,6 +51,15 @@ public interface Animation {
 	
 	/** Reload the animation if it was paused */
 	public void reload();
+
+	/** Stop the animation. It is used when a maximum number of jobs is reached and nothing can be done */
+	public void stop();
+
+	/**
+	 * Next event in the animation.
+	 * The simulation time is increased (whenever System.currentMillis() is used, multiply it for a factor > 1), and the simulation pauses when a new event occurs
+	 */
+	public void next();
 		
 	/**
 	 * This method is important for udpdating all those components inside the Animation that are affected by a pause of the Animator.

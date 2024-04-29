@@ -46,7 +46,7 @@ public class BoxStation extends JComponent implements JobContainer{
 	private int queueSize;
 	
 	//information about the current Job inside the BoxStation
-	private Color color = Color.RED;
+	private Color color;
 	private double duration;
 	private int maxValue = 10; //this value is for the conversion from the duration to a colored box (try to select a max value accordingly to the type of distribution)
 	private int priority;
@@ -83,7 +83,7 @@ public class BoxStation extends JComponent implements JobContainer{
 		
 		//paint the circle above
 		if(isWorking) {
-			g.setColor(Color.GREEN);
+			g.setColor(color);
 			g.fillOval(sPos.x + (queueSize-index-1)*size + (sLength/queueSize)/2 - sizeCircle/2, sPos.y - sizeCircle - 10, sizeCircle, sizeCircle); 
 		}
 		

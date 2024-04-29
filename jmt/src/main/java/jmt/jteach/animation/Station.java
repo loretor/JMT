@@ -42,6 +42,7 @@ import jmt.jteach.animation.customQueue.PRIOQueue;
  */
 public class Station extends JComponent implements JobContainer{
 	private JPanel parent; //panel in which the Station is drawn
+	private AnimationClass animation;
 	
 	//general information about the station
 	private Point pos;
@@ -61,9 +62,13 @@ public class Station extends JComponent implements JobContainer{
 	private BoxStation[] boxes;
 	private final int sizeQueue = 5;	
 	private CircleStation[] circles;
+
+	//for the Step simulation
+	private boolean nextEvent = false;
 	
 	/**
 	 * Constructor
+	 * @param animation, AnimationClass which the edge is part of
 	 * @param parent, JPanel that contains this station
 	 * @param xcentered, if the station is x centered with respect to the parent
 	 * @param ycentered, if the station is y centered with respect to the parent
@@ -72,7 +77,8 @@ public class Station extends JComponent implements JobContainer{
 	 * @param type, queue policy type
 	 * @param servers, number of servers
 	 */
-	public Station(JPanel parent, boolean xcentered, boolean ycentered, Point pos, JobContainer next, QueuePolicyNonPreemptive type, int servers) {
+	public Station(AnimationClass anim, JPanel parent, boolean xcentered, boolean ycentered, Point pos, JobContainer next, QueuePolicyNonPreemptive type, int servers) {
+		this.animation = anim;
 		this.parent = parent;
 		this.pos = pos; 
 		this.xcentered = xcentered;
@@ -250,6 +256,12 @@ public class Station extends JComponent implements JobContainer{
 		if(jobQueue.size() != sizeQueue) {
 			jobQueue.addNew(newJob);
 		}	
+
+		if(nextEvent) {
+			refresh();
+			animation.pause();
+			animation.resetNextEvent();
+		}
 	}
 
 	public Point getPosition() {
@@ -295,6 +307,22 @@ public class Station extends JComponent implements JobContainer{
 			circles[i] = new CircleStation(this, position);
 			position *= -1;
 		}
+	}
+
+	public void setVelocityFactor(int value) {
+		for(CircleStation c: circles) {
+			c.setVelocityFactor(value);
+		}
+	}
+
+	/** Set the Step simulation on */
+	public void nextEvent() {
+		nextEvent = true;
+	}
+
+	/** Set the Step simulation off */
+	public void resetNextEvent() {
+		nextEvent = false;
 	}
 
 }

@@ -45,7 +45,28 @@ public class ConstantsJTch {
     public static final String JSQ_DESCRIPTION =
         "The JSQ (Join the Shortes Job Queue) routing policy is a routing algorithm to distribute tasks when they arrive at the router. Jobs are routed based on the station connected to the router with less jobs in its queue";
     
-        
+    
+    //tooltips of the MainPanel
+    public static final String[] PREEMPTIVE_TOOLTIPS = {
+        "First Come First Served",
+        "Last Come First Served",
+        "Priority",
+        "Shortest Job First",
+        "Longest Job First"
+    };
+
+    public static final String[] ROUTING_TOOLTIPS = {
+        "Round Robin",
+        "Probabilistic",
+        "Join the Shortest Queue"
+    };
+
+    public static final String[] MARKOV_TOOLTIPS = {
+        "M/M/1 Station, 1 Server",
+        "M/M/1/k Finite Capacity Station, 1 Server",
+        "M/M/c Station, c Servers",
+        "M/M/c/k Finite Capacity Station, c Servers"
+    };
     
     //help text
     public static final String[] HELP_BUTTONS_ANIMATIONS = {
@@ -57,15 +78,17 @@ public class ConstantsJTch {
     };
         
     public static final String[] HELP_BUTTONS_MAINPANEL = {
-        "Opens a new panel with Non Preemptive Scheduling Simulation",
-        "Opens a new panel with Preemptive Scheduling Simulation",
+        "Select the algorithm for the Non Preemptive Scheduling Simulation",
+        "",
+        "Select the algorithm for the Preemptive Scheduling Simulation",
+        "",
         "Opens a new panel with a Round Robin simulation",
-        "Opens a new panel with a Probabilistic Routing simulation",
-        "Opens a new panel with a Routing simulation, the selection of the type of algorithm will be done in the next window",        
-        "Opens a new panel with a M/M/1 Queue Markov Chain",
-        "Opens a new panel with a M/M/1/k Queue Markov Chain",
-        "Opens a new panel with a M/M/c Queue Markov Chain",
-        "Opens a new panel with a M/M/c/k Queue Markov Chain"
+        "",
+        "Opens a new panel with a the Probabilistic Routing simulation",
+        "",
+        "Select the algorithm for a Routing simulation",       
+        "", 
+        "Select the type of Queue Markov Chain",
     };
     
     public static final String[] HELP_PARAMETERS_PANELS = {
@@ -73,7 +96,8 @@ public class ConstantsJTch {
         "Select how many servers are available for each station",
         "Select the type of distribution for the inter arrival time between jobs",
         "Select the type of distribution for the service time for each station in the simulation",
-        "Once all the parameters are setted, click this button to create the animation. At this point you can start the animation."
+        "By default, the simulation runs indefinitely. To change this behavior, uncheck the box and set the number of jobs to generate",
+        "Once all the parameters are setted, click this button to create the animation. At this point you can start the animation"
     };
 
     public static final String[] HELP_PROBABILITIES = {

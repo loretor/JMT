@@ -70,39 +70,39 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		
 		sink = new Sink(container, true, new Point(800,0), this);
 		
-		edgeList.add(new Edge(container, true, true, new Point(550,0), new Point(600,0), sink));
+		edgeList.add(new Edge(this,container, true, true, new Point(550,0), new Point(600,0), sink));
 		
 		//two vertical edges
-		edgeList.add(new Edge(container, false, false, new Point(550,100+30), new Point(550,252), edgeList.get(0)));
-		edgeList.add(new Edge(container, false, false, new Point(550,374), new Point(550,252), edgeList.get(0)));
+		edgeList.add(new Edge(this,container, false, false, new Point(550,100+30), new Point(550,252), edgeList.get(0)));
+		edgeList.add(new Edge(this, container, false, false, new Point(550,374), new Point(550,252), edgeList.get(0)));
 		
 		//three horizontal edges
-		edgeList.add(new Edge(container, false, false, new Point(500,100+30), new Point(550,100+30), edgeList.get(1)));		
-		edgeList.add(new Edge(container, true, false, new Point(500,0), new Point(550,0),  edgeList.get(0)));
-		edgeList.add(new Edge(container, false, false, new Point(500,374), new Point(550,374), edgeList.get(2)));
+		edgeList.add(new Edge(this, container, false, false, new Point(500,100+30), new Point(550,100+30), edgeList.get(1)));		
+		edgeList.add(new Edge(this, container, true, false, new Point(500,0), new Point(550,0),  edgeList.get(0)));
+		edgeList.add(new Edge(this, container, false, false, new Point(500,374), new Point(550,374), edgeList.get(2)));
 		
 		//three stations
-		stationList.add(new Station(container, false, false, new Point(300,100), edgeList.get(3), queuePolicy, nServers));
-		stationList.add(new Station(container, false, true, new Point(300,0), edgeList.get(4), queuePolicy, nServers));
-		stationList.add(new Station(container, false, false, new Point(300,252+(252-100-60)), edgeList.get(5), queuePolicy, nServers));
+		stationList.add(new Station(this, container, false, false, new Point(300,100), edgeList.get(3), queuePolicy, nServers));
+		stationList.add(new Station(this, container, false, true, new Point(300,0), edgeList.get(4), queuePolicy, nServers));
+		stationList.add(new Station(this, container, false, false, new Point(300,252+(252-100-60)), edgeList.get(5), queuePolicy, nServers));
 		
 		//three horizontal edges
-		edgeList.add(new Edge(container, false, true, new Point(180,100+30), new Point(280,100+30), stationList.get(0)));
-		edgeList.add(new Edge(container, true, true, new Point(210,0), new Point(280,0), stationList.get(1)));
-		edgeList.add(new Edge(container, false, true, new Point(180,374), new Point(280,374), stationList.get(2)));
+		edgeList.add(new Edge(this, container, false, true, new Point(180,100+30), new Point(280,100+30), stationList.get(0)));
+		edgeList.add(new Edge(this, container, true, true, new Point(210,0), new Point(280,0), stationList.get(1)));
+		edgeList.add(new Edge(this, container, false, true, new Point(180,374), new Point(280,374), stationList.get(2)));
 		
 		//two vertical edges
-		edgeList.add(new Edge(container, false, false, new Point(180,222), new Point(180,100+30), edgeList.get(6)));
-		edgeList.add(new Edge(container, false, false, new Point(180,282), new Point(180,374),  edgeList.get(8)));
+		edgeList.add(new Edge(this, container, false, false, new Point(180,222), new Point(180,100+30), edgeList.get(6)));
+		edgeList.add(new Edge(this, container, false, false, new Point(180,282), new Point(180,374),  edgeList.get(8)));
 		
 		//create the two Lists for the router
 		int l = edgeList.size();
 		List<Edge> eList = new ArrayList<>(Arrays.asList(edgeList.get(l-2), edgeList.get(l-4), edgeList.get(l-1)));
 		router = new Router(container, false, true, new Point(160,0), eList, stationList, routingPolicy, probabilities);
 		
-		edgeList.add(new Edge(container, true, true, new Point(80,0), new Point(150,0), router));
+		edgeList.add(new Edge(this, container, true, true, new Point(80,0), new Point(150,0), router));
 		
-		source = new Source(container, true, new Point(10,0), edgeList.get(edgeList.size()-1), this, interArrival, service);
+		source = new Source(this, container, true, new Point(10,0), edgeList.get(edgeList.size()-1), interArrival, service);
 		
 	}
 	
@@ -159,6 +159,8 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		repaint();	
 	}
 
+	//TODO: stop for multiple
+
 	@Override
 	public void updatePause(long pause) {
 		//update all those elements that work with System.currentMillis() like CircleStation
@@ -166,6 +168,8 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 			st.updatePause(pause);
 		}
 	}
+
+	//TODO: next for multiple
 
 	@Override
 	public void updateMultiple(Distributions service, Distributions interA){

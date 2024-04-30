@@ -21,6 +21,7 @@ package jmt.jteach.Wizard;
 import jmt.gui.common.CommonConstants;
 import jmt.gui.common.JMTImageLoader;
 import jmt.jteach.Wizard.panels.MainPanel;
+import jmt.jteach.Wizard.panels.ResultsPanel;
 import jmt.jteach.animation.Policy;
 import jmt.jteach.animation.QueuePolicyNonPreemptive;
 import jmt.jteach.animation.RoutingPolicy;
@@ -29,6 +30,8 @@ import jmt.jteach.Wizard.panels.MMQueuesPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -56,11 +59,11 @@ public class MainWizard extends JTchWizard{
 
     //components of the panel
     private JPanel menus;
-
     private MainPanel mainPanel;
-
-
     private HoverHelp help;
+
+	//list of panels after the MainPanel
+	private List<WizardPanel> panelCollection = new ArrayList<>();
 	
     
 	public MainWizard() {
@@ -100,8 +103,13 @@ public class MainWizard extends JTchWizard{
 		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+TITLE_SCHEDULING);
 
 		WizardPanel p = new AnimationPanel(this, Policy.NON_PREEMPTIVE, algorithm);
-
 		this.addPanel(p);
+		panelCollection.add(p);
+
+		p = new ResultsPanel();
+		this.addPanel(p);
+		panelCollection.add(p);
+
 		this.showNext();
 	}
 
@@ -113,8 +121,11 @@ public class MainWizard extends JTchWizard{
 		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+ TITLE_ROUTING);
 
 		WizardPanel p = new AnimationPanel(this, policy);
-
 		this.addPanel(p);
+		panelCollection.add(p);
+
+		//TODO: add here the results panel
+		
 		this.showNext();
 	}
 
@@ -134,8 +145,9 @@ public class MainWizard extends JTchWizard{
 			title = "Markov Chain M/M/n/k Finite Capacity Station";
 		}
 		this.setTitle(TITLE + " - "+ title);
-
 		this.addPanel(p);
+		panelCollection.add(p);
+
 		this.showNext();
 	}
 
@@ -171,7 +183,10 @@ public class MainWizard extends JTchWizard{
 	 * It is called by all the panels in the CanGoBack()
 	 */
 	public void resetScreen() {
-		this.removePanel(currentPanel); //remove the last panel
+		for (int i = 0; i < panelCollection.size(); i++) {
+			tabbedPane.remove(panelCollection.get(i));
+		}
+
 		this.setTitle(TITLE);
 		mainPanel.createMenu(); //update the menu and toolbar
 		mainPanel.createToolBar();

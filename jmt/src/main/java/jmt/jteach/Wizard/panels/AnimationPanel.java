@@ -84,7 +84,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     //------------ components of the panel -----------------------
     private MainWizard parent;
     private JPanel mainPanel;
-    private JEditorPane descrLabel;
+    private JLabel descrLabel;
     private JComboBox<String> algorithmJComboBox = null;
     private JComboBox<Distributions> interAComboBox;
     private JComboBox<Distributions> serviceComboBox;
@@ -194,8 +194,12 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     }
 
     public void initGUI(){
+        Box introductionBox = Box.createHorizontalBox();
+        JLabel label = new JLabel(ConstantsJTch.INTRODUCTION_SIMULATION);
+        introductionBox.add(label);
+
         this.setLayout(new BorderLayout());
-        this.setBorder(BorderFactory.createEmptyBorder(20,10,20,10));
+        //this.setBorder(BorderFactory.createEmptyBorder(20,10,20,10));
         mainPanel = new JPanel();
         if(policy == Policy.NON_PREEMPTIVE){
             mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling"));
@@ -227,27 +231,26 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         //------------------LEFT PART
         leftPanel.setBorder(BorderFactory.createEmptyBorder(10,5,10,5));
         leftPanel.setLayout(new BorderLayout());
+        leftPanel.add(Box.createVerticalStrut(5), BorderLayout.NORTH);
 
         //description of the policy
-        descrLabel = new JEditorPane();
-        descrLabel.setContentType("text/html");
+        JPanel descrPanel = new JPanel(new BorderLayout());
+        descrLabel = new JLabel();
         if(policy == Policy.ROUTING){
-            descrLabel.setText("<html><p style='text-align:justify;'>"+routingPolicy.getDescription()+"</p></html>");
+            descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+routingPolicy.getDescription()+"</p></body></html>");
         }
         else{
-            descrLabel.setText("<html><p style='text-align:justify;'> No description, set parameters first</p></html>");
+            descrLabel.setText(ConstantsJTch.NO_DESCRIPTION);
         }
-        descrLabel.setEditable(false);
-        descrLabel.setPreferredSize(leftPanel.getSize());
-        descrLabel.setBackground(null);
-        leftPanel.add(descrLabel, BorderLayout.CENTER);
+        descrPanel.add(descrLabel, BorderLayout.CENTER);
+        leftPanel.add(descrPanel, BorderLayout.NORTH);
 
         //paramters panel
         createParameters(leftPanel);;
         leftPanel.add(parametersPanel, BorderLayout.SOUTH);
 
         //------------------RIGHT PART
-        rightPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0)); //handle padding correctly, since it seems to move all the objects of the animation in one direction
+        //rightPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0)); //handle padding correctly, since it seems to move all the objects of the animation in one direction
         rightPanel.setLayout(new BorderLayout());
 
         animationPanel = new JPanel(new BorderLayout());
@@ -260,9 +263,26 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         }
         animationPanel.add(animation, BorderLayout.CENTER);
         animationPanel.setBackground(Color.WHITE);
-        rightPanel.add(animationPanel, BorderLayout.CENTER);
 
-        this.add(mainPanel, BorderLayout.CENTER);
+        rightPanel.add(Box.createVerticalStrut(10), BorderLayout.NORTH);
+        rightPanel.add(Box.createHorizontalStrut(10), BorderLayout.WEST);
+        rightPanel.add(animationPanel, BorderLayout.CENTER);
+        rightPanel.add(Box.createVerticalStrut(10), BorderLayout.SOUTH);
+
+        Box mainBox = Box.createVerticalBox();
+        mainBox.add(Box.createVerticalStrut(20));
+		mainBox.add(introductionBox);
+		mainBox.add(Box.createVerticalStrut(20));
+        mainBox.add(mainPanel);
+        mainBox.add(Box.createVerticalStrut(20));
+
+        Box totalBox = Box.createHorizontalBox(); //this box is for adding also the horizontal padding
+		totalBox.add(Box.createHorizontalStrut(20));
+		totalBox.add(mainBox);
+		totalBox.add(Box.createHorizontalStrut(20));
+        this.add(totalBox, BorderLayout.CENTER);
+
+        this.add(totalBox, BorderLayout.CENTER);
         createMenu();
         createToolbar();
     }
@@ -481,7 +501,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
                 maxJobs = (Integer) duration.getValue();
             }
             mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling - " + queuePolicyNonPreemptive.toString()));
-            descrLabel.setText("<html><p style='text-align:justify;'>"+queuePolicyNonPreemptive.getDescription()+"</p></html>");
+            descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+queuePolicyNonPreemptive.getDescription()+"</p></body></html>");
             animation.updateSingle(queuePolicyNonPreemptive, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem(), maxJobs);
         }
         else if(policy == Policy.PREEMPTIVE){

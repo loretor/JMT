@@ -45,6 +45,32 @@ public class ConstantsJTch {
     public static final String JSQ_DESCRIPTION =
         "The JSQ (Join the Shortes Job Queue) routing policy is a routing algorithm to distribute tasks when they arrive at the router. Jobs are routed based on the station connected to the router with less jobs in its queue";
     
+    //introduction AnimationPanel
+    public static final String INTRODUCTION_SIMULATION = "<html><body>"
+        + "<p style='text-align:justify;'>"
+        + "<font size=\"4\"><b>Simulation</b></font><br>"
+        + "<font size=\"3\">In this panel, you can simulate a queue or routing policy. "
+        + "Parameters can be set in the <i>Parameters</i> panel and once selected, click on <i>Create</i> button. "
+        + "At this point, simulation can be executed. <br>"
+        + "At any time, simulation parameters can be altered to initiate a new simulation. <br>"
+        + "Each time a simulation with different parameters is initiated, new results will be displayed in the <i>Results</i> panel.</font>"
+        + "</p></body></html>";
+
+    public static final String NO_DESCRIPTION = "<html><body>"
+        + "<p style='text-align:justify;'>"
+        + "<font size=\"3\"> <i>No description, set parameters first</i>"
+        + "</p></body></html>";
+
+    //introduction ResultsPanel
+    public static final String INTRODUCTION_RESULTS = "<html><body>"
+        + "<p style='text-align:justify;'>"
+        + "<font size=\"4\"><b>Simulation Results</b></font><br>"
+        + "<font size=\"3\">In this panel, it is possible to visualize all the results of the simulations and to compare them. "
+        + "When a new simulation is created and started, the results of the simulation will be displayed in this table. "
+        + "Simulation results are ordered chronologically based on the time the associated simulation was run. <br>"
+        + "Simulations results can also be removed from the table. <br>"
+        + "Please note that returning to the <i>Main Panel</i> will result in the loss of all table data.</font>"
+        + "</p></body></html>";
     
     //tooltips of the MainPanel
     public static final String[] PREEMPTIVE_TOOLTIPS = {

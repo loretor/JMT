@@ -21,16 +21,17 @@ import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.TableCellRenderer;
 
+
 import jmt.framework.data.ArrayUtils;
 import jmt.framework.gui.table.editors.ButtonCellEditor;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.CommonConstants;
 import jmt.gui.common.JMTImageLoader;
-import jmt.gui.exact.table.ComboBoxCell;
 import jmt.gui.exact.table.DisabledCellRenderer;
 import jmt.gui.exact.table.ExactTable;
 import jmt.gui.exact.table.ExactTableModel;
 import jmt.gui.exact.table.ListOp;
+import jmt.jteach.ConstantsJTch;
 
 /**
  * Panel for showing the results of the simulations
@@ -59,7 +60,7 @@ public class ResultsPanel extends WizardPanel{
     private final static int COL_R = 5;
     private final static int COL_QUEUETIME = 6; 
     private final static int COL_NQUEUE = 7;
-    private final static int COL_NSTATION = 8;
+    private final static int COL_THROUGHPUT = 8;
 	private final static int COL_DELETE_BUTTON = 9;
 
     //for each column, an array of values
@@ -70,8 +71,8 @@ public class ResultsPanel extends WizardPanel{
     private double[] services = new double[0];
     private double[] responseTimes = new double[0];
     private double[] queueTimes = new double[0];
+    private double[] thoughputs = new double[0];
     private int[] queueNumbers = new int[0];
-    private int[] stationNumbers = new int[0];
 
     /** This action is to add a new row in the table */
     private AbstractAction addResult = new AbstractAction("New Simulation") {
@@ -147,11 +148,11 @@ public class ResultsPanel extends WizardPanel{
         responseTimes[nResults-1] = 5.0;
         queueTimes = ArrayUtils.resize(queueTimes, nResults, 0.0);
         queueTimes[nResults-1] = 6.0;
+        thoughputs = ArrayUtils.resize(thoughputs, nResults, 0);
+        thoughputs[nResults-1] = 7;
         queueNumbers = ArrayUtils.resize(queueNumbers, nResults, 0);
         queueNumbers[nResults-1] = 7;
-        stationNumbers = ArrayUtils.resize(stationNumbers, nResults, 0);
-        stationNumbers[nResults-1] = 7;
-
+       
 		updateTable();
 	}
 
@@ -173,35 +174,38 @@ public class ResultsPanel extends WizardPanel{
     }
 
     public void initGUI(){
+        this.setLayout(new BorderLayout());
+
         table = new ResultTable();
 
-        Box descrBox = Box.createHorizontalBox();
-        JLabel spinnerLabel = new JLabel("ciao");  
-        descrBox.add(spinnerLabel);
-        descrBox.add(Box.createHorizontalStrut(10));
-
-        Box numberBox = Box.createVerticalBox();
-        numberBox.add(new JButton(addResult));
-        descrBox.add(numberBox);
-
-        Box classBox = Box.createVerticalBox();
-		classBox.add(Box.createVerticalStrut(30));
+        //----upper part
+        Box introductionBox = Box.createHorizontalBox();
+        JLabel label = new JLabel(ConstantsJTch.INTRODUCTION_RESULTS);
+        introductionBox.add(label);
+ 
+        //----center part
+        Box resultBox = Box.createVerticalBox();
+        resultBox.add(Box.createVerticalStrut(20));
+		resultBox.add(introductionBox);
+		resultBox.add(Box.createVerticalStrut(20));
         JScrollPane tablePane = new JScrollPane(table);
 		tablePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		tablePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        classBox.add(tablePane);
-		classBox.add(Box.createVerticalStrut(30));
+        resultBox.add(tablePane);
+		resultBox.add(Box.createVerticalStrut(20));
 
-        Box totalBox = Box.createHorizontalBox();
-        classBox.add(descrBox);
-		classBox.add(Box.createVerticalStrut(10));
+        Box totalBox = Box.createHorizontalBox(); //this box is for adding also the horizontal padding
 		totalBox.add(Box.createHorizontalStrut(20));
-		totalBox.add(classBox);
+		totalBox.add(resultBox);
 		totalBox.add(Box.createHorizontalStrut(20));
+        this.add(totalBox, BorderLayout.CENTER);
 
-		setLayout(new BorderLayout());
-		this.add(totalBox, BorderLayout.CENTER);
-
+        //----lower part
+        Box numberBox = Box.createVerticalBox();
+        numberBox.add(new JButton(addResult));
+        this.add(numberBox, BorderLayout.SOUTH);
+        
+		
         addRow();
     }
 
@@ -246,8 +250,8 @@ public class ResultsPanel extends WizardPanel{
         services = ArrayUtils.delete(services, i);
         responseTimes = ArrayUtils.delete(responseTimes, i);
         queueTimes = ArrayUtils.delete(queueTimes, i);
+        thoughputs = ArrayUtils.delete(thoughputs, i);
         queueNumbers = ArrayUtils.delete(queueNumbers, i);
-        stationNumbers = ArrayUtils.delete(stationNumbers, i);
 
 		classOps.add(ListOp.createDeleteOp(i));
 		hasDeletes = true;
@@ -381,15 +385,15 @@ public class ResultsPanel extends WizardPanel{
                 case COL_DISTR_SERVICE:
                     return "Service Distr.";
                 case COL_SERVICE:
-                    return "S";
+                    return "Service Time";
                 case COL_R:
-                    return "Mean Response Time";
+                    return "Response Time";
                 case COL_QUEUETIME:
-                    return "Mean Queue Time";
+                    return "Queue Time";
+                case COL_THROUGHPUT:
+                    return "Throughput";
                 case COL_NQUEUE:
-                    return "Mean Numbers of Job in Queue";
-                case COL_NSTATION:
-                    return "Number of stations";           
+                    return "Numbers of Job in Queue";          
                 default:
                     return null;
             }
@@ -422,10 +426,10 @@ public class ResultsPanel extends WizardPanel{
                     return responseTimes[rowIndex];
                 case COL_QUEUETIME:
                     return queueTimes[rowIndex];
+                case COL_THROUGHPUT:
+                    return thoughputs[rowIndex];
                 case COL_NQUEUE:
-                    return queueNumbers[rowIndex];
-                case COL_NSTATION:
-                    return stationNumbers[rowIndex];           
+                    return queueNumbers[rowIndex];         
                 default:
                     return null;
             }

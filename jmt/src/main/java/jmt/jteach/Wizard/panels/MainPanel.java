@@ -39,6 +39,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.ListCellRenderer;
@@ -54,6 +55,7 @@ import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.JMTImageLoader;
+import jmt.gui.jwat.JWatWizard;
 import jmt.jteach.ConstantsJTch;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
@@ -483,7 +485,18 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
 	@Override
 	public void stopAnimation() {
-	}    
+	}   
+	
+	
+	@Override
+	public void gotFocus() { //this method is essential for controlling if the user tries to go back to the main panel from a panel like the Result one
+		if (parent.getNumbersPanel() > 0) {
+			if (JOptionPane.showConfirmDialog(this, "This operation resets all data. Are you sure you want to go back to start screen?", "Back operation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.NO_OPTION){
+				parent.resetScreen();
+				((JWatWizard) getParentWizard()).setEnableButton("Next >", false);
+			} 
+		}
+	}
 }
 
 

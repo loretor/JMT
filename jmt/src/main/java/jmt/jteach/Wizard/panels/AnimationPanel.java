@@ -455,7 +455,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
 
     @Override
     public boolean canGoBack() {
-		if (JOptionPane.showConfirmDialog(this, "Are you sure you want to go back to start screen?", "Back operation", JOptionPane.YES_NO_OPTION,
+		if (JOptionPane.showConfirmDialog(this, "This operation resets all data. Are you sure you want to go back to start screen?", "Back operation", JOptionPane.YES_NO_OPTION,
 				JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION) {
 			return false;
 		}		

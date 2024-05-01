@@ -30,6 +30,7 @@ import jmt.jteach.Wizard.panels.MMQueuesPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Event;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -186,6 +187,7 @@ public class MainWizard extends JTchWizard{
 		for (int i = 0; i < panelCollection.size(); i++) {
 			tabbedPane.remove(panelCollection.get(i));
 		}
+		panelCollection.clear();
 
 		this.setTitle(TITLE);
 		mainPanel.createMenu(); //update the menu and toolbar
@@ -193,5 +195,8 @@ public class MainWizard extends JTchWizard{
 		this.validate();
 	}
 
+	public int getNumbersPanel(){
+		return panelCollection.size();
+	}
 	
 }

@@ -4,7 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -12,6 +15,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
@@ -69,6 +73,7 @@ public class ResultsPanel extends WizardPanel{
     private int[] queueNumbers = new int[0];
     private int[] stationNumbers = new int[0];
 
+    /** This action is to add a new row in the table */
     private AbstractAction addResult = new AbstractAction("New Simulation") {
 		/**
 		 * 
@@ -81,10 +86,11 @@ public class ResultsPanel extends WizardPanel{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			addClass();
+			addRow();
 		}
 	};
 
+    /** This Action is only for displaying the X in each row */
     private AbstractAction deleteOneResult = new AbstractAction("") {
 		/**
 		 * 
@@ -100,12 +106,30 @@ public class ResultsPanel extends WizardPanel{
 		}
 	};
 
-    private void addClass() {
-		setNumberOfClasses(nResults + 1);
+    /** This action is for deleting more rows in one time */
+    private AbstractAction deleteResults = new AbstractAction("Delete selected classes") {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		{
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0, false));
+			putValue(Action.SHORT_DESCRIPTION, "Deletes selected classes from the system");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			deleteSelectedRows();
+		}
+	};
+
+    private void addRow() {
+		setNumberOfResults(nResults + 1);
 	}
 
-    private void setNumberOfClasses(int number) {
-		//table.stopEditing();
+    /** Change the size of data structures updating also the table */
+    private void setNumberOfResults(int number) {
+		table.stopEditing();
 		nResults = number;
 
         //TODO: remove this value only for debugging
@@ -128,13 +152,18 @@ public class ResultsPanel extends WizardPanel{
         stationNumbers = ArrayUtils.resize(stationNumbers, nResults, 0);
         stationNumbers[nResults-1] = 7;
 
-		//table.updateStructure();
-		/*if (!deleting) {
+		updateTable();
+	}
+
+    /** Update the changes on the table */
+    private void updateTable(){
+        table.updateStructure();
+		if (!deleting) {
 			classOps.add(ListOp.createResizeOp(nResults));
 		}
 
-		table.updateDeleteCommand(); */
-	}
+		table.updateDeleteCommand();
+    }
 
 
     public ResultsPanel(){
@@ -173,8 +202,60 @@ public class ResultsPanel extends WizardPanel{
 		setLayout(new BorderLayout());
 		this.add(totalBox, BorderLayout.CENTER);
 
-        addClass();
+        addRow();
     }
+
+    /** Adds the possibility of deleting multiple rows by selecting them with 2 clicks of the mouse + Shift */
+    private void deleteSelectedRows() {
+		int[] selectedRows = table.getSelectedRows();
+		int nrows = selectedRows.length;
+		int left = table.getRowCount() - nrows;
+		if (left < 1) {
+			table.removeRowSelectionInterval(selectedRows[nrows - 1], selectedRows[nrows - 1]);
+			deleteSelectedRows();
+			return;
+		}
+		deleteResults(selectedRows);
+	}
+
+    /** 
+     * Remove selected Rows from arrays 
+     * @param idx, array of indices of the rows selected to be deleted
+     */
+	private void deleteResults(int[] idx) {
+		deleting = true;
+		Arrays.sort(idx);
+		for (int i = idx.length - 1; i >= 0; i--) {
+			deleteResult(idx[i]);
+		}
+		updateTable();
+		deleting = false;
+	}
+
+    /** 
+     * Delete a single Result 
+     * @param i, the index of the row to be deleted
+     */
+	private void deleteResult(int i) {
+		nResults--;
+
+        algorithms = ArrayUtils.delete(algorithms, i);
+		arrivalDistibutions = ArrayUtils.delete(arrivalDistibutions, i);
+		lambdas = ArrayUtils.delete(lambdas, i);
+		serviceDistributions = ArrayUtils.delete(serviceDistributions, i);
+        services = ArrayUtils.delete(services, i);
+        responseTimes = ArrayUtils.delete(responseTimes, i);
+        queueTimes = ArrayUtils.delete(queueTimes, i);
+        queueNumbers = ArrayUtils.delete(queueNumbers, i);
+        stationNumbers = ArrayUtils.delete(stationNumbers, i);
+
+		classOps.add(ListOp.createDeleteOp(i));
+		hasDeletes = true;
+	}
+
+    private void updateSizes() {
+		setNumberOfResults(nResults);
+	}
 
     @Override
     public String getName() {
@@ -209,17 +290,22 @@ public class ResultsPanel extends WizardPanel{
 			disabledCellRenderer = new DisabledCellRenderer();
 
             
-			deleteButton = new JButton("Delete");
+			deleteButton = new JButton(deleteOneResult);
 			deleteButtonCellRenderer = new ButtonCellEditor(deleteButton);
-			//enableDeletes();
+			enableDeletes();
 			rowHeader.setRowHeight(CommonConstants.ROW_HEIGHT);
 			setRowHeight(CommonConstants.ROW_HEIGHT);
-
 
             setDefaultRenderer(DisabledCellRenderer.class, disabledCellRenderer);
 
             setRowSelectionAllowed(true);
 			setColumnSelectionAllowed(false);
+
+            installKeyboardAction(getInputMap(), getActionMap(), deleteResults); //add the action of deleting a row 
+
+            //add popup menu when right clicking
+			mouseHandler = new ExactTable.MouseHandler(makeMouseMenu());
+			mouseHandler.install();
         }  
 
         @Override
@@ -232,17 +318,56 @@ public class ResultsPanel extends WizardPanel{
 			}
 		}
 
+        /*enables deleting operations with last column's button*/
+		private void enableDeletes() {
+			deleteOneResult.setEnabled(nResults > 1);
+			
+			this.addMouseListener(new MouseAdapter() { //detection of the rows selected
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if ((columnAtPoint(e.getPoint()) == getColumnCount() - 1) && getRowCount() > 1) {
+						setRowSelectionInterval(rowAtPoint(e.getPoint()), rowAtPoint(e.getPoint()));
+						deleteSelectedRows();
+					}
+				}
+			});
+			getColumnModel().getColumn(getColumnCount() - 1).setMinWidth(20);
+			getColumnModel().getColumn(getColumnCount() - 1).setMaxWidth(20);
+		}
+
+        @Override
+		protected JPopupMenu makeMouseMenu() { //this is for popping the menu when right clicking on selected rows
+			JPopupMenu menu = new JPopupMenu();
+			menu.add(deleteResults);
+			return menu;
+		}
+
         /** Called by ResultPanel to update the Delete Buttons */
-        /*protected void updateDeleteCommand() {
+        protected void updateDeleteCommand() {
 			deleteOneResult.setEnabled(nResults > 1);
 			getColumnModel().getColumn(getColumnCount() - 1).setMinWidth(20);
 			getColumnModel().getColumn(getColumnCount() - 1).setMaxWidth(20);
-		} */
+		} 
+
+        @Override
+		protected void updateActions() {
+			boolean isEnabled = nResults > 1 && getSelectedRowCount() > 0;
+			deleteResults.setEnabled(isEnabled);
+			deleteOneResult.setEnabled(nResults > 1);
+		}
     }
 
     /** The model for the table */
     private class ResultsTableModel extends ExactTableModel {
         private final int nColumns = 10;
+
+        //index, algorithm, distribution arrival, lambda, distribution service, service, response time, queue times, queue numbers, station numbers, delete
+        private Object[] prototypes = { "10000", new String(new char[30]), new String(new char[10]), 100.00, new String(new char[10]), 100.00, 100.00, 100.00, 10, 10, "" };
+
+		@Override
+		public Object getPrototype(int columnIndex) {
+			return prototypes[columnIndex + 1];
+		}
 
         @Override
         public String getColumnName(int index) {

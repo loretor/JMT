@@ -66,7 +66,6 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		anim = new Animator(30, this);
 		edgeList = new ArrayList<>();
 		stationList = new ArrayList<>();
-		jobList = new ArrayList<>();
 		
 		sink = new Sink(container, true, new Point(800,0), this);
 		

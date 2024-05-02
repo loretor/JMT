@@ -153,6 +153,14 @@ public class Station extends JComponent implements JobContainer{
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
+ 
+		//----paint all sub-components below the station
+        for(int i = 0; i < boxes.length; i++) {
+			boxes[i].paint(g);
+		}   
+        for(int i = 0; i < nServers; i++) {
+        	circles[i].paint(g);
+        }
 		
 		//get the correct position for centering the station in the panel
 		if(xcentered) {
@@ -189,15 +197,7 @@ public class Station extends JComponent implements JobContainer{
         	g.drawOval(pos.x + length + 1, pos.y + height/2, height, height);
         }
         
-         
-        //----paint all sub-components
-        for(int i = 0; i < boxes.length; i++) {
-			boxes[i].paint(g);
-		}   
-        for(int i = 0; i < nServers; i++) {
-        	circles[i].paint(g);
-        }  
-        
+       
         if(paintQueueSize) {
         	g.setColor(Color.BLACK);
         	g.setFont(new Font("Arial", Font.PLAIN, 10));

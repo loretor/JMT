@@ -3,6 +3,7 @@
 package jmt.jteach.animation;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -11,7 +12,7 @@ import jmt.jteach.Distributions;
 
 /**
  * This class is a super class for all the animations.
- * It is needed, since it is a way of having a class that represents all the animations, being also in the same time a JComponent
+ * It is needed, since it is a way of having a class that represents all the animations, being also at the same time a JComponent
  *
  * @author Lorenzo Torri
  * Date: 22-mar-2024
@@ -20,6 +21,11 @@ import jmt.jteach.Distributions;
 public class AnimationClass extends JComponent implements Animation{
 	//each Animation must have a jobList of the Jobs inside the Animation. This because the rendering must be performed by the animation, so that it can paint the jobs over all the other components
 	protected List<Job> jobList; //instanciate it inside the constructor of the subclass
+	protected Animator anim;
+
+	public AnimationClass(){
+		jobList = new ArrayList<>();
+	}
 	
 	@Override
 	public void refresh() {}
@@ -91,4 +97,8 @@ public class AnimationClass extends JComponent implements Animation{
 	 */
 	public void updateMultiple(double[] percentages, Distributions serviceTime, Distributions interArrivalTime){}
 
+
+	public Animator getAnimator(){
+		return anim;
+	}
 }

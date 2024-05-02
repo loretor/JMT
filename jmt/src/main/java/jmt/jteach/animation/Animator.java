@@ -53,7 +53,7 @@ public class Animator extends Thread{
 		sleepTime = (long) (1000 / fps);
 	}
 
-	/**Starts the handled animation, otherwise if the Animator is paused it reloads the animation*/
+	/**Starts the handled animation, otherwise if the Animator is paused it restarts the animation*/
 	@Override
 	public void start() {
 		if(!isPaused) {
@@ -61,7 +61,7 @@ public class Animator extends Thread{
 			isWorking = true;
 		}
 		else {
-			reload();
+			restart();
 		}
 	}
 	
@@ -71,8 +71,8 @@ public class Animator extends Thread{
 		startPause = System.currentTimeMillis();
 	}
 	
-	/** Reload the animation, update also the components of animation to let them know the animation was paused for a certain period of time */
-	public void reload() {
+	/** Restart the animation, update also the components of animation to let them know the animation was paused for a certain period of time */
+	public void restart() {
 		isPaused = false;
 		animation.updatePause(System.currentTimeMillis()-startPause);
 	}
@@ -101,5 +101,10 @@ public class Animator extends Thread{
 		synchronized (mutex) {
 			mutex.notifyAll();
 		}
+	}
+
+	/** To know if the animator is paused */
+	public boolean isPaused() {
+		return isPaused;
 	}
 }

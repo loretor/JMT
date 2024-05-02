@@ -62,7 +62,7 @@ public interface Animation {
 	public void next();
 		
 	/**
-	 * This method is important for udpdating all those components inside the Animation that are affected by a pause of the Animator.
+	* This method is important for udpdating all those components inside the Animation that are affected by a pause of the Animator.
 	* One example is the CircleStation, in which the amount of progression is computed as the difference between the current time and the time of entrance of the job in the circle.
 	* But if the animator was paused, then this amount does not have to be computed in the difference of before, so it is crucial to pass to the Circle this value and remove it from the difference
 	* @param pause the amount of time during which the animator was paused

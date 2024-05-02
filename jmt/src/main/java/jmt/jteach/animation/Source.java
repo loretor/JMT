@@ -18,10 +18,13 @@
 
  package jmt.jteach.animation;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.geom.Arc2D;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -56,10 +59,14 @@ public class Source extends JComponent implements JobContainer{
 	private double nextRandomValue = 0;
 
 	private long pauseTime = 0; //keep track for how long the animation was paused
+	private long passedTime = 0;
 	private int velocityFactor = 1; //to increase the velocity of the simulation
 
 	private int maxJobs = -1; //by default the source runs infinitely, if this value is > 0 then there is an upperbound
 	private int counterJobs = 0;
+
+	private int sizeCircle = 20;
+	private float progression = 0.0f;
 	
 	
 	/**
@@ -103,16 +110,34 @@ public class Source extends JComponent implements JobContainer{
 		//TODO: remove those two lines, only for debug
 		g.setFont(new Font("Arial", Font.BOLD, 13));
 		g.drawString(String.valueOf(nextRandomValue), pos.x, pos.y-20);
+
+		//pie arrivals
+		g.drawOval(pos.x + size/2 - sizeCircle/2, pos.y+size+10, sizeCircle, sizeCircle);
+		g.setColor(new Color(50, 168, 82));
+		Graphics2D g2d = (Graphics2D) g.create();
+		Arc2D arc = new Arc2D.Double(pos.x + size/2 - sizeCircle/2, pos.y+size+10, sizeCircle, sizeCircle, 90, 360*progression, Arc2D.PIE); //paint the circle
+	    g2d.fill(arc); 
 	}
 
 	@Override
 	public void refresh() {
 		if(maxJobs == -1 || (maxJobs != -1 && counterJobs > 0)){
-			//every next random value of the distribution of the interarrival time, a new job arrives
-			if(System.currentTimeMillis() - pauseTime - start >= (nextRandomValue*1000)/velocityFactor) {
+			passedTime += (System.currentTimeMillis() - pauseTime - start)*velocityFactor;
+			start = System.currentTimeMillis();
+			pauseTime = 0;
+			
+			long nextValue = (long)nextRandomValue*1000;
+			long diff = nextValue - passedTime;
+			progression = (float) diff/nextValue;
+			
+			if(progression < 0) {
+				progression = 0;
+				pauseTime = 0;
+				passedTime = 0;
+				start = System.currentTimeMillis();
+
 				routeJob = new Job(service);
 				routeJob(0);
-				start = System.currentTimeMillis();
 				try {
 					nextRandomValue = interArrival.nextRand();
 				} catch (IncorrectDistributionParameterException e) {
@@ -120,7 +145,7 @@ public class Source extends JComponent implements JobContainer{
 					nextRandomValue = 64.0;
 				}
 				anim.addNewJob(routeJob);
-				pauseTime = 0;
+
 				counterJobs--;
 			}
 		}		
@@ -132,11 +157,14 @@ public class Source extends JComponent implements JobContainer{
 	 */
 	public void setStart(long time){
 		start = time;
-		try {
-			nextRandomValue = interArrival.nextRand();
-		} catch (IncorrectDistributionParameterException e) {
-			//this will never happen, since the parameters of the distribution of the interArrival are OK
-			nextRandomValue = 64.0;
+
+		if(!anim.getAnimator().isPaused()) { //if it is paused, and we restart the animation, we don't have to create another arrival time
+			try {
+				nextRandomValue = interArrival.nextRand();
+			} catch (IncorrectDistributionParameterException e) {
+				//this will never happen, since the parameters of the distribution of the interArrival are OK
+				nextRandomValue = 64.0;
+			}
 		}
 	}
 

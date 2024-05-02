@@ -43,7 +43,6 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	private Source source;
 	private Sink sink;
 	private Station station;
-	private Animator anim;
 	private List<Edge> edgeList;
 	
 	//--all the characteristics of the Animation
@@ -55,6 +54,7 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	
 	/** Constructor*/
 	public SingleQueueNetAnimation(AnimationPanel animPanel, JPanel container, QueuePolicyNonPreemptive queuePolicy) {		
+		super();
 		this.animPanel = animPanel;
 		this.parent = container;
 		this.queuePolicy = queuePolicy;
@@ -63,9 +63,9 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	
 	public void initGUI(JPanel container) {
 		//Define the elements of the Animation from the last to the first, since each element must have a reference to the next one
-		anim = new Animator(30, this);
 		edgeList = new ArrayList<>();
-		jobList = new ArrayList<>();
+		anim = new Animator(30, this);
+		jobList = new ArrayList<>(); //do not move in the super class, since each time I have to reload the simulation, this method is called
 		
 		sink = new Sink(container, true, new Point(0,0), this);
 		edgeList.add(new Edge(this, container, true, true, new Point(450,0), new Point(590,0), sink));
@@ -109,7 +109,9 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	
 	@Override
 	public void start() {
-		source.setStart(System.currentTimeMillis());
+		if(!anim.isPaused()) { //if it's the first time the animation is started, otherwise it is a simple restart after a pause
+			source.setStart(System.currentTimeMillis());			
+		}
 		anim.start();
 	}
 	

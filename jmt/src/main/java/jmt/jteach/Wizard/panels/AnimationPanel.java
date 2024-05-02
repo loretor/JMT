@@ -79,7 +79,7 @@ import jmt.jteach.animation.SingleQueueNetAnimation;
  * Time: 14.40
  */
 public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
-    private static final String PANEL_NAME = "Scheduling";
+    private static final String PANEL_NAME = "Simulation";
 
     //------------ components of the panel -----------------------
     private MainWizard parent;

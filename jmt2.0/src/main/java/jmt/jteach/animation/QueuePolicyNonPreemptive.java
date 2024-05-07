@@ -55,7 +55,7 @@ public enum QueuePolicyNonPreemptive {
 	PRIO{
 		@Override
 		public String toString() {
-			return "PRIORITY";
+			return "FCFS-PR";
 		}
 
 		@Override

@@ -46,7 +46,7 @@ import jmt.gui.jsimgraph.controller.SimulationStateChecker;
 public class DispatcherThread extends Thread implements AbortMeasure {
 
 	private SimulationStateChecker simStateChecker;
-	private DispatcherJSIMschema simulator;
+	public DispatcherJSIMschema simulator;
 	private GuiInterface gui;
 	private SimulationDefinition sd;
 	private TimerThread timer = null;

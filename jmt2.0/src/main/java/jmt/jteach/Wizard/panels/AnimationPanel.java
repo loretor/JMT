@@ -25,8 +25,12 @@ import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
-
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -38,6 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -53,13 +58,19 @@ import javax.swing.event.ChangeListener;
 
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
+import jmt.framework.gui.graph.MeasureValue;
 import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.JMTImageLoader;
-
+import jmt.gui.common.controller.DispatcherThread;
+import jmt.gui.common.definitions.GuiInterface;
+import jmt.gui.common.definitions.MeasureDefinition;
+import jmt.gui.common.definitions.ResultsModel;
+import jmt.gui.common.xml.XMLWriter;
 import jmt.jteach.ConstantsJTch;
 import jmt.jteach.Distributions;
+import jmt.jteach.Solver;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
 import jmt.jteach.actionsWizard.*;
@@ -78,7 +89,7 @@ import jmt.jteach.animation.SingleQueueNetAnimation;
  * Date: 30-mar-2024
  * Time: 14.40
  */
-public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
+public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiInterface{
     private static final String PANEL_NAME = "Simulation";
 
     //------------ components of the panel -----------------------
@@ -94,6 +105,8 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     private JButton createButton;
     private JPanel animationPanel;
     private HoverHelp help;
+
+    JLabel label;
 
     //------------ variables for parameters JPanel ---------------
     private JPanel parametersPanel;
@@ -118,6 +131,9 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
     private QueuePolicyNonPreemptive[] nonPreemptivePolicies; //array of all possible nonPreemptive policies
     private QueuePolicyNonPreemptive queuePolicyNonPreemptive = null;
     private RoutingPolicy routingPolicy = null;
+
+    //------------- engine simulation --------------------------
+    private Solver solver;
 
 
     //Action associated to the button Create
@@ -161,6 +177,8 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         openHelp = new Help(this,"JTCH");
         about = new About(this);
 
+        solver = new Solver();
+
         pause.setEnabled(false);
         reload.setEnabled(false);
     }
@@ -195,7 +213,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
 
     public void initGUI(){
         Box introductionBox = Box.createHorizontalBox();
-        JLabel label = new JLabel(ConstantsJTch.INTRODUCTION_SIMULATION);
+        label = new JLabel(ConstantsJTch.INTRODUCTION_SIMULATION);
         introductionBox.add(label);
 
         this.setLayout(new BorderLayout());
@@ -515,6 +533,73 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
                 animation.updateMultiple((Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
             }
         }
+
+        getSimulationResults();
+    }
+
+    MeasureDefinition results;
+    int lenght;
+
+    /** Called each time 'Create' is pressed. Start the simulation with the engine to get the results of the simulation in the Results Panel */
+    public void getSimulationResults(){ 
+        //first update the solver with the new values
+        solver.setQueueStrategy(algorithmJComboBox.getSelectedIndex());
+        solver.setNumberOfServers((int) serversSpinner.getValue());
+        solver.setServiceTime(serviceComboBox.getSelectedIndex());
+        solver.setInterArrivalTime(interAComboBox.getSelectedIndex());
+
+        File temp = null;
+        DispatcherThread dispatcher = null;
+        try {
+            temp = File.createTempFile("~JModelSimulation", ".xml");
+            temp.deleteOnExit();
+            descrLabel.setText(System.getProperty("java.io.tmpdir"));         
+            XMLWriter.writeXML(temp, solver.getModel());
+            String logCSVDelimiter = solver.getModel().getLoggingGlbParameter("delim");
+            String logDecimalSeparator = solver.getModel().getLoggingGlbParameter("decimalSeparator");
+            solver.getModel().setSimulationResults(new ResultsModel(solver.getModel().getPollingInterval().doubleValue(), logCSVDelimiter, logDecimalSeparator));
+            dispatcher = new DispatcherThread(this, solver.getModel());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /* 
+        try {
+            temp = new File("C:/Users/Torros/Desktop/~JModelSimulation6196690308517869181.xml");
+        } catch (Exception e) {
+            showErrorMessage("TOOL_TIP_TEXT_KEY");
+        } */
+
+        try {
+            dispatcher.startSimulation(temp);
+        } catch (Exception e) {
+            showErrorMessage("cc");
+        }
+
+        
+        long start = System.currentTimeMillis();
+        try {
+            int i = 0;
+            while(!dispatcher.simulator.isFinished()){
+                descrLabel.setText(String.valueOf(i));
+                i++;
+            }
+            descrLabel.setText("finished after "+(System.currentTimeMillis()-start)/(Math.pow(10,3)));
+        } catch (Exception e) {
+            showErrorMessage("non posso");
+        }
+        
+
+        results = solver.getModel().getSimulationResults();
+        int[] indices = results.getQueueLengthMeasures();
+        String res = "-";
+        for(int i = 0; i < indices.length; i++){
+            res += "Stazione "+String.valueOf(indices[i])+"----";
+            Vector<MeasureValue> values = results.getValues(indices[i]);
+            res += String.valueOf(values.get(values.size()-1).getMeanValue());
+        }
+        
+        descrLabel.setText(res); 
     }
 
     @Override
@@ -586,5 +671,56 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH{
         pause.setEnabled(false);
         reload.setEnabled(false);
         nextStep.setEnabled(false);
+    }
+
+
+    //-----------------------------------------------------------------------
+    //-------------------- all GUI Interface methods ------------------------
+    //-----------------------------------------------------------------------
+    @Override
+    public void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void handleException(Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+		showErrorMessage(sw.toString());
+    }
+
+    @Override
+    public void changeSimActionsState(boolean start, boolean pause, boolean stop) {
+        
+    }
+
+    @Override
+    public void setResultsWindow(JFrame rsw) {
+    }
+
+    @Override
+    public void showResultsWindow() {
+        //TODO:add row to the table
+
+    }
+
+    @Override
+    public boolean isAnimationDisplayable() {
+        return true;
+    }
+
+    @Override
+    public void showRelatedPanel(int problemType, int problemSubType, Object relatedStation, Object relatedCLass) {
+    }
+
+    @Override
+    public void setAnimationHolder(Thread thread) {
+
+    }
+
+    @Override
+    public String getFileName() {
+        return null;
     }
 }

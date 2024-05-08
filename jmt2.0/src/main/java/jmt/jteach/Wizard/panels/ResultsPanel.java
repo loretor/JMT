@@ -78,7 +78,7 @@ public class ResultsPanel extends WizardPanel{
     private double[] responseTimes = new double[0];
     private double[] queueTimes = new double[0];
     private double[] thoughputs = new double[0];
-    private int[] queueNumbers = new int[0];
+    private double[] nCustomers = new double[0];
 
     /** This action is to add a new row in the table */
     private AbstractAction addResult = new AbstractAction("New Simulation") {
@@ -93,7 +93,7 @@ public class ResultsPanel extends WizardPanel{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			addRow();
+			//addRow();
 		}
 	};
 
@@ -130,34 +130,52 @@ public class ResultsPanel extends WizardPanel{
 		}
 	};
 
+    /**
+	 * Method called by the MainWizard to update the Result Panel
+	 * @param algorithm queue algorithm of the animation
+	 * @param arrivalDistr arrival time distribution
+	 * @param lambda the inter arrival time
+	 * @param serviceDistr service time distribution
+	 * @param service service time
+	 * @param responseTime response time
+	 * @param queueTime queue time
+	 * @param thoughput thoughput
+	 * @param nCustomers customer numbers
+	 */
+    public void addResult(String algorithm, String arrivalDistr, double lambda, String serviceDistr, double service, double responseTime, double queueTime, double thoughput, double nCustomer){
+        setNumberOfResults(nResults+1, algorithm, arrivalDistr, lambda, serviceDistr, service, responseTime, queueTime, thoughput, nCustomer);
+    }
+
     private void addRow() {
-		setNumberOfResults(nResults + 1);
+		//setNumberOfResults(nResults + 1);
 	}
 
     /** Change the size of data structures updating also the table */
-    private void setNumberOfResults(int number) {
+    private void setNumberOfResults(int number, String algorithm, String arrivalDistr, double lambda, String serviceDistr, double service, double responseTime, double queueTime, double thoughput, double nCustomer) {
 		table.stopEditing();
 		nResults = number;
 
-        //TODO: remove this value only for debugging
+        //resize the arrays
 		algorithms = ArrayUtils.resize(algorithms, nResults, null);
-        algorithms[nResults-1] = new String("SJF");
-		arrivalDistibutions = ArrayUtils.resize(arrivalDistibutions, nResults, null);
-        arrivalDistibutions[nResults-1] = new String("Exp");
-		lambdas = ArrayUtils.resize(lambdas, nResults, 0.0);
-        lambdas[nResults-1] = 3.0;
-		serviceDistributions = ArrayUtils.resize(serviceDistributions, nResults, null);
-        serviceDistributions[nResults-1] = new String("Exp");
+        arrivalDistibutions = ArrayUtils.resize(arrivalDistibutions, nResults, null);
+        lambdas = ArrayUtils.resize(lambdas, nResults, 0.0);
+        serviceDistributions = ArrayUtils.resize(serviceDistributions, nResults, null);
         services = ArrayUtils.resize(services, nResults, 0.0);
-        services[nResults-1] =  4.0;
         responseTimes = ArrayUtils.resize(responseTimes, nResults, 0.0);
-        responseTimes[nResults-1] = 5.0;
         queueTimes = ArrayUtils.resize(queueTimes, nResults, 0.0);
-        queueTimes[nResults-1] = 6.0;
         thoughputs = ArrayUtils.resize(thoughputs, nResults, 0);
-        thoughputs[nResults-1] = 7;
-        queueNumbers = ArrayUtils.resize(queueNumbers, nResults, 0);
-        queueNumbers[nResults-1] = 7;
+        nCustomers = ArrayUtils.resize(nCustomers, nResults, 0);
+
+        //add new values
+        algorithms[nResults-1] = algorithm;		
+        arrivalDistibutions[nResults-1] = arrivalDistr;
+        lambdas[nResults-1] = lambda;
+        serviceDistributions[nResults-1] = serviceDistr;
+        services[nResults-1] =  service;
+        responseTimes[nResults-1] = responseTime;
+        queueTimes[nResults-1] = queueTime;
+        thoughputs[nResults-1] = thoughput;
+        nCustomers[nResults-1] = nCustomer;
        
 		updateTable();
 	}
@@ -259,14 +277,15 @@ public class ResultsPanel extends WizardPanel{
         responseTimes = ArrayUtils.delete(responseTimes, i);
         queueTimes = ArrayUtils.delete(queueTimes, i);
         thoughputs = ArrayUtils.delete(thoughputs, i);
-        queueNumbers = ArrayUtils.delete(queueNumbers, i);
+        nCustomers = ArrayUtils.delete(nCustomers, i);
 
 		classOps.add(ListOp.createDeleteOp(i));
 	}
 
+    /* 
     private void updateSizes() {
 		setNumberOfResults(nResults);
-	}
+	} */
 
     @Override
     public String getName() {
@@ -409,7 +428,7 @@ public class ResultsPanel extends WizardPanel{
                 case COL_THROUGHPUT:
                     return "Throughput";
                 case COL_NQUEUE:
-                    return "Numbers of Job in Queue";          
+                    return "Numbers of Customers";          
                 default:
                     return null;
             }
@@ -445,7 +464,7 @@ public class ResultsPanel extends WizardPanel{
                 case COL_THROUGHPUT:
                     return thoughputs[rowIndex];
                 case COL_NQUEUE:
-                    return queueNumbers[rowIndex];         
+                    return nCustomers[rowIndex];         
                 default:
                     return null;
             }

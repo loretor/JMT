@@ -591,15 +591,29 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         
 
         results = solver.getModel().getSimulationResults();
-        int[] indices = results.getQueueLengthMeasures();
+        int[] indices = results.getQueueLengthMeasures(); //not needed, since there is only one station so index is only one and it is = 0
         String res = "-";
-        for(int i = 0; i < indices.length; i++){
+        for(int i = 0; i < indices.length; i++){ //this loop is not essential, since we are using just one station in each simulation
             res += "Stazione "+String.valueOf(indices[i])+"----";
             Vector<MeasureValue> values = results.getValues(indices[i]);
             res += String.valueOf(values.get(values.size()-1).getMeanValue());
         }
         
         descrLabel.setText(res); 
+
+        parent.routeResults(solver.getQueueStrategy(), 
+            solver.getInterArrivalDistribution(), 
+            getLastMeasure(results, 0),
+            solver.getServiceDistribution(), 
+            solver.getServiceTimeMean(), 
+            getLastMeasure(results, 1),
+            getLastMeasure(results, 2), 
+            getLastMeasure(results, 3), 
+            getLastMeasure(results, 4));
+    }
+
+    public double getLastMeasure(MeasureDefinition md, int index){
+        return md.getValues(index).lastElement().getMeanValue();
     }
 
     @Override

@@ -159,16 +159,33 @@ public class Solver implements CommonConstants{
 
     /** Add all the metrics to control (like setting the parameters in JSIM) */
     private void addMeasure(){
-        model.addMeasure(SimulationDefinition.MEASURE_QL, serverKey, classKey); 
-        model.addMeasure(SimulationDefinition.MEASURE_RP, serverKey, classKey);
-        model.addMeasure(SimulationDefinition.MEASURE_X, serverKey, classKey);
-        model.addMeasure(SimulationDefinition.MEASURE_QT, serverKey, classKey);
-        
-        
+        model.addMeasure(SimulationDefinition.MEASURE_AR, serverKey, classKey); //0
+        //service??
+        model.addMeasure(SimulationDefinition.MEASURE_RP, serverKey, classKey); //1
+        model.addMeasure(SimulationDefinition.MEASURE_QT, serverKey, classKey); //2
+        model.addMeasure(SimulationDefinition.MEASURE_X, serverKey, classKey); //3
+        model.addMeasure(SimulationDefinition.MEASURE_QL, serverKey, classKey);  //4             
     }
 
     public CommonModel getModel(){
         return model;
+    }
+
+    //--------------- methods to get some parameters of the simulation --------------------
+    public String getQueueStrategy(){
+        return model.getQueueStrategy(serverKey, classKey);
+    }
+
+    public String getInterArrivalDistribution(){
+        return ((Distribution) model.getClassDistribution(classKey)).toString();
+    }
+
+    public String getServiceDistribution(){
+        return ((Distribution) model.getServiceTimeDistribution(serverKey, classKey)).toString();
+    }
+
+    public double getServiceTimeMean(){
+        return ((Distribution) model.getServiceTimeDistribution(serverKey, classKey)).getMean();
     }
 
 

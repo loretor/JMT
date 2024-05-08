@@ -20,6 +20,7 @@ package jmt.jteach.Wizard;
 
 import jmt.gui.common.CommonConstants;
 import jmt.gui.common.JMTImageLoader;
+import jmt.gui.common.animation.Animation;
 import jmt.jteach.Wizard.panels.MainPanel;
 import jmt.jteach.Wizard.panels.ResultsPanel;
 import jmt.jteach.animation.Policy;
@@ -66,6 +67,8 @@ public class MainWizard extends JTchWizard{
 
 	//list of panels after the MainPanel
 	private List<WizardPanel> panelCollection = new ArrayList<>();
+	private AnimationPanel animationPanel;
+	private ResultsPanel resultsPanel;
 	
     
 	public MainWizard() {
@@ -104,13 +107,13 @@ public class MainWizard extends JTchWizard{
 	public void setAnimationPanelEnv(QueuePolicyNonPreemptive algorithm){
 		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+TITLE_SCHEDULING);
 
-		WizardPanel p = new AnimationPanel(this, Policy.NON_PREEMPTIVE, algorithm);
-		this.addPanel(p);
-		panelCollection.add(p);
+		animationPanel = new AnimationPanel(this, Policy.NON_PREEMPTIVE, algorithm);
+		this.addPanel(animationPanel);
+		panelCollection.add(animationPanel);
 
-		p = new ResultsPanel(this);
-		this.addPanel(p);
-		panelCollection.add(p);
+		resultsPanel = new ResultsPanel(this);
+		this.addPanel(resultsPanel);
+		panelCollection.add(resultsPanel);
 
 		this.showNext();
 	}
@@ -122,9 +125,9 @@ public class MainWizard extends JTchWizard{
 	public void setAnimationPanelEnv(RoutingPolicy policy){
 		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+ TITLE_ROUTING);
 
-		WizardPanel p = new AnimationPanel(this, policy);
-		this.addPanel(p);
-		panelCollection.add(p);
+		animationPanel = new AnimationPanel(this, policy);
+		this.addPanel(animationPanel);
+		panelCollection.add(animationPanel);
 
 		//TODO: add here the results panel
 		
@@ -198,6 +201,22 @@ public class MainWizard extends JTchWizard{
 
 	public int getNumbersPanel(){
 		return panelCollection.size();
+	}
+
+	/**
+	 * Method called by the AnimationPanel to update the Result Panel
+	 * @param algorithm queue algorithm of the animation
+	 * @param arrivalDistr arrival time distribution
+	 * @param lambda the inter arrival time
+	 * @param serviceDistr service time distribution
+	 * @param service service time
+	 * @param responseTime response time
+	 * @param queueTime queue time
+	 * @param thoughput thoughput
+	 * @param queueNumber queue number
+	 */
+	public void routeResults(String algorithm, String arrivalDistr, double lambda, String serviceDistr, double service, double responseTime, double queueTime, double thoughput, double queueNumber){
+		resultsPanel.addResult(algorithm, arrivalDistr, lambda, serviceDistr, service, responseTime, queueTime, thoughput, queueNumber);
 	}
 	
 }

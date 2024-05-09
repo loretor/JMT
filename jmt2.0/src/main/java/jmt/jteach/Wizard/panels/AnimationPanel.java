@@ -66,6 +66,7 @@ import jmt.gui.common.JMTImageLoader;
 import jmt.gui.common.controller.DispatcherThread;
 import jmt.gui.common.definitions.GuiInterface;
 import jmt.gui.common.definitions.MeasureDefinition;
+import jmt.gui.common.definitions.MeasureDefinition.ProgressListener;
 import jmt.gui.common.definitions.ResultsModel;
 import jmt.gui.common.xml.XMLWriter;
 import jmt.jteach.ConstantsJTch;
@@ -537,8 +538,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         getSimulationResults();
     }
 
-    MeasureDefinition results;
-    int lenght;
+    
 
     /** Called each time 'Create' is pressed. Start the simulation with the engine to get the results of the simulation in the Results Panel */
     public void getSimulationResults(){ 
@@ -552,64 +552,16 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         DispatcherThread dispatcher = null;
         try {
             temp = File.createTempFile("~JModelSimulation", ".xml");
-            temp.deleteOnExit();
-            descrLabel.setText(System.getProperty("java.io.tmpdir"));         
+            temp.deleteOnExit();       
             XMLWriter.writeXML(temp, solver.getModel());
             String logCSVDelimiter = solver.getModel().getLoggingGlbParameter("delim");
             String logDecimalSeparator = solver.getModel().getLoggingGlbParameter("decimalSeparator");
             solver.getModel().setSimulationResults(new ResultsModel(solver.getModel().getPollingInterval().doubleValue(), logCSVDelimiter, logDecimalSeparator));
             dispatcher = new DispatcherThread(this, solver.getModel());
+            dispatcher.startSimulation(temp);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        /* 
-        try {
-            temp = new File("C:/Users/Torros/Desktop/~JModelSimulation6196690308517869181.xml");
-        } catch (Exception e) {
-            showErrorMessage("TOOL_TIP_TEXT_KEY");
-        } */
-
-        try {
-            dispatcher.startSimulation(temp);
-        } catch (Exception e) {
-            handleException(e);
-        }
-
-        
-        long start = System.currentTimeMillis();
-        try {
-            int i = 0;
-            while(!dispatcher.simulator.isFinished()){
-                descrLabel.setText(String.valueOf(i));
-                i++;
-            }
-            descrLabel.setText("finished after "+(System.currentTimeMillis()-start)/(Math.pow(10,3)));
-        } catch (Exception e) {
-            handleException(e);
-        }
-        
-
-        results = solver.getModel().getSimulationResults();
-        int[] indices = results.getQueueLengthMeasures(); //not needed, since there is only one station so index is only one and it is = 0
-        String res = "-";
-        for(int i = 0; i < indices.length; i++){ //this loop is not essential, since we are using just one station in each simulation
-            res += "Stazione "+String.valueOf(indices[i])+"----";
-            Vector<MeasureValue> values = results.getValues(indices[i]);
-            res += String.valueOf(values.get(values.size()-1).getMeanValue());
-        }
-        
-        descrLabel.setText(res); 
-
-        parent.routeResults(solver.getQueueStrategy(), 
-            solver.getInterArrivalDistribution(), 
-            getLastMeasure(results, 0),
-            solver.getServiceDistribution(), 
-            solver.getServiceTimeMean(), 
-            getLastMeasure(results, 1),
-            getLastMeasure(results, 2), 
-            getLastMeasure(results, 3), 
-            getLastMeasure(results, 4));
     }
 
     public double getLastMeasure(MeasureDefinition md, int index){
@@ -687,6 +639,10 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         nextStep.setEnabled(false);
     }
 
+    public void showInfoMessage() {
+        JOptionPane.showMessageDialog(parent, "Simulation saved in the table", "Simulation Saved", JOptionPane.INFORMATION_MESSAGE);
+    }
+
 
     //-----------------------------------------------------------------------
     //-------------------- all GUI Interface methods ------------------------
@@ -711,12 +667,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
     @Override
     public void setResultsWindow(JFrame rsw) {
+
     }
 
     @Override
     public void showResultsWindow() {
-        //TODO:add row to the table
-
     }
 
     @Override
@@ -736,5 +691,23 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     @Override
     public String getFileName() {
         return null;
+    }
+
+    @Override
+    public void simulationFinished() { //called by dispatcher when the simulation is finished
+        //I opted for this solution since the progressionListener is not very well synchronized with the available data, it happened most of the times that the progression was 100% bu there was no available data
+        showInfoMessage();
+        
+        MeasureDefinition results = solver.getModel().getSimulationResults();
+
+        parent.routeResults(solver.getQueueStrategy(), 
+            solver.getInterArrivalDistribution(), 
+            getLastMeasure(results, 0),
+            solver.getServiceDistribution(), 
+            solver.getServiceTimeMean(), 
+            getLastMeasure(results, 1),
+            getLastMeasure(results, 2), 
+            getLastMeasure(results, 3), 
+            getLastMeasure(results, 4));
     }
 }

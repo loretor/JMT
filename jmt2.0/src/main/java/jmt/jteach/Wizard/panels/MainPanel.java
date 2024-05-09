@@ -112,17 +112,6 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction PRIO = new AbstractAction("Priority") {
-		private static final long serialVersionUID = 1L;
-		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[2]);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.PRIO);
-		}
-	};
-
 	protected AbstractAction SJF = new AbstractAction("SJF") {
 		private static final long serialVersionUID = 1L;
 		{
@@ -370,7 +359,6 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		subMenus[0] = new JPopupMenu();
 		subMenus[0].add(new CustomMenuItem(FCFS, true));
 		subMenus[0].add(new CustomMenuItem(LCFS, true));
-		subMenus[0].add(new CustomMenuItem(PRIO, true));
 		subMenus[0].add(new CustomMenuItem(SJF, true));
 		subMenus[0].add(new CustomMenuItem(LJF, true));
 		

@@ -573,7 +573,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         try {
             dispatcher.startSimulation(temp);
         } catch (Exception e) {
-            showErrorMessage("cc");
+            handleException(e);
         }
 
         
@@ -586,7 +586,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
             }
             descrLabel.setText("finished after "+(System.currentTimeMillis()-start)/(Math.pow(10,3)));
         } catch (Exception e) {
-            showErrorMessage("non posso");
+            handleException(e);
         }
         
 

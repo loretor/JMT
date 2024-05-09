@@ -36,7 +36,6 @@ public class Solver implements CommonConstants{
     private static final String[] queueStrategies = {
         QUEUE_STRATEGY_FCFS,
         QUEUE_STRATEGY_LCFS,
-        QUEUE_STRATEGY_FCFS_PR,
         QUEUE_STRATEGY_SJF,
         QUEUE_STRATEGY_LJF,
     };

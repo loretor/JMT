@@ -52,17 +52,6 @@ public enum QueuePolicyNonPreemptive {
 			return ConstantsJTch.LIFO_DESCRIPTION;
 		}
 	}, 
-	PRIO{
-		@Override
-		public String toString() {
-			return "FCFS-PR";
-		}
-
-		@Override
-		public String getDescription() {
-			return ConstantsJTch.PRIO_DESCRIPTION;
-		}
-	},
 	SJF{
 		@Override
 		public String toString() {

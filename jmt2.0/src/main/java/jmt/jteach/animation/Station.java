@@ -120,15 +120,6 @@ public class Station extends JComponent implements JobContainer{
 		case LIFO:
 			jobQueue = new LIFOQueue<Job>();
 			break;
-		case PRIO:
-			jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
-				@Override
-				public int compare(Job o1, Job o2) {
-					return Integer.compare(o1.getPriority(), o2.getPriority());
-				}
-				
-			});
-			break;
 		case SJF:
 			jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
 				@Override

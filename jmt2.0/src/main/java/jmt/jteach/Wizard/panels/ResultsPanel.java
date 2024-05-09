@@ -32,6 +32,7 @@ import jmt.gui.exact.table.DisabledCellRenderer;
 import jmt.gui.exact.table.ExactTable;
 import jmt.gui.exact.table.ExactTableModel;
 import jmt.gui.exact.table.ListOp;
+import jmt.gui.exact.table.PrototypedTableModel;
 import jmt.jteach.ConstantsJTch;
 import jmt.jteach.Wizard.MainWizard;
 
@@ -318,7 +319,6 @@ public class ResultsPanel extends WizardPanel{
             super(new ResultsTableModel());
             setName("ResultTable");
 			disabledCellRenderer = new DisabledCellRenderer();
-
             
 			deleteButton = new JButton(deleteOneResult);
 			deleteButtonCellRenderer = new ButtonCellEditor(deleteButton);
@@ -397,11 +397,11 @@ public class ResultsPanel extends WizardPanel{
     }
 
     /** The model for the table */
-    private class ResultsTableModel extends ExactTableModel {
+    private class ResultsTableModel extends ExactTableModel implements PrototypedTableModel {
         private final int nColumns = 10;
 
         //index, algorithm, distribution arrival, lambda, distribution service, service, response time, queue times, queue numbers, station numbers, delete
-        private Object[] prototypes = { "10000", new String(new char[30]), new String(new char[10]), 100.00, new String(new char[10]), 100.00, 100.00, 100.00, 10, 10, "" };
+        private Object[] prototypes = { "10000", "-------------", "-------------------------", 100.00, "-------------------------", 100.00, 100.00, 100.00, 10, 10, "" };
 
 		@Override
 		public Object getPrototype(int columnIndex) {

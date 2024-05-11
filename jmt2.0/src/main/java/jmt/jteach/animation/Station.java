@@ -138,6 +138,15 @@ public class Station extends JComponent implements JobContainer{
 				
 			});
 			break;
+		/*case FCFS_PR:
+			jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
+				@Override
+				public int compare(Job o1, Job o2) {
+					return Integer.compare(o1.getPriority(), o2.getPriority());
+				}
+				
+			});
+			break; */
 		}
 	}
 	

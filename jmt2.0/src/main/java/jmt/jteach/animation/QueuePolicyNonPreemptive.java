@@ -74,6 +74,17 @@ public enum QueuePolicyNonPreemptive {
 			return ConstantsJTch.LJF_DESCRIPTION;
 		}
 	};
+	/*FCFS_PR{
+		@Override
+		public String toString() {
+			return "FCFS-PR";
+		}
+
+		@Override
+		public String getDescription() {
+			return ConstantsJTch.FCFS_PR_DESCRIPTION;
+		}
+	}; */
 	
 	public abstract String toString(); //to covert each enum to its policy name
 	public abstract String getDescription(); //to get for each enum a description on how the policy works

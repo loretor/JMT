@@ -115,7 +115,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction SJF = new AbstractAction("SJF") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[3]);
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[2]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -126,13 +126,24 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction LJF = new AbstractAction("LJF") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[4]);
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[3]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.LJF);
 		}
 	};
+
+	/*protected AbstractAction FCFS_PR = new AbstractAction("FCFS_PR") {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[4]);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.FCFS_PR);
+		}
+	}; */
 
 	//TODO: preemptive buttons
 
@@ -361,10 +372,15 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		subMenus[0].add(new CustomMenuItem(LCFS, true));
 		subMenus[0].add(new CustomMenuItem(SJF, true));
 		subMenus[0].add(new CustomMenuItem(LJF, true));
+		/*subMenus[0].add(new CustomMenuItem(FCFS_PR, true)); */
 		
 		subMenus[1] = new JPopupMenu(); //subMenu for the separator
 		
 		subMenus[2] = new JPopupMenu();
+		subMenus[2].add(new CustomMenuItem("FCFS-PR", false));
+		subMenus[2].add(new CustomMenuItem("LCFS-PR", false));
+		subMenus[2].add(new CustomMenuItem("SRPT", false));
+		subMenus[2].add(new CustomMenuItem("EDF", false));
 		
 		subMenus[3] = new JPopupMenu(); //subMenu for the separator
 		

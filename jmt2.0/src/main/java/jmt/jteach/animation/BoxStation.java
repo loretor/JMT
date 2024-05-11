@@ -86,6 +86,13 @@ public class BoxStation extends JComponent implements JobContainer{
 			g.setColor(color);
 			g.fillOval(sPos.x + (queueSize-index-1)*size + (sLength/queueSize)/2 - sizeCircle/2, sPos.y - sizeCircle - 10, sizeCircle, sizeCircle); 
 		}
+
+		//if the queue is ordered with the priority algorithm, then display on the BoxStation also the priority of the job
+		/*if(station.getQueuePolicy() == QueuePolicyNonPreemptive.FCFS_PR && priority != 0) {
+			g.setColor(Color.BLACK);
+			g.setFont(new Font("Arial", Font.BOLD, 13));
+			g.drawString(String.valueOf(priority), sPos.x + (queueSize-index-1)*size + 3,  sPos.y - 2); //+3 and -2 only for estetic purposes
+		} */
 	}
 	
 	@Override

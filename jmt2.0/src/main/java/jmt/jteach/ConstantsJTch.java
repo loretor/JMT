@@ -36,6 +36,9 @@ public class ConstantsJTch {
         "The SJF (Shortest Job First) scheduling Policy is a scheduling algorithm that orders the job inside the queue based on their service time. Jobs with smaller service time are prioritized with respect to the others inside the queue.";
     public static final String LJF_DESCRIPTION =
         "The LJF (Longest Job First) scheduling Policy is a scheduling algorithm that orders the job inside the queue based on their service time. Jobs with higher service time are prioritized with respect to the others inside the queue.";
+    public static final String FCFS_PR_DESCRIPTION =
+        "The FCFS-PR (First come first served with priority) scheduling Policy is a scheduling algorithm that orders the job inside the queue based on their priority. In the simulation each job has a priority from 1 to 5. Jobs with same priority are ordered with FCFS policy.";
+    
     public static final String RR_DESCRIPTION =
         "The RR (Round Robin) routing policy is a routing algorithm to distribute tasks when they arrive at the router. Jobs are routed randomly to one of the edges connected to the router.";
     public static final String PROB_DESCRIPTION =
@@ -74,9 +77,9 @@ public class ConstantsJTch {
     public static final String[] PREEMPTIVE_TOOLTIPS = {
         "First Come First Served",
         "Last Come First Served",
-        "Priority",
         "Shortest Job First",
-        "Longest Job First"
+        "Longest Job First",
+        "First Come First Served with Priority"
     };
 
     public static final String[] ROUTING_TOOLTIPS = {

@@ -543,7 +543,12 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     /** Called each time 'Create' is pressed. Start the simulation with the engine to get the results of the simulation in the Results Panel */
     public void getSimulationResults(){ 
         //first update the solver with the new values
-        solver.setQueueStrategy(algorithmJComboBox.getSelectedIndex());
+        if(((String) algorithmJComboBox.getSelectedItem()).contains("PR")){
+            solver.setStrategy(true, 0);
+        }
+        else{
+            solver.setStrategy(false, algorithmJComboBox.getSelectedIndex());
+        }      
         solver.setNumberOfServers((int) serversSpinner.getValue());
         solver.setServiceTime(serviceComboBox.getSelectedIndex());
         solver.setInterArrivalTime(interAComboBox.getSelectedIndex());
@@ -560,7 +565,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
             dispatcher = new DispatcherThread(this, solver.getModel());
             dispatcher.startSimulation(temp);
         } catch (IOException e) {
-            e.printStackTrace();
+            handleException(e);
         }
     }
 

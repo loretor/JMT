@@ -37,8 +37,9 @@ public class Solver implements CommonConstants{
         QUEUE_STRATEGY_FCFS,
         QUEUE_STRATEGY_LCFS,
         QUEUE_STRATEGY_SJF,
-        QUEUE_STRATEGY_LJF,
+        QUEUE_STRATEGY_LJF
     };
+
     private static Distribution[] distributions = { //for now the same distributions for interarrival time and service time
         new Exponential(),
         new Deterministic(),
@@ -128,7 +129,6 @@ public class Solver implements CommonConstants{
     private void addQueue(){
         serverKey = model.addStation("Queue", STATION_TYPE_SERVER, 1, new ArrayList<ServerType>());
 
-        //input panel
         model.setStationQueueCapacity(serverKey, 5);
         model.setDropRule(serverKey, classKey, "Drop");
         model.setStationQueueStrategy(serverKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
@@ -136,7 +136,6 @@ public class Solver implements CommonConstants{
         model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
         model.updateBalkingParameter(serverKey, classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
         
-        //service panel
         model.setStationNumberOfServers(serverKey, 1);
 		model.updateNumOfServers(serverKey, 1);
         Exponential exp = new Exponential();
@@ -189,9 +188,19 @@ public class Solver implements CommonConstants{
 
 
     //--------------- methods to change the parameters of the simulation ------------------
-
-    public void setQueueStrategy(int index){
-        model.setQueueStrategy(serverKey, classKey, queueStrategies[index]);
+    public void setStrategy(boolean priority, int index){
+        if(priority){
+            model.setStationQueueStrategy(classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE_PRIORITY);
+            model.setQueueStrategy(serverKey, classKey, queueStrategies[0]); //for now only the FCFS has a priority       
+            model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
+            model.updateBalkingParameter(serverKey, classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE_PRIORITY);
+        }
+        else{
+            model.setStationQueueStrategy(serverKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
+            model.setQueueStrategy(serverKey, classKey, queueStrategies[index]);         
+            model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
+            model.updateBalkingParameter(serverKey, classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
+        }    
     }
 
     public void setInterArrivalTime(int index){

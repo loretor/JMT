@@ -4037,4 +4037,8 @@ public class Mediator implements GuiInterface {
 		}
 	}
 
+	@Override
+	public void simulationFinished() {
+	}
+
 }

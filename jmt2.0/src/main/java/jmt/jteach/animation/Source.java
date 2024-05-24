@@ -108,8 +108,8 @@ public class Source extends JComponent implements JobContainer{
 		g.drawImage(sourceImg, pos.x, pos.y, size, size, null);
 
 		//TODO: remove those two lines, only for debug
-		g.setFont(new Font("Arial", Font.BOLD, 13));
-		g.drawString(String.valueOf(nextRandomValue), pos.x, pos.y-20);
+		//g.setFont(new Font("Arial", Font.BOLD, 13));
+		//g.drawString(String.valueOf(nextRandomValue), pos.x, pos.y-20);
 
 		//pie arrivals
 		g.drawOval(pos.x + size/2 - sizeCircle/2, pos.y+size+10, sizeCircle, sizeCircle);

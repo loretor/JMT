@@ -22,9 +22,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -47,7 +47,6 @@ import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
-import javax.swing.plaf.basic.BasicMenuUI;
 
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
@@ -74,7 +73,7 @@ import jmt.jteach.animation.RoutingPolicy;
 public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
     private static final String PANEL_NAME = "Main Panel";
-    private static final String IMG_STARTSCREEN = "StartScreenJTeach";
+    private static final String IMG_STARTSCREEN = "StartScreenJMCH";
 
     private MainWizard parent;
 	private JMTMenuBar menu;
@@ -252,11 +251,16 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
 		//---------------central panel
 		JPanel centerPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.insets = new Insets(20, 0, 0, 0); // Image just a little down
       
         //---------------------flow chart schema
 		JLabel imageLabel = new JLabel();
-		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(540, 455)));
-		centerPanel.add(imageLabel);
+		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(540, 450)));
+		centerPanel.add(imageLabel, gbc);
 
 		//---------------------panel with all the buttons
 		JPanel eastPanel = new JPanel(new FlowLayout());
@@ -275,11 +279,6 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 				}
 				
 			}
-		}
-
-		for(Component c: components){
-			c.setBackground(Color.RED);
-			help.addHelp(c, "ciao");
 		}
 
 		help.addHelp(list, "Select the JTCH Mode");
@@ -314,7 +313,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
         });
 
 
-		GridBagConstraints gbc = new GridBagConstraints();
+		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.VERTICAL;

@@ -55,7 +55,7 @@ public class MainWizard extends JTchWizard{
 
     //general variables for the JMTFrame
     private String IMG_JWATICON = "JMCHIcon";
-    private static final String TITLE = "JTCH";
+    private static final String TITLE = "JMCH - Modelling Classroom Helper"; 
 	private static final String TITLE_QUEUEING = "Queueing Network";
 	private static final String TITLE_SCHEDULING = "Scheduling";
 	private static final String TITLE_ROUTING = "Routing";

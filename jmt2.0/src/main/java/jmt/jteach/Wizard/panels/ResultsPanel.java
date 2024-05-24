@@ -81,23 +81,6 @@ public class ResultsPanel extends WizardPanel{
     private double[] thoughputs = new double[0];
     private double[] nCustomers = new double[0];
 
-    /** This action is to add a new row in the table */
-    private AbstractAction addResult = new AbstractAction("New Simulation") {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		{
-			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK));
-			putValue(Action.SHORT_DESCRIPTION, "Adds a new Simulation to Model");
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			//addRow();
-		}
-	};
-
     /** This Action is only for displaying the X in each row */
     private AbstractAction deleteOneResult = new AbstractAction("") {
 		/**
@@ -227,10 +210,10 @@ public class ResultsPanel extends WizardPanel{
 		totalBox.add(Box.createHorizontalStrut(20));
         this.add(totalBox, BorderLayout.CENTER);
 
-        //----lower part
+        /*----lower part
         Box numberBox = Box.createVerticalBox();
         numberBox.add(new JButton(addResult));
-        this.add(numberBox, BorderLayout.SOUTH);
+        this.add(numberBox, BorderLayout.SOUTH); */
         
 		
         addRow();
@@ -241,7 +224,7 @@ public class ResultsPanel extends WizardPanel{
 		int[] selectedRows = table.getSelectedRows();
 		int nrows = selectedRows.length;
 		int left = table.getRowCount() - nrows;
-		if (left < 1) {
+		if (left < 0) { // 1 if you want that at least one row is in the table
 			table.removeRowSelectionInterval(selectedRows[nrows - 1], selectedRows[nrows - 1]);
 			deleteSelectedRows();
 			return;
@@ -359,12 +342,12 @@ public class ResultsPanel extends WizardPanel{
 
         /*enables deleting operations with last column's button*/
 		private void enableDeletes() {
-			deleteOneResult.setEnabled(nResults > 1);
+			deleteOneResult.setEnabled(nResults > 0); // 1 if you want that at least one row is in the table
 			
 			this.addMouseListener(new MouseAdapter() { //detection of the rows selected
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					if ((columnAtPoint(e.getPoint()) == getColumnCount() - 1) && getRowCount() > 1) {
+					if ((columnAtPoint(e.getPoint()) == getColumnCount() - 1) && getRowCount() > 0) { // 1 if you want that at least one row is in the table
 						setRowSelectionInterval(rowAtPoint(e.getPoint()), rowAtPoint(e.getPoint()));
 						deleteSelectedRows();
 					}
@@ -383,16 +366,16 @@ public class ResultsPanel extends WizardPanel{
 
         /** Called by ResultPanel to update the Delete Buttons */
         protected void updateDeleteCommand() {
-			deleteOneResult.setEnabled(nResults > 1);
+			deleteOneResult.setEnabled(nResults > 0); // 1 if you want that at least one row is in the table
 			getColumnModel().getColumn(getColumnCount() - 1).setMinWidth(20);
 			getColumnModel().getColumn(getColumnCount() - 1).setMaxWidth(20);
 		} 
 
         @Override
 		protected void updateActions() {
-			boolean isEnabled = nResults > 1 && getSelectedRowCount() > 0;
+			boolean isEnabled = nResults > 0 && getSelectedRowCount() > 0; // 1 if you want that at least one row is in the table
 			deleteResults.setEnabled(isEnabled);
-			deleteOneResult.setEnabled(nResults > 1);
+			deleteOneResult.setEnabled(nResults > 0); // 1 if you want that at least one row is in the table
 		}
     }
 

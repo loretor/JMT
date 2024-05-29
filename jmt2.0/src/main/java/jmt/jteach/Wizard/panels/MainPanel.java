@@ -81,7 +81,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
     private HoverHelp help; //retrieve from parent the HoverHelp
 
 	//----------- variables for the panel with all the buttons of the graph
-	private final String[] data = {"NON-PREEMPTIVE", "", "PREEMPTIVE", "", "RR", "", "PROBABLISITC", "", "...", "", "MARKOV CHAINS"}; //some of them are empty because they represent the box empty between two elements of the list
+	private final String[] data = {"NON-PREEMPTIVE", "", "PROCESSOR SHARING", "", "PREEMPTIVE", "", "RR", "", "PROBABLISITC", "", "...", "", "MARKOV CHAINS"}; //some of them are empty because they represent the empty box between two elements of the list
 	private final JList<String> list = new JList<>(data);
 
 	//all actions associated to the buttons of the Menu and ToolBar
@@ -132,17 +132,6 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.LJF);
 		}
 	};
-
-	/*protected AbstractAction FCFS_PR = new AbstractAction("FCFS_PR") {
-		private static final long serialVersionUID = 1L;
-		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[4]);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.FCFS_PR);
-		}
-	}; */
 
 	//TODO: preemptive buttons
 
@@ -259,7 +248,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
       
         //---------------------flow chart schema
 		JLabel imageLabel = new JLabel();
-		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(540, 450)));
+		imageLabel.setIcon(JMTImageLoader.loadImage(IMG_STARTSCREEN, new Dimension(473, 470)));
 		centerPanel.add(imageLabel, gbc);
 
 		//---------------------panel with all the buttons
@@ -337,8 +326,8 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
             	JLabel label = new JLabel(value);
             	
             	if(index % 2 != 0) { //index odd are divisors
-            		label.setPreferredSize(new Dimension(150,40));
-            		label.setMinimumSize(new Dimension(150,40));
+            		label.setPreferredSize(new Dimension(150,30));
+            		label.setMinimumSize(new Dimension(150,30));
             	}
             	else {            		
 					label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -364,7 +353,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	 * @return the array of subMenus
 	 */
 	public JPopupMenu[] createSubMenus() {
-		JPopupMenu[] subMenus = new JPopupMenu[11];
+		JPopupMenu[] subMenus = new JPopupMenu[13];
 		
 		subMenus[0] = new JPopupMenu();
 		subMenus[0].add(new CustomMenuItem(FCFS, true));
@@ -374,44 +363,49 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		/*subMenus[0].add(new CustomMenuItem(FCFS_PR, true)); */
 		
 		subMenus[1] = new JPopupMenu(); //subMenu for the separator
-		
+
 		subMenus[2] = new JPopupMenu();
-		subMenus[2].add(new CustomMenuItem("FCFS-PR", false));
-		subMenus[2].add(new CustomMenuItem("LCFS-PR", false));
-		subMenus[2].add(new CustomMenuItem("SRPT", false));
-		subMenus[2].add(new CustomMenuItem("EDF", false));
-		
+		subMenus[2].add(new CustomMenuItem("PS", false));
+
 		subMenus[3] = new JPopupMenu(); //subMenu for the separator
 		
 		subMenus[4] = new JPopupMenu();
-		subMenus[4].add(new CustomMenuItem(RR, true));
+		subMenus[4].add(new CustomMenuItem("FCFS-PR", false));
+		subMenus[4].add(new CustomMenuItem("LCFS-PR", false));
+		subMenus[4].add(new CustomMenuItem("SRPT", false));
+		subMenus[4].add(new CustomMenuItem("EDF", false));
 		
 		subMenus[5] = new JPopupMenu(); //subMenu for the separator
 		
 		subMenus[6] = new JPopupMenu();
-		subMenus[6].add(new CustomMenuItem(PROBABILISTIC, true));
+		subMenus[6].add(new CustomMenuItem(RR, true));
 		
 		subMenus[7] = new JPopupMenu(); //subMenu for the separator
 		
 		subMenus[8] = new JPopupMenu();
-		subMenus[8].add(new CustomMenuItem(JSQ, true));
-		subMenus[8].add(new CustomMenuItem("Random", false));
-		subMenus[8].add(new CustomMenuItem("Shortest Response Time", false));
-		subMenus[8].add(new CustomMenuItem("Least Utilization", false));
-		subMenus[8].add(new CustomMenuItem("Fastest Service", false));
-		subMenus[8].add(new CustomMenuItem("Load Dependend Routing", false));
-		subMenus[8].add(new CustomMenuItem("Power of K", false));
-		subMenus[8].add(new CustomMenuItem("Weighted Round Robin", false));
-		subMenus[8].add(new CustomMenuItem("Class Switch", false));
-
-
+		subMenus[8].add(new CustomMenuItem(PROBABILISTIC, true));
+		
 		subMenus[9] = new JPopupMenu(); //subMenu for the separator
-
+		
 		subMenus[10] = new JPopupMenu();
-		subMenus[10].add(new CustomMenuItem(MM1, true));
-		subMenus[10].add(new CustomMenuItem(MM1K, true));
-		subMenus[10].add(new CustomMenuItem(MMC, true));
-		subMenus[10].add(new CustomMenuItem(MMCK, true));
+		subMenus[10].add(new CustomMenuItem(JSQ, true));
+		subMenus[10].add(new CustomMenuItem("Random", false));
+		subMenus[10].add(new CustomMenuItem("Shortest Response Time", false));
+		subMenus[10].add(new CustomMenuItem("Least Utilization", false));
+		subMenus[10].add(new CustomMenuItem("Fastest Service", false));
+		subMenus[10].add(new CustomMenuItem("Load Dependend Routing", false));
+		subMenus[10].add(new CustomMenuItem("Power of K", false));
+		subMenus[10].add(new CustomMenuItem("Weighted Round Robin", false));
+		subMenus[10].add(new CustomMenuItem("Class Switch", false));
+
+
+		subMenus[11] = new JPopupMenu(); //subMenu for the separator
+
+		subMenus[12] = new JPopupMenu();
+		subMenus[12].add(new CustomMenuItem(MM1, true));
+		subMenus[12].add(new CustomMenuItem(MM1K, true));
+		subMenus[12].add(new CustomMenuItem(MMC, true));
+		subMenus[12].add(new CustomMenuItem(MMCK, true));
 		
 		return subMenus;	
 	}

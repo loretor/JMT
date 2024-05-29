@@ -56,7 +56,6 @@ import jmt.gui.jaba.JabaWizard;
 import jmt.gui.jsimgraph.mainGui.JSIMGraphMain;
 import jmt.gui.jsimwiz.JSIMWizMain;
 import jmt.gui.jwat.MainJwatWizard;
-import jmt.jmarkov.MMQueues;
 import jmt.jmva.gui.exact.ExactWizard;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.manual.ChapterIdentifier;
@@ -81,7 +80,6 @@ public class GraphStartScreen extends JMTFrame {
 	private JButton onlineDoc;
 	private JButton introEng;
 	private JButton about;
-	private JButton jTeach; /********************************************************** */
 
 	// Queue Animation
 	public static SampleQNAnimation sampleQNAni;
@@ -160,7 +158,7 @@ public class GraphStartScreen extends JMTFrame {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			MMQueues.main(args);
+			MainWizard.main(args);
 		}
 
 	};
@@ -307,12 +305,6 @@ public class GraphStartScreen extends JMTFrame {
 		about = new JButton("Credits");
 		about.addMouseListener(rollover);
 
-		/****************************************************************** */
-		jTeach = new JButton("JTeach");
-		jTeach.addMouseListener(rollover);
-		introButtonArea.add(jTeach);
-		introButtonArea.add(new JPanel());
-
 		introButtonArea.add(introEng);
 		introButtonArea.add(new JPanel());
 		introButtonArea.add(onlineDoc);
@@ -354,15 +346,6 @@ public class GraphStartScreen extends JMTFrame {
 				AboutDialogFactory.showJMT(GraphStartScreen.this);
 			}
 		});
-
-		/*********************************************************************** */
-		jTeach.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				MainWizard.main(args); /////////////////////////////////////////////////
-			}
-			
-		}); 
 	}
 
 	/**

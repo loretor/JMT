@@ -542,7 +542,6 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
     /** Called each time 'Create' is pressed. Start the simulation with the engine to get the results of the simulation in the Results Panel */
     public void getSimulationResults(){
-        showErrorMessage(solver.getInterArrivalDistribution()); 
         //first update the solver with the new values
         if(((String) algorithmJComboBox.getSelectedItem()).contains("PR")){
             solver.setStrategy(true, 0);

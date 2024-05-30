@@ -51,4 +51,10 @@ public class LIFOQueue<E> extends ArrayDeque implements CustomCollection{
 	public Object first() {
 		return super.peek();
 	}
+
+	@Override
+	public boolean removeObject(Object e) {
+		super.remove(e);
+		return true;
+	}
 }

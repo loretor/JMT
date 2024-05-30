@@ -67,4 +67,11 @@ public interface CustomCollection<E> extends Iterable<E>{
 	 * @return size of the collection
 	 */
 	public int size();
+
+	/**
+	 * Remove the Object o from the list. Used for specific cases like BoxStation in PS that has to remove the job from the queue
+	 * @param o the object
+	 * @return true if it has removed the object correctly
+	 */
+	public boolean removeObject(Object o);
 }

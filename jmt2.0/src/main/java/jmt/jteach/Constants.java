@@ -41,16 +41,18 @@ public class Constants {
 
     //descriptions of all the policies
     public static final String FCFS_DESCRIPTION = 
-        "The FCFS (First come first served) sheduling Policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. The first task that arrives is the first to be executed and subsequent tasks are executed in the order of their arrival.";
+        "The FCFS (First come first served) sheduling policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. The first task that arrives is the first to be executed and subsequent tasks are executed in the order of their arrival.";
     public static final String LCFS_DESCRIPTION = 
-        "The LCFS (Last come first served) sheduling Policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. Most recently arrived tasks are executed before any others. It operates on a 'last come, first served' basis, similar to a stack data structure.";
+        "The LCFS (Last come first served) sheduling policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. Most recently arrived tasks are executed before any others. It operates on a 'last come, first served' basis, similar to a stack data structure.";
     public static final String SJF_DESCRIPTION =
-        "The SJF (Shortest Job First) scheduling Policy is a scheduling algorithm that orders the job inside the queue based on their service time. Jobs with smaller service time are prioritized with respect to the others inside the queue.";
+        "The SJF (Shortest Job First) scheduling policy is a scheduling algorithm that orders the job inside the queue based on their service time. Jobs with smaller service time are prioritized with respect to the others inside the queue.";
     public static final String LJF_DESCRIPTION =
-        "The LJF (Longest Job First) scheduling Policy is a scheduling algorithm that orders the job inside the queue based on their service time. Jobs with higher service time are prioritized with respect to the others inside the queue.";
-    public static final String FCFS_PR_DESCRIPTION =
-        "The FCFS-PR (First come first served with priority) scheduling Policy is a scheduling algorithm that orders the job inside the queue based on their priority. In the simulation each job has a priority from 1 to 5. Jobs with same priority are ordered with FCFS policy.";
+        "The LJF (Longest Job First) scheduling policy is a scheduling algorithm that orders the job inside the queue based on their service time. Jobs with higher service time are prioritized with respect to the others inside the queue.";
     
+    public static final String PS_DESCRIPTION = 
+        "The Processor Sharing (PS) scheduling policy is a scheduling algorithm where the server works as if all the customers in the station are processed simultaneously, but devotes to each of them a fraction of its total capacity that is inversely proportional to the number of customers. If the station has m servers but only n < m resident cutomers, then each customer is executed as if it were alone." + //
+                        "n<m resident customers, then each customer is executed as if it were alone";
+
     public static final String RR_DESCRIPTION =
         "The RR (Round Robin) routing policy is a routing algorithm to distribute tasks when they arrive at the router. Jobs are routed randomly to one of the edges connected to the router.";
     public static final String PROB_DESCRIPTION =
@@ -92,6 +94,10 @@ public class Constants {
         "Shortest Job First",
         "Longest Job First",
         "First Come First Served with Priority"
+    };
+
+    public static final String[] PROCESSOR_SHARING_TOOLTIPS = {
+        "Processor Sharing"
     };
 
     public static final String[] ROUTING_TOOLTIPS = {

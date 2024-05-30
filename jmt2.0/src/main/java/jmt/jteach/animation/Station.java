@@ -23,11 +23,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.text.DecimalFormat;
 import java.util.Comparator;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import jmt.jteach.Constants;
 import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.animation.customQueue.CustomCollection;
 import jmt.jteach.animation.customQueue.FIFOQueue;
@@ -197,6 +199,14 @@ public class Station extends JComponent implements JobContainer{
         	g.setFont(new Font("Arial", Font.PLAIN, 10));
         	g.drawString("Queue Size: "+String.valueOf(jobQueue.size()), pos.x,  pos.y-20);
         }
+
+		if(simulation.getName() == Constants.PS){ //if processor sharing, then print the processorSpeed
+			g.setColor(Color.BLACK);
+        	g.setFont(new Font("Arial", Font.PLAIN, 10));
+        	double processorSpeed = jobQueue.size() > 0 ? (double)nServers/(jobQueue.size() + nServers): 1;
+        	DecimalFormat df = new DecimalFormat("#.##");
+        	g.drawString("Processor Speed: "+df.format(processorSpeed), pos.x,  pos.y-20);
+		}
 	}
 	
 	@Override
@@ -213,8 +223,13 @@ public class Station extends JComponent implements JobContainer{
 				}				
 			}
 		}
+
+		double processorSpeed = jobQueue.size() > 0 ? (double)nServers/(jobQueue.size() + nServers): 1; //this is needed only for processorSharing
 		
 		for(int i = 0; i < nServers; i++) {
+			if(simulation.getName() == Constants.PS) {
+				circles[i].setProcessorSpeed(processorSpeed);
+			}
 			circles[i].refresh();
 		}
 				
@@ -229,17 +244,42 @@ public class Station extends JComponent implements JobContainer{
 		for(int i = index; i < sizeQueue; i++) {
 			boxes[i].clear();
 		}
+
+		if(simulation.getName() == Constants.PS){
+			for(BoxStation b: boxes) {
+				b.setProcessorSpeed(processorSpeed);
+				b.refresh();
+			}
+		}
 	}
 	
 	/**
 	 * Update all the subComponents of Station that are affected by a Pause in the Animator.
-	 * Currently the only one that needs to be update is the CircleStation, since the progression of the pie depends on the entrance of the job and on the current time - time of pause
 	 * @param pause value for which the animator was paused
 	 */
 	public void updatePause(long pause) {
 		for(int i = 0; i < nServers; i++) {
 			circles[i].setPauseTime(pause);
 		}	
+		for(int i = 0; i < boxes.length; i++) {
+			boxes[i].setPauseTime(pause);
+		}
+	}
+
+	/**
+	 * Once the job is processed, then it must be routed to the next JobContainer. Can be called both by a CircleStation, but also by a BoxStation if processor sharing is active
+	 * @param job the job to be routed
+	 */
+	public void routeJob(Job job) {
+		job.setDuration(); //set the duration = 0 since the job is completely processed
+		//then if the next element is an edge, the job must be painted as a green circle, otherwise do not paint it
+		if(getNextContainer() instanceof Edge) {
+			job.setOnEdge();
+		}
+		else {
+			job.unsetOnEdge();
+		}
+		getNextContainer().addJob(job);
 	}
 	
 	@Override
@@ -256,6 +296,11 @@ public class Station extends JComponent implements JobContainer{
 			animation.pause();
 			animation.resetNextEvent();
 		}
+	}
+
+	/** Remove the job from the collection, called by the BoxStation */
+	public void removeJob(Job job) {
+		jobQueue.removeObject(job);
 	}
 
 	public Point getPosition() {
@@ -317,6 +362,10 @@ public class Station extends JComponent implements JobContainer{
 	/** Set the Step simulation off */
 	public void resetNextEvent() {
 		nextEvent = false;
+	}
+
+	public boolean isProcessorSharing() {
+		return simulation.getName() == Constants.PS;
 	}
 
 }

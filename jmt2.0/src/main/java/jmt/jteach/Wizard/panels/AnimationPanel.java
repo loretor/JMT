@@ -245,11 +245,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
         animationPanel = new JPanel(new BorderLayout());
         //based on the type of Policy passed in the constructor, create a new Animation
-        if(simulation.getType() == SimulationType.NON_PREEMPTIVE){
-            animation = new SingleQueueNetAnimation(this, animationPanel, simulation);
+        if(simulation.getType() == SimulationType.ROUTING){
+            animation = new MultipleQueueNetAnimation(animationPanel, simulation);     
         }
         else{
-            animation = new MultipleQueueNetAnimation(animationPanel, simulation);
+            animation = new SingleQueueNetAnimation(this, animationPanel, simulation);
         }
         animationPanel.add(animation, BorderLayout.CENTER);
         animationPanel.setBackground(Color.WHITE);
@@ -481,20 +481,21 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         reloadAnimation();
         start.setEnabled(true);
 
-        if(simulation.getType() == SimulationType.NON_PREEMPTIVE){
+        if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PREEMPTIVE || simulation.getType() == SimulationType.PROCESSOR_SHARING){
             if(infDuration.isSelected()){
                 maxJobs = -1;
             }
             else{
                 maxJobs = (Integer) duration.getValue();
             }
-            simulation = SimulationFactory.createSimulation(simulation.getType(), String.valueOf(algorithmJComboBox.getSelectedItem()));
-            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), simulation.getType().toString() + " Scheduling - " + simulation.getName()));
-            descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+simulation.getDescription()+"</p></body></html>");
+            
+            if(simulation.getType() == SimulationType.NON_PREEMPTIVE){ //in case of non preemptive update the title and the description
+                simulation = SimulationFactory.createSimulation(simulation.getType(), String.valueOf(algorithmJComboBox.getSelectedItem()));
+                mainPanel.setBorder(new TitledBorder(new EtchedBorder(), simulation.getType().toString() + " Scheduling - " + simulation.getName()));
+                descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+simulation.getDescription()+"</p></body></html>");
+            }
+        
             animation.updateSingle(simulation, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem(), maxJobs);
-        }
-        else if(simulation.getType() == SimulationType.PREEMPTIVE){
-
         }
         else{ //in case of routing only the animation must be updated
             if(simulation.getType() == SimulationType.ROUTING && simulation.getName() == Constants.PROBABILISTIC){
@@ -513,30 +514,34 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     /** Called each time 'Create' is pressed. Start the simulation with the engine to get the results of the simulation in the Results Panel */
     public void getSimulationResults(){
         //first update the solver with the new values
-        if(((String) algorithmJComboBox.getSelectedItem()).contains("PR")){
-            solver.setStrategy(true, 0);
-        }
-        else{
-            solver.setStrategy(false, algorithmJComboBox.getSelectedIndex());
-        }      
-        solver.setNumberOfServers((int) serversSpinner.getValue());
-        solver.setServiceTime(serviceComboBox.getSelectedIndex());
-        solver.setInterArrivalTime(interAComboBox.getSelectedIndex());
 
-        File temp = null;
-        DispatcherThread dispatcher = null;
-        try {
-            temp = File.createTempFile("~JModelSimulation", ".xml");
-            temp.deleteOnExit();       
-            XMLWriter.writeXML(temp, solver.getModel());
-            String logCSVDelimiter = solver.getModel().getLoggingGlbParameter("delim");
-            String logDecimalSeparator = solver.getModel().getLoggingGlbParameter("decimalSeparator");
-            solver.getModel().setSimulationResults(new ResultsModel(solver.getModel().getPollingInterval().doubleValue(), logCSVDelimiter, logDecimalSeparator));
-            dispatcher = new DispatcherThread(this, solver.getModel());
-            dispatcher.startSimulation(temp);
-        } catch (IOException e) {
-            handleException(e);
+        if(simulation.getType() == SimulationType.NON_PREEMPTIVE){  //TODO: per ora solo non preemptive, è ovviamente da togliere questo
+            if(((String) algorithmJComboBox.getSelectedItem()).contains("PR")){
+                solver.setStrategy(true, 0);
+            }
+            else{
+                solver.setStrategy(false, algorithmJComboBox.getSelectedIndex());
+            }      
+            solver.setNumberOfServers((int) serversSpinner.getValue());
+            solver.setServiceTime(serviceComboBox.getSelectedIndex());
+            solver.setInterArrivalTime(interAComboBox.getSelectedIndex());
+    
+            File temp = null;
+            DispatcherThread dispatcher = null;
+            try {
+                temp = File.createTempFile("~JModelSimulation", ".xml");
+                temp.deleteOnExit();       
+                XMLWriter.writeXML(temp, solver.getModel());
+                String logCSVDelimiter = solver.getModel().getLoggingGlbParameter("delim");
+                String logDecimalSeparator = solver.getModel().getLoggingGlbParameter("decimalSeparator");
+                solver.getModel().setSimulationResults(new ResultsModel(solver.getModel().getPollingInterval().doubleValue(), logCSVDelimiter, logDecimalSeparator));
+                dispatcher = new DispatcherThread(this, solver.getModel());
+                dispatcher.startSimulation(temp);
+            } catch (IOException e) {
+                handleException(e);
+            }
         }
+        
     }
 
     public double getLastMeasure(MeasureDefinition md, int index){

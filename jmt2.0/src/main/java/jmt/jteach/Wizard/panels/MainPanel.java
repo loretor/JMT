@@ -91,7 +91,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 
 
 	//all the AbstractActions associated to the buttons related of this panel only
-	protected AbstractAction FCFS = new AbstractAction("FCFS") {
+	protected AbstractAction FCFS = new AbstractAction(Constants.FCFS) {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.PREEMPTIVE_TOOLTIPS[0]);
@@ -103,7 +103,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction LCFS = new AbstractAction("LCFS") {
+	protected AbstractAction LCFS = new AbstractAction(Constants.LCFS) {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.PREEMPTIVE_TOOLTIPS[1]);
@@ -115,7 +115,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction SJF = new AbstractAction("SJF") {
+	protected AbstractAction SJF = new AbstractAction(Constants.SJF) {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.PREEMPTIVE_TOOLTIPS[2]);
@@ -127,7 +127,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction LJF = new AbstractAction("LJF") {
+	protected AbstractAction LJF = new AbstractAction(Constants.LJF) {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.PREEMPTIVE_TOOLTIPS[3]);
@@ -139,9 +139,19 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	//TODO: preemptive buttons
+	protected AbstractAction PS = new AbstractAction(Constants.PS) {
+		private static final long serialVersionUID = 1L;
+		{
+			putValue(Action.SHORT_DESCRIPTION, Constants.PROCESSOR_SHARING_TOOLTIPS[0]);
+		}
 
-	protected AbstractAction RR = new AbstractAction("Rond Robin") {
+		public void actionPerformed(ActionEvent e) {
+			Simulation sim = SimulationFactory.createSimulation(SimulationType.PROCESSOR_SHARING, Constants.PS);
+			parent.setAnimationPanelEnv(sim);
+		}
+	};
+
+	protected AbstractAction RR = new AbstractAction(Constants.RR) {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.ROUTING_TOOLTIPS[0]);
@@ -153,7 +163,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction PROBABILISTIC = new AbstractAction("Probabilistic") {
+	protected AbstractAction PROBABILISTIC = new AbstractAction(Constants.PROBABILISTIC) {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.ROUTING_TOOLTIPS[1]);
@@ -165,7 +175,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction JSQ = new AbstractAction("JSQ") {
+	protected AbstractAction JSQ = new AbstractAction(Constants.JSQ) {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.ROUTING_TOOLTIPS[2]);
@@ -374,7 +384,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		subMenus[1] = new JPopupMenu(); //subMenu for the separator
 
 		subMenus[2] = new JPopupMenu();
-		subMenus[2].add(new CustomMenuItem("PS", false));
+		subMenus[2].add(new CustomMenuItem(PS, true));
 
 		subMenus[3] = new JPopupMenu(); //subMenu for the separator
 		

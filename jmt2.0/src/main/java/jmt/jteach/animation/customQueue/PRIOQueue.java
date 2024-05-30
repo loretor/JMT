@@ -75,4 +75,10 @@ public class PRIOQueue<E> extends ArrayList implements CustomCollection{
 	public Object first() {
 		return super.get(0);
 	}
+
+	@Override
+	public boolean removeObject(Object e) {
+		super.remove(e);
+		return true;
+	}
 }

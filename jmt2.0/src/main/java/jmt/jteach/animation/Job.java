@@ -150,6 +150,11 @@ public class Job extends JComponent{
     public void setDuration() {
     	duration = 0;
     }
+
+	/** Called by the BoxStation in PS, to update the new duration of the job */
+	public void setDuration(double value) {
+    	duration = value;
+    }
     
     public void setOnEdge() {
     	onEdge = true;

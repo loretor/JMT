@@ -38,7 +38,8 @@ public class CircleStation extends JComponent implements JobContainer{
 	
 	private long pauseTime; //this variable is important if we are processing a job and then the animator is paused, we need to know how much time the job remained paused and remove this value from the passedTime
 	//then set this value = 0 when the job gets out from this class
-	private int velocityFactor = 1; //to increase the velocity of the simulation
+	private int velocityFactor = 0; //to increase the velocity of the simulation
+	private double processorSpeed = 1; //only for processorsharing
 	
 	/**
 	 * Constructor
@@ -73,7 +74,7 @@ public class CircleStation extends JComponent implements JobContainer{
 	public void refresh() {
 		if(isWorking) {
 			long duration = (long) (currentJob.getDuration() * Math.pow(10, 3));
-			passedTime += (System.currentTimeMillis() - entranceTime - pauseTime)*velocityFactor;
+			passedTime += (System.currentTimeMillis() - entranceTime - pauseTime)* (velocityFactor + processorSpeed); //both the factor for the step and the one of processor sharing
 			entranceTime = System.currentTimeMillis();
 			pauseTime = 0;
 			
@@ -86,7 +87,7 @@ public class CircleStation extends JComponent implements JobContainer{
 				pauseTime = 0;
 				passedTime = 0;
 				
-				routeJob();
+				station.routeJob(currentJob);
 			}
 		}	
 	}
@@ -117,28 +118,16 @@ public class CircleStation extends JComponent implements JobContainer{
 		}	
 	}
 	
-	/**
-	 * Once the job is processed, then it must be routed to the next JobContainer
-	 */
-	public void routeJob() {
-		currentJob.setDuration(); //set the duration = 0 since the job is completely processed
-		//then if the next element is an edge, the job must be painted as a green circle, otherwise do not paint it
-		if(station.getNextContainer() instanceof Edge) {
-			currentJob.setOnEdge();
-		}
-		else {
-			currentJob.unsetOnEdge();
-		}
-		station.getNextContainer().addJob(currentJob);
-	}
-
-	
 	public void setPosition(Point pos) {
 		sPos = pos;
 	}
 
 	public void setVelocityFactor(int value) {
 		velocityFactor = value;
+	}
+
+	public void setProcessorSpeed(double velocity) {
+		processorSpeed = velocity;
 	}
 
 	

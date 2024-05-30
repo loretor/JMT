@@ -46,10 +46,16 @@ public class BoxStation extends JComponent implements JobContainer{
 	private int queueSize;
 	
 	//information about the current Job inside the BoxStation
+	private Job currentJob = null;
 	private Color color;
 	private double duration;
 	private int maxValue = 10; //this value is for the conversion from the duration to a colored box (try to select a max value accordingly to the type of distribution)
-	private int priority;
+
+	//information about the current Job for processor sharing
+	private long entranceTime;
+	private long pausedTime = 0;
+	private double velocityFactor = 0;
+	private double processorSpeed = 1;
 	
 	private boolean isWorking = false; //to know if there is a job in this BoxStation or not to print the circle above
 	private int sizeCircle = 10; //circle above the box if there is a job 
@@ -67,7 +73,6 @@ public class BoxStation extends JComponent implements JobContainer{
 		sHeight = st.getHeight();
 		queueSize = st.getsizeQueue();
 		duration = 0;
-		priority = 0;
 	}
 	
 	@Override
@@ -86,21 +91,41 @@ public class BoxStation extends JComponent implements JobContainer{
 			g.setColor(color);
 			g.fillOval(sPos.x + (queueSize-index-1)*size + (sLength/queueSize)/2 - sizeCircle/2, sPos.y - sizeCircle - 10, sizeCircle, sizeCircle); 
 		}
+	}
 
-		//if the queue is ordered with the priority algorithm, then display on the BoxStation also the priority of the job
-		/*if(station.getQueuePolicy() == QueuePolicyNonPreemptive.FCFS_PR && priority != 0) {
-			g.setColor(Color.BLACK);
-			g.setFont(new Font("Arial", Font.BOLD, 13));
-			g.drawString(String.valueOf(priority), sPos.x + (queueSize-index-1)*size + 3,  sPos.y - 2); //+3 and -2 only for estetic purposes
-		} */
+	@Override
+	public void refresh() { //in general refresh does nothing, but if processor sharing is active, then the job is processed even if is in the queue
+		if(station.isProcessorSharing() && isWorking) {
+			long jobDuration = (long) (currentJob.getDuration() * Math.pow(10, 3));
+			//System.out.println((System.currentTimeMillis() - entranceTime - pausedTime)*velocityFactor);
+			double newDuration = (jobDuration - (System.currentTimeMillis() - entranceTime - pausedTime)* (velocityFactor + processorSpeed)) / (Math.pow(10,3));
+			currentJob.setDuration(newDuration);
+			entranceTime = System.currentTimeMillis();
+			pausedTime = 0;
+			
+			duration = currentJob.getDuration();
+			//System.out.println("job "+currentJob.toString()+ " duration:"+duration);
+			
+			if(duration < 0) {
+				isWorking = false;
+				pausedTime = 0;
+				
+				station.removeJob(currentJob);
+				station.routeJob(currentJob);
+			}
+		}
+		
 	}
 	
 	@Override
 	public void addJob(Job newJob) {
+		if(!newJob.equals(currentJob)) { //need to update only if the newJob is different than the one that the box already has
+			entranceTime = System.currentTimeMillis();
+		}
+		currentJob = newJob;		
 		color = newJob.getColor();
 		duration = newJob.getDuration();
 		isWorking = true;
-		priority = newJob.getPriority();
 	}
 	
 	/**
@@ -109,12 +134,24 @@ public class BoxStation extends JComponent implements JobContainer{
 	public void clear() {
 		duration = 0;
 		isWorking = false;
-		priority = 0;
 	}
 
-	@Override
-	public void refresh() {
-		
+	/**
+	 * To know for how long the animator has stopped
+	 * @param value the time of pausing
+	 */
+	public void setPauseTime(long value) {
+		if(isWorking) {
+			pausedTime += value;
+		}	
+	}
+
+	public void setProcessorSpeed(double velocity) {
+		processorSpeed = velocity;
+	}
+	
+	public void setVelocityFactor(int value) {
+		velocityFactor = value;
 	}
 	
 	public void setPosition(Point pos) {

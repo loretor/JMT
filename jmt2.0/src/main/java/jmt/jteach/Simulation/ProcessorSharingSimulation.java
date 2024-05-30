@@ -39,16 +39,15 @@ public abstract class ProcessorSharingSimulation implements Simulation {
  * - PS
  */
 class PS extends ProcessorSharingSimulation{
-    public static final String NAME = Constants.PS;
 
     @Override
     public String getName() {
-        return NAME;
+        return Constants.PS;
     }
 
     @Override
     public String getDescription() {
-        return "ciao";
+        return Constants.PS_DESCRIPTION;
     }
     
 }

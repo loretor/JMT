@@ -53,9 +53,7 @@ public class MainWizard extends JTchWizard{
     //general variables for the JMTFrame
     private String IMG_JWATICON = "JMCHIcon";
     private static final String TITLE = "JMCH - Modelling Classroom Helper"; 
-	private static final String TITLE_QUEUEING = "Queueing Network";
-	private static final String TITLE_SCHEDULING = "Scheduling";
-	private static final String TITLE_ROUTING = "Routing";
+	private static final String TITLE_QUEUEING = "Queueing";
 
     //components of the panel
     private JPanel menus;
@@ -102,7 +100,7 @@ public class MainWizard extends JTchWizard{
 	 * @param simulation the type of Simulation
 	 */
 	public void setAnimationPanelEnv(Simulation simulation){
-		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+TITLE_SCHEDULING);
+		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+simulation.getType().toString());
 
 		animationPanel = new AnimationPanel(this, simulation);
 		this.addPanel(animationPanel);

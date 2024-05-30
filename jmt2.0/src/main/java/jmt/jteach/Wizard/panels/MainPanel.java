@@ -55,13 +55,15 @@ import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.JMTImageLoader;
 import jmt.gui.jwat.JWatWizard;
-import jmt.jteach.ConstantsJTch;
+import jmt.jteach.Constants;
+import jmt.jteach.Simulation.Simulation;
+import jmt.jteach.Simulation.Simulation.*;
+import jmt.jteach.Simulation.SimulationFactory;
+import jmt.jteach.Simulation.SimulationType;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
 import jmt.jteach.actionsWizard.AbstractTCHAction;
 import jmt.jteach.actionsWizard.Help;
-import jmt.jteach.animation.QueuePolicyNonPreemptive;
-import jmt.jteach.animation.RoutingPolicy;
 
 /**
  * Main Panel of the MainWizard. This panel offers the possibility of choosing between a JTeach Model or Markov chain.
@@ -92,44 +94,48 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction FCFS = new AbstractAction("FCFS") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[0]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.PREEMPTIVE_TOOLTIPS[0]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.FIFO);
+			Simulation sim = SimulationFactory.createSimulation(SimulationType.NON_PREEMPTIVE, Constants.FCFS);
+			parent.setAnimationPanelEnv(sim);
 		}
 	};
 
 	protected AbstractAction LCFS = new AbstractAction("LCFS") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[1]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.PREEMPTIVE_TOOLTIPS[1]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.LIFO);
+			Simulation sim = SimulationFactory.createSimulation(SimulationType.NON_PREEMPTIVE, Constants.LCFS);
+			parent.setAnimationPanelEnv(sim);
 		}
 	};
 
 	protected AbstractAction SJF = new AbstractAction("SJF") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[2]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.PREEMPTIVE_TOOLTIPS[2]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.SJF);
+			Simulation sim = SimulationFactory.createSimulation(SimulationType.NON_PREEMPTIVE, Constants.SJF);
+			parent.setAnimationPanelEnv(sim);
 		}
 	};
 
 	protected AbstractAction LJF = new AbstractAction("LJF") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.PREEMPTIVE_TOOLTIPS[3]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.PREEMPTIVE_TOOLTIPS[3]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(QueuePolicyNonPreemptive.LJF);
+			Simulation sim = SimulationFactory.createSimulation(SimulationType.NON_PREEMPTIVE, Constants.LJF);
+			parent.setAnimationPanelEnv(sim);
 		}
 	};
 
@@ -138,40 +144,43 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction RR = new AbstractAction("Rond Robin") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.ROUTING_TOOLTIPS[0]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.ROUTING_TOOLTIPS[0]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(RoutingPolicy.RR);
+			Simulation sim = SimulationFactory.createSimulation(SimulationType.ROUTING, Constants.RR);
+			parent.setAnimationPanelEnv(sim);
 		}
 	};
 
 	protected AbstractAction PROBABILISTIC = new AbstractAction("Probabilistic") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.ROUTING_TOOLTIPS[1]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.ROUTING_TOOLTIPS[1]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(RoutingPolicy.PROBABILISTIC);
+			Simulation sim = SimulationFactory.createSimulation(SimulationType.ROUTING, Constants.PROBABILISTIC);
+			parent.setAnimationPanelEnv(sim);
 		}
 	};
 
 	protected AbstractAction JSQ = new AbstractAction("JSQ") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.ROUTING_TOOLTIPS[2]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.ROUTING_TOOLTIPS[2]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.setAnimationPanelEnv(RoutingPolicy.JSQ);
+			Simulation sim = SimulationFactory.createSimulation(SimulationType.ROUTING, Constants.JSQ);
+			parent.setAnimationPanelEnv(sim);
 		}
 	};
 
 	protected AbstractAction MM1 = new AbstractAction("M/M/1") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.MARKOV_TOOLTIPS[0]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.MARKOV_TOOLTIPS[0]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -182,7 +191,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction MM1K = new AbstractAction("M/M/1/k") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.MARKOV_TOOLTIPS[1]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.MARKOV_TOOLTIPS[1]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -193,7 +202,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction MMC = new AbstractAction("M/M/c") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.MARKOV_TOOLTIPS[2]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.MARKOV_TOOLTIPS[2]);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -204,7 +213,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 	protected AbstractAction MMCK = new AbstractAction("M/M/c/k") {
 		private static final long serialVersionUID = 1L;
 		{
-			putValue(Action.SHORT_DESCRIPTION, ConstantsJTch.MARKOV_TOOLTIPS[3]);
+			putValue(Action.SHORT_DESCRIPTION, Constants.MARKOV_TOOLTIPS[3]);
 		}
 
 		public void actionPerformed(ActionEvent e) {

@@ -25,12 +25,24 @@ package jmt.jteach;
  * Date: 29-mar-2024
  * Time: 13.40
  */
-public class ConstantsJTch {
+public class Constants {
+
+    //all the algorithms
+    public static final String FCFS = "FCFS";
+    public static final String LCFS = "LCFS";
+    public static final String SJF = "SJF";
+    public static final String LJF = "LJF";
+
+    public static final String PS = "PS";
+
+    public static final String RR = "RR";
+    public static final String PROBABILISTIC = "PROBABILISTIC";
+    public static final String JSQ = "JSQ";
 
     //descriptions of all the policies
-    public static final String FIFO_DESCRIPTION = 
+    public static final String FCFS_DESCRIPTION = 
         "The FCFS (First come first served) sheduling Policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. The first task that arrives is the first to be executed and subsequent tasks are executed in the order of their arrival.";
-    public static final String LIFO_DESCRIPTION = 
+    public static final String LCFS_DESCRIPTION = 
         "The LCFS (Last come first served) sheduling Policy is a scheduling algorithm that orders the jobs inside the queue of a station based on their arrival time. Most recently arrived tasks are executed before any others. It operates on a 'last come, first served' basis, similar to a stack data structure.";
     public static final String SJF_DESCRIPTION =
         "The SJF (Shortest Job First) scheduling Policy is a scheduling algorithm that orders the job inside the queue based on their service time. Jobs with smaller service time are prioritized with respect to the others inside the queue.";

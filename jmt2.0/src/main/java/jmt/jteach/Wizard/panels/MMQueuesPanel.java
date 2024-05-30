@@ -26,7 +26,7 @@ import jmt.framework.gui.components.JMTToolBar;
 import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.wizard.WizardPanel;
 import jmt.gui.common.JMTImageLoader;
-import jmt.jteach.ConstantsJTch;
+import jmt.jteach.Constants;
 import jmt.jteach.Wizard.MMQueues;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
@@ -112,7 +112,7 @@ public class MMQueuesPanel extends WizardPanel implements WizardPanelTCH{
         //add help for each Action/JComboBox with helpLabel
 		for (int i = 0; i < buttons.size(); i++) {
 			AbstractButton button = buttons.get(i);
-			help.addHelp(button, ConstantsJTch.HELP_BUTTONS_MARKOV[i]);
+			help.addHelp(button, Constants.HELP_BUTTONS_MARKOV[i]);
 		}
 		  
 		parent.setToolBar(toolbar);

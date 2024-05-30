@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import jmt.jteach.Distributions;
+import jmt.jteach.Simulation.Simulation;
 
 /**
  * This class is a super class for all the animations.
@@ -74,13 +75,13 @@ public class AnimationClass extends JComponent implements Animation{
 
 	/**
 	 * Method for updating the SingleQueue (called when the create button is pressed)
-	 * @param policy new policy selected
+	 * @param sim new info about the simulation
 	 * @param nservers number of servers
 	 * @param serviceTime distribution of the service time
 	 * @param interArrivalTime distribution of the inter-arrival time
 	 * @param maxJobs -1 if the simulation has no upper limit, otherwise > 0 means a max number of jobs to simulate
 	 */
-	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers, Distributions serviceTime, Distributions interArrivalTime, int maxJobs){ }
+	public void updateSingle(Simulation sim, int nservers, Distributions serviceTime, Distributions interArrivalTime, int maxJobs){ }
 
 	/**
 	 * Method for updating the MultipleQueue

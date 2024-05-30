@@ -29,6 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import jmt.gui.common.JMTImageLoader;
+import jmt.jteach.Simulation.Simulation;
 
 /**
  * Class for representing a Router inside the Animation
@@ -49,7 +50,7 @@ public class Router extends JComponent implements JobContainer{
 	private List<Edge> nextEdges;
 	private List<Station> nextStations;
 
-	private RoutingPolicy policy;
+	private Simulation simulation;
 	private double[] percentages;
 	
 	//double constructor, since we can create a Router without percentages (needed only for PROBABILISTIC Routing Policy) or with them
@@ -62,19 +63,19 @@ public class Router extends JComponent implements JobContainer{
 	 * @param pos, position of the Router, if it is x-y centered then the respective coordinates are not considered
 	 * @param nextEdges, the edges linked to this router
 	 * @param nextStations, the stations linked to this router
-	 * @param policy, type of Routing Policy
+	 * @param simulation, information of the simulation
 	 */
-	public Router(JPanel parent, boolean xcentered, boolean ycentered, Point pos, List<Edge> nextEdges, List<Station> nextStations, RoutingPolicy policy) {
+	public Router(JPanel parent, boolean xcentered, boolean ycentered, Point pos, List<Edge> nextEdges, List<Station> nextStations, Simulation simulation) {
 		this.parent = parent;
 		this.pos = pos; 
 		this.xcentered = xcentered;
 		this.ycentered = ycentered;
-		this.policy = policy;
+		this.simulation = simulation;
 		
 		this.nextEdges = nextEdges;
 		this.nextStations = nextStations;
 		
-		if(policy == RoutingPolicy.JSQ) { //if the policy is the JSQ then the stations must paint the size of their queue
+		if(simulation.getName() == "JSQ") { //if the policy is the JSQ then the stations must paint the size of their queue
 			for(Station st: nextStations) {
 				st.paintQueueSize();
 			}
@@ -88,11 +89,11 @@ public class Router extends JComponent implements JobContainer{
 	 * @param percentages, it must be of size = 3 and all doubles between 0 and 1, and they must sum up to 1. 
 	 * This check is not performed here, since it is something that have to be checked in the TextField before creating the Animation
 	 */
-	public Router(JPanel parent, boolean xcentered, boolean ycentered, Point pos, List<Edge> nextEdges, List<Station> nextStations, RoutingPolicy policy, double[] percentages) {
-		this(parent, xcentered, ycentered, pos, nextEdges, nextStations, policy);
+	public Router(JPanel parent, boolean xcentered, boolean ycentered, Point pos, List<Edge> nextEdges, List<Station> nextStations, Simulation simulation, double[] percentages) {
+		this(parent, xcentered, ycentered, pos, nextEdges, nextStations, simulation);
 		this.percentages = percentages;
 		
-		if(policy == RoutingPolicy.PROBABILISTIC) { //if the policy is the PROB then the edges must paint also their percentage
+		if(simulation.getName() == "PROBABILISTIC") { //if the policy is the PROB then the edges must paint also their percentage
 			for(int i = 0; i < nextEdges.size(); i++) {
 				nextEdges.get(i).paintPercentage(percentages[i]);
 			}
@@ -126,16 +127,16 @@ public class Router extends JComponent implements JobContainer{
 	public void addJob(Job newJob) {
 		//choose where to route the job based on the type of policy
 		int index;
-		switch(policy) {
-			case RR:
+		switch(simulation.getName()) {
+			case "RR":
 				index = new Random().nextInt(nextEdges.size());
 				route(newJob, index);
 				break;
-			case PROBABILISTIC:
+			case "PROBABILISTIC":
 				index = probabilistic();
 				route(newJob, index);
 				break;
-			case JSQ:
+			case "JSQ":
 				index = shortestJobQueue();
 				route(newJob, index);
 				break;

@@ -26,6 +26,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import jmt.jteach.Distributions;
+import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.Wizard.panels.AnimationPanel;
 
 /**
@@ -46,18 +47,18 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	private List<Edge> edgeList;
 	
 	//--all the characteristics of the Animation
-	private QueuePolicyNonPreemptive queuePolicy;
+	private Simulation simulation;
 	private int nServers = 1;
 	private Distributions interArrival = Distributions.DETERMINISTIC; //by default the two distributions are DETERMINSTIC
 	private Distributions service = Distributions.DETERMINISTIC;
 	
 	
 	/** Constructor*/
-	public SingleQueueNetAnimation(AnimationPanel animPanel, JPanel container, QueuePolicyNonPreemptive queuePolicy) {		
+	public SingleQueueNetAnimation(AnimationPanel animPanel, JPanel container, Simulation simulation) {		
 		super();
 		this.animPanel = animPanel;
 		this.parent = container;
-		this.queuePolicy = queuePolicy;
+		this.simulation = simulation;
 		initGUI(container);
 	}
 	
@@ -69,7 +70,7 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		
 		sink = new Sink(container, true, new Point(0,0), this);
 		edgeList.add(new Edge(this, container, true, true, new Point(450,0), new Point(590,0), sink));
-		station = new Station(this, container, true, true, new Point(0,0), edgeList.get(0), queuePolicy, nServers);
+		station = new Station(this, container, true, true, new Point(0,0), edgeList.get(0), simulation, nServers);
 		edgeList.add(new Edge(this, container, true, true, new Point(80,0), new Point(230,0), station));
 		source = new Source(this, container, true, new Point(0,0), edgeList.get(edgeList.size()-1), interArrival, service);
 	}
@@ -174,13 +175,13 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	}
 
 	@Override
-	public void updateSingle(QueuePolicyNonPreemptive policy, int nservers, Distributions service, Distributions interA, int maxjobs){
-		queuePolicy = policy;
+	public void updateSingle(Simulation sim, int nservers, Distributions service, Distributions interA, int maxjobs){
+		simulation = sim;
 		interArrival = interA;
 		this.service = service;
 		this.nServers = nservers;
 
-		station.typeOfQueue(policy);
+		station.typeOfQueue(simulation);
 		station.updateNServers(nservers);
 		source.updateDistribution(service, interA);	
 		source.setMaxJobs(maxjobs);

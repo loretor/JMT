@@ -23,16 +23,13 @@ import jmt.gui.common.JMTImageLoader;
 import jmt.gui.common.animation.Animation;
 import jmt.jteach.Wizard.panels.MainPanel;
 import jmt.jteach.Wizard.panels.ResultsPanel;
-import jmt.jteach.animation.Policy;
-import jmt.jteach.animation.QueuePolicyNonPreemptive;
-import jmt.jteach.animation.RoutingPolicy;
 import jmt.jteach.Solver;
+import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.Wizard.panels.AnimationPanel;
 import jmt.jteach.Wizard.panels.MMQueuesPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Event;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,12 +99,12 @@ public class MainWizard extends JTchWizard{
     
 	/**
 	 * Method to create a new AnimationPanel for Non Preemptive Scheduling
-	 * @param algorithm the type of Non Preemptive algorithm
+	 * @param simulation the type of Simulation
 	 */
-	public void setAnimationPanelEnv(QueuePolicyNonPreemptive algorithm){
+	public void setAnimationPanelEnv(Simulation simulation){
 		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+TITLE_SCHEDULING);
 
-		animationPanel = new AnimationPanel(this, Policy.NON_PREEMPTIVE, algorithm);
+		animationPanel = new AnimationPanel(this, simulation);
 		this.addPanel(animationPanel);
 		panelCollection.add(animationPanel);
 
@@ -115,22 +112,6 @@ public class MainWizard extends JTchWizard{
 		this.addPanel(resultsPanel);
 		panelCollection.add(resultsPanel);
 
-		this.showNext();
-	}
-
-	/**
-	 * Same method as before, but with a Routing policy
-	 * @param policy the type of Routing Policy
-	 */
-	public void setAnimationPanelEnv(RoutingPolicy policy){
-		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+ TITLE_ROUTING);
-
-		animationPanel = new AnimationPanel(this, policy);
-		this.addPanel(animationPanel);
-		panelCollection.add(animationPanel);
-
-		//TODO: add here the results panel
-		
 		this.showNext();
 	}
 

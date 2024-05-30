@@ -28,6 +28,7 @@ import java.util.Comparator;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.animation.customQueue.CustomCollection;
 import jmt.jteach.animation.customQueue.FIFOQueue;
 import jmt.jteach.animation.customQueue.LIFOQueue;
@@ -50,7 +51,7 @@ public class Station extends JComponent implements JobContainer{
 	private boolean ycentered;
 	private int height = 60;
 	private int length = 120;
-	private QueuePolicyNonPreemptive policyType;
+	private Simulation simulation;
 	private int nServers;
 	private boolean paintQueueSize = false; //this parameter is used to know if it is needed to paint the size of the queue above the station (useful for polices like JSQ
 	
@@ -74,16 +75,16 @@ public class Station extends JComponent implements JobContainer{
 	 * @param ycentered, if the station is y centered with respect to the parent
 	 * @param pos, position of the station, if it is x-y centered then the respective coordinates are not considered
 	 * @param next, Jobcontainer connected to this station
-	 * @param type, queue policy type
+	 * @param sim, information about the simulation
 	 * @param servers, number of servers
 	 */
-	public Station(AnimationClass anim, JPanel parent, boolean xcentered, boolean ycentered, Point pos, JobContainer next, QueuePolicyNonPreemptive type, int servers) {
+	public Station(AnimationClass anim, JPanel parent, boolean xcentered, boolean ycentered, Point pos, JobContainer next, Simulation sim, int servers) {
 		this.animation = anim;
 		this.parent = parent;
 		this.pos = pos; 
 		this.xcentered = xcentered;
 		this.ycentered = ycentered;
-		
+		this.simulation = sim;
 		this.nServers = servers;
 		this.next = next;
 		
@@ -103,50 +104,43 @@ public class Station extends JComponent implements JobContainer{
 			position *= -1;
 		}
 				
-		typeOfQueue(type);
+		typeOfQueue(simulation);
 	}
 	
 	/**
-	 * Create the CustomCollection instance, based on the enum QueuePolicy
-	 * @param type
+	 * Create the CustomCollection instance, based on the simulation information
+	 * @param sim 
 	 */
 	@SuppressWarnings("unchecked")
-	protected void typeOfQueue(QueuePolicyNonPreemptive type) {
-		this.policyType = type;
-		switch(type) {
-		case FIFO:
-			jobQueue = new FIFOQueue<Job>();
-			break;
-		case LIFO:
-			jobQueue = new LIFOQueue<Job>();
-			break;
-		case SJF:
-			jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
-				@Override
-				public int compare(Job o1, Job o2) {
-					return Double.compare(o1.getDuration(), o2.getDuration());
-				}
-				
-			});
-			break;
-		case LJF:
-			jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
-				@Override
-				public int compare(Job o1, Job o2) {
-					return Double.compare(o2.getDuration(), o1.getDuration());
-				}
-				
-			});
-			break;
-		/*case FCFS_PR:
-			jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
-				@Override
-				public int compare(Job o1, Job o2) {
-					return Integer.compare(o1.getPriority(), o2.getPriority());
-				}
-				
-			});
-			break; */
+	protected void typeOfQueue(Simulation sim) {
+		switch(sim.getName()) {
+			case "FCFS":
+				jobQueue = new FIFOQueue<Job>();
+				break;
+			case "LCFS":
+				jobQueue = new LIFOQueue<Job>();
+				break;
+			case "SJF":
+				jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
+					@Override
+					public int compare(Job o1, Job o2) {
+						return Double.compare(o1.getDuration(), o2.getDuration());
+					}
+					
+				});
+				break;
+			case "LJF":
+				jobQueue = new PRIOQueue<Job>(new Comparator<Job>() {
+					@Override
+					public int compare(Job o1, Job o2) {
+						return Double.compare(o2.getDuration(), o1.getDuration());
+					}
+					
+				});
+				break;
+			default: //default since the sim.getName could be also something like RR, so in this case we opt for a station with FIFO policy 
+				jobQueue = new FIFOQueue<Job>();
+				break;
 		}
 	}
 	
@@ -284,8 +278,8 @@ public class Station extends JComponent implements JobContainer{
 		return jobQueue.size();
 	}
 	
-	public QueuePolicyNonPreemptive getQueuePolicy() {
-		return policyType;
+	public Simulation getSimulation() {
+		return simulation;
 	}
 	
 	public JobContainer getNextContainer() {

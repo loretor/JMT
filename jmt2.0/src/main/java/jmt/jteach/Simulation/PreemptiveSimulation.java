@@ -15,35 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
+package jmt.jteach.Simulation;
 
-package jmt.jteach.animation;
-
-/**
- * Enum for the type of Policy.
- *
- * @author Lorenzo Torri
- * Date: 07-apr-2024
- * Time: 19.50
- */
-public enum Policy {
-    PREEMPTIVE{
-        @Override
-        public String toString() {
-            return "Preemptive";
-        }
-    },
-    NON_PREEMPTIVE{
-        @Override
-        public String toString() {
-            return "Non Preemptive";
-        }
-    }, 
-    ROUTING{
-        @Override
-        public String toString() {
-            return "Preemptive";
-        }
-    };
-
-    public abstract String toString();
+public abstract class PreemptiveSimulation implements Simulation {
+    public SimulationType getType(){
+        return SimulationType.NON_PREEMPTIVE;
+    }
 }

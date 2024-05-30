@@ -27,6 +27,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import jmt.jteach.Distributions;
+import jmt.jteach.Simulation.Simulation;
 
 /**
  * Class with all the JComponents for the Animation of Routing Policy
@@ -49,16 +50,15 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	
 	
 	//--all the characteristics of the Animation
-	private QueuePolicyNonPreemptive queuePolicy = QueuePolicyNonPreemptive.FIFO; //it is setted by default = FIFO
-	private RoutingPolicy routingPolicy;
+	private Simulation simulation;
 	private int nServers = 1; //by default = 1
 	private Distributions interArrival = Distributions.DETERMINISTIC; //by default the two distributions are DETERMINSTIC
 	private Distributions service = Distributions.DETERMINISTIC;
 	
 	/** Constructor */
-	public MultipleQueueNetAnimation(JPanel container, RoutingPolicy routingPolicy) {
+	public MultipleQueueNetAnimation(JPanel container, Simulation simulation) {
 		this.parent = container;
-		this.routingPolicy = routingPolicy;
+		this.simulation = simulation;
 		initGUI(container);
 	}
 	
@@ -81,9 +81,9 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		edgeList.add(new Edge(this, container, false, false, new Point(500,374), new Point(550,374), edgeList.get(2)));
 		
 		//three stations
-		stationList.add(new Station(this, container, false, false, new Point(300,100), edgeList.get(3), queuePolicy, nServers));
-		stationList.add(new Station(this, container, false, true, new Point(300,0), edgeList.get(4), queuePolicy, nServers));
-		stationList.add(new Station(this, container, false, false, new Point(300,252+(252-100-60)), edgeList.get(5), queuePolicy, nServers));
+		stationList.add(new Station(this, container, false, false, new Point(300,100), edgeList.get(3), simulation, nServers));
+		stationList.add(new Station(this, container, false, true, new Point(300,0), edgeList.get(4), simulation, nServers));
+		stationList.add(new Station(this, container, false, false, new Point(300,252+(252-100-60)), edgeList.get(5), simulation, nServers));
 		
 		//three horizontal edges
 		edgeList.add(new Edge(this, container, false, true, new Point(180,100+30), new Point(280,100+30), stationList.get(0)));
@@ -97,7 +97,7 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		//create the two Lists for the router
 		int l = edgeList.size();
 		List<Edge> eList = new ArrayList<>(Arrays.asList(edgeList.get(l-2), edgeList.get(l-4), edgeList.get(l-1)));
-		router = new Router(container, false, true, new Point(160,0), eList, stationList, routingPolicy, probabilities);
+		router = new Router(container, false, true, new Point(160,0), eList, stationList, simulation, probabilities);
 		
 		edgeList.add(new Edge(this, container, true, true, new Point(80,0), new Point(150,0), router));
 		

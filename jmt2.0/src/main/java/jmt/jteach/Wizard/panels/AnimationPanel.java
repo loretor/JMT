@@ -20,9 +20,7 @@ package jmt.jteach.Wizard.panels;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -30,7 +28,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.List;
+
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -41,14 +40,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -58,7 +55,6 @@ import javax.swing.event.ChangeListener;
 
 import jmt.framework.gui.components.JMTMenuBar;
 import jmt.framework.gui.components.JMTToolBar;
-import jmt.framework.gui.graph.MeasureValue;
 import jmt.framework.gui.help.HoverHelp;
 import jmt.framework.gui.listeners.MenuAction;
 import jmt.framework.gui.wizard.WizardPanel;
@@ -66,20 +62,20 @@ import jmt.gui.common.JMTImageLoader;
 import jmt.gui.common.controller.DispatcherThread;
 import jmt.gui.common.definitions.GuiInterface;
 import jmt.gui.common.definitions.MeasureDefinition;
-import jmt.gui.common.definitions.MeasureDefinition.ProgressListener;
 import jmt.gui.common.definitions.ResultsModel;
 import jmt.gui.common.xml.XMLWriter;
-import jmt.jteach.ConstantsJTch;
+import jmt.jteach.Constants;
 import jmt.jteach.Distributions;
 import jmt.jteach.Solver;
+import jmt.jteach.Simulation.NonPreemptiveSimulation;
+import jmt.jteach.Simulation.Simulation;
+import jmt.jteach.Simulation.SimulationFactory;
+import jmt.jteach.Simulation.SimulationType;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
 import jmt.jteach.actionsWizard.*;
 import jmt.jteach.animation.AnimationClass;
 import jmt.jteach.animation.MultipleQueueNetAnimation;
-import jmt.jteach.animation.Policy;
-import jmt.jteach.animation.QueuePolicyNonPreemptive;
-import jmt.jteach.animation.RoutingPolicy;
 import jmt.jteach.animation.SingleQueueNetAnimation;
 
 /**
@@ -106,8 +102,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     private JButton createButton;
     private JPanel animationPanel;
     private HoverHelp help;
-
-    JLabel label;
+    
 
     //------------ variables for parameters JPanel ---------------
     private JPanel parametersPanel;
@@ -127,11 +122,9 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     private AbstractTCHAction about;
 
     //--------------properties of the animation------------------
+    private Simulation simulation;
     private AnimationClass animation;
-    private Policy policy = null;
-    private QueuePolicyNonPreemptive[] nonPreemptivePolicies; //array of all possible nonPreemptive policies
-    private QueuePolicyNonPreemptive queuePolicyNonPreemptive = null;
-    private RoutingPolicy routingPolicy = null;
+    private List<String> algorithms; //array of all possible algorithms to select
 
     //------------- engine simulation --------------------------
     private Solver solver;
@@ -153,7 +146,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     private ChangeListener changeListener = new ChangeListener() {
         @Override
         public void stateChanged(ChangeEvent e) {
-            if(policy == Policy.ROUTING && routingPolicy == RoutingPolicy.PROBABILISTIC && prob1 != null && prob2 != null){
+            if(simulation.getType() == SimulationType.ROUTING && simulation.getName() == Constants.PROBABILISTIC && prob1 != null && prob2 != null){
                 double value1 = (double) prob1.getValue();
                 double value2 = (double) prob2.getValue();
                 if (value1 + value2 <= 1) { 
@@ -169,6 +162,8 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         this.parent = main;
         help = parent.getHoverHelp();
 
+        algorithms = NonPreemptiveSimulation.getAlgorithms();
+
         //define all the AbstractTeachAction
         exit = new Exit(this);
         start = new StartSimulation(this);
@@ -180,55 +175,31 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
         solver = new Solver();
 
+        start.setEnabled(false); //cannot start a simulation without setting the parameters
+        nextStep.setEnabled(false);
         pause.setEnabled(false);
         reload.setEnabled(false);
     }
 
-    /**
-     * To create a new AnimationPanel, call this constructor only if Policy = PREEMPTIVE or NON_PREEMPTIVE
-     * @param main the main wizard
-     * @param policy the type of policy
-     */
-    public AnimationPanel(MainWizard main, Policy policy, QueuePolicyNonPreemptive algorithm){
+    public AnimationPanel(MainWizard main, Simulation sim){
         this(main);
-        this.policy = policy;
-        this.queuePolicyNonPreemptive = algorithm; 
-        this.routingPolicy = null;
-        start.setEnabled(false); //cannot start a simulation without setting the parameters
-        nextStep.setEnabled(false);
-        initGUI();
-    }
-
-    /**
-     * To create a new AnimationPanel, call this constructor for routing policies
-     * @param main the main wizard
-     * @param policy the type of policy
-     */
-    public AnimationPanel(MainWizard main, RoutingPolicy routingpolicy){
-        this(main);
-        this.routingPolicy = routingpolicy;
-        this.policy = Policy.ROUTING;
-        start.setEnabled(false);//cannot start a simulation without setting the parameters
+        this.simulation = sim;     
         initGUI();
     }
 
     public void initGUI(){
         Box introductionBox = Box.createHorizontalBox();
-        label = new JLabel(ConstantsJTch.INTRODUCTION_SIMULATION);
-        introductionBox.add(label);
+        JLabel introductionLabel = new JLabel(Constants.INTRODUCTION_SIMULATION);
+        introductionBox.add(introductionLabel);
 
         this.setLayout(new BorderLayout());
-        //this.setBorder(BorderFactory.createEmptyBorder(20,10,20,10));
         mainPanel = new JPanel();
-        if(policy == Policy.NON_PREEMPTIVE){
-            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling"));
-        }
-        else if(policy == Policy.PREEMPTIVE){
 
+        String title = "";
+        if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PREEMPTIVE){
+            title = " Scheduling";
         }
-        else{
-            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), routingPolicy.toString()));
-        }
+        mainPanel.setBorder(new TitledBorder(new EtchedBorder(), simulation.getType().toString() + title));
         
         mainPanel.setLayout(new BorderLayout());
 
@@ -255,11 +226,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         //description of the policy
         JPanel descrPanel = new JPanel(new BorderLayout());
         descrLabel = new JLabel();
-        if(policy == Policy.ROUTING){
-            descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+routingPolicy.getDescription()+"</p></body></html>");
+        if(simulation.getType() == SimulationType.ROUTING || simulation.getType() == SimulationType.PROCESSOR_SHARING){ 
+            descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+simulation.getDescription()+"</p></body></html>");
         }
-        else{
-            descrLabel.setText(ConstantsJTch.NO_DESCRIPTION);
+        else{ //only in the case of preemptive or non preemptive no description at the beginning
+            descrLabel.setText(Constants.NO_DESCRIPTION);
         }
         descrPanel.add(descrLabel, BorderLayout.CENTER);
         leftPanel.add(descrPanel, BorderLayout.NORTH);
@@ -274,11 +245,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
         animationPanel = new JPanel(new BorderLayout());
         //based on the type of Policy passed in the constructor, create a new Animation
-        if(policy == Policy.NON_PREEMPTIVE){
-            animation = new SingleQueueNetAnimation(this, animationPanel, QueuePolicyNonPreemptive.FIFO);
+        if(simulation.getType() == SimulationType.NON_PREEMPTIVE){
+            animation = new SingleQueueNetAnimation(this, animationPanel, simulation);
         }
         else{
-            animation = new MultipleQueueNetAnimation(animationPanel, routingPolicy);
+            animation = new MultipleQueueNetAnimation(animationPanel, simulation);
         }
         animationPanel.add(animation, BorderLayout.CENTER);
         animationPanel.setBackground(Color.WHITE);
@@ -317,28 +288,27 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         EmptyBorder paddingBorder = new EmptyBorder(0, 10, 0, 10); //padding right and left for all the panels inside the JPanel (top and bottom = 0 otherwise it does not show other panels)
         
         //algorithm Panel (this one is displayed only for Scheduling Policies)
-        if(policy == Policy.NON_PREEMPTIVE || policy == Policy.PREEMPTIVE){
-            JPanel algorithmPanel = createPanel(paddingBorder, false, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[0]);
+        if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PREEMPTIVE){
+            JPanel algorithmPanel = createPanel(paddingBorder, false, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[0]);
             algorithmPanel.setLayout(new GridLayout(1,2));
             algorithmPanel.add(new JLabel("Algorithm :"));
 
-            if(policy == Policy.NON_PREEMPTIVE){
-                nonPreemptivePolicies = QueuePolicyNonPreemptive.values();
-                String[] options = new String[nonPreemptivePolicies.length];
+            if(simulation.getType() == SimulationType.NON_PREEMPTIVE){
+                String[] options = new String[algorithms.size()];
                 for (int i = 0; i < options.length; i++) {
-                    options[i] = nonPreemptivePolicies[i].toString();
+                    options[i] = algorithms.get(i);
                 }
                 algorithmJComboBox = new JComboBox<String>(options);
-                algorithmJComboBox.setSelectedItem(queuePolicyNonPreemptive.toString()); //set as selected policy the one chosen in the MainPanel when the button was pressed
+                algorithmJComboBox.setSelectedItem(simulation.getName()); //set as selected policy the one chosen in the MainPanel when the button was pressed
                 algorithmPanel.add(algorithmJComboBox);
             }
             
             parametersPanel.add(algorithmPanel);
         }
 
-        //N servers panel (this one is displayed only for Scheduling Policies)
-        if(policy == Policy.NON_PREEMPTIVE || policy == Policy.PREEMPTIVE){
-            JPanel nserversPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[1]);
+        //N servers panel (this one is displayed only for Scheduling Policies or Srocessor Sharing)
+        if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PREEMPTIVE || simulation.getType() == SimulationType.PROCESSOR_SHARING){
+            JPanel nserversPanel = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[1]);
             nserversPanel.setLayout(new GridLayout(1,2));
             nserversPanel.add(new JLabel("N.servers:"));
             SpinnerNumberModel model = new SpinnerNumberModel(1,1,2,1);
@@ -347,15 +317,15 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         }
 
         //probability panel (displayed only for probabilistic routing)
-        if(routingPolicy == RoutingPolicy.PROBABILISTIC){
-            JPanel probabilitiesPanel = createPanel(paddingBorder, false, spaceBetweenPanels, ConstantsJTch.HELP_PROBABILITIES[0]);
+        if(simulation.getType() == SimulationType.ROUTING && simulation.getName() == Constants.PROBABILISTIC){
+            JPanel probabilitiesPanel = createPanel(paddingBorder, false, spaceBetweenPanels, Constants.HELP_PROBABILITIES[0]);
             probabilitiesPanel.setBorder(new TitledBorder(new EtchedBorder(), "Probabilities"));
             probabilitiesPanel.setLayout(new BoxLayout(probabilitiesPanel, BoxLayout.Y_AXIS));
 
             JPanel p1Panel = new JPanel();
             p1Panel.setBorder(paddingBorder);
             probabilitiesPanel.add(p1Panel);
-            help.addHelp(p1Panel, ConstantsJTch.HELP_PROBABILITIES[1]);
+            help.addHelp(p1Panel, Constants.HELP_PROBABILITIES[1]);
             p1Panel.setLayout(new GridLayout(1,2));
             p1Panel.add(new JLabel("P1:"));
             SpinnerNumberModel model1 = new SpinnerNumberModel(0.5,0,1,0.01);
@@ -366,7 +336,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
             JPanel p2Panel = new JPanel();
             p2Panel.setBorder(paddingBorder);
             probabilitiesPanel.add(p2Panel);
-            help.addHelp(p2Panel, ConstantsJTch.HELP_PROBABILITIES[2]);
+            help.addHelp(p2Panel, Constants.HELP_PROBABILITIES[2]);
             p2Panel.setLayout(new GridLayout(1,2));
             p2Panel.add(new JLabel("P2:"));
             SpinnerNumberModel model2 = new SpinnerNumberModel(0.5,0,1,0.01);
@@ -378,7 +348,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         }
 
         //Inter arrival time panel
-        JPanel interAPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[2]);
+        JPanel interAPanel = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[2]);
         interAPanel.setLayout(new GridLayout(1,2));
         interAPanel.add(new JLabel("Inter Arrival:"));
         interAComboBox = new JComboBox<Distributions>(distributions);
@@ -386,7 +356,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         parametersPanel.add(interAPanel);
 
         //Service Time panel
-        JPanel serviceTPanel = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[3]);
+        JPanel serviceTPanel = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[3]);
         serviceTPanel.setLayout(new GridLayout(1,2));
         serviceTPanel.add(new JLabel("Service Time:"));
         serviceComboBox = new JComboBox<Distributions>(distributions);
@@ -394,7 +364,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         parametersPanel.add(serviceTPanel);
 
         //Simulation Duration
-        JPanel simulationDuration = createPanel(paddingBorder, true, spaceBetweenPanels, ConstantsJTch.HELP_PARAMETERS_PANELS[4]);
+        JPanel simulationDuration = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[4]);
         simulationDuration.setLayout(new GridLayout(1,2));
         simulationDuration.add(new JLabel("Max jobs generated:"));
 
@@ -423,10 +393,10 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
         //create button
         paddingBorder = new EmptyBorder(0,80,0,80);
-        JPanel createPanel = createPanel(paddingBorder, true, spaceBetweenPanels*2, ConstantsJTch.HELP_PARAMETERS_PANELS[5]);
+        JPanel createPanel = createPanel(paddingBorder, true, spaceBetweenPanels*2, Constants.HELP_PARAMETERS_PANELS[5]);
         createPanel.setLayout(new BorderLayout());
         createButton = new JButton(CREATE);
-        help.addHelp(createButton, ConstantsJTch.HELP_PARAMETERS_PANELS[4]);
+        help.addHelp(createButton, Constants.HELP_PARAMETERS_PANELS[4]);
         createPanel.add(createButton, BorderLayout.CENTER);
         parametersPanel.add(Box.createVerticalStrut(spaceBetweenPanels));
     }
@@ -486,7 +456,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         //add help for each Action/JComboBox with helpLabel
 		for (int i = 0; i < buttons.size(); i++) {
 			AbstractButton button = buttons.get(i);
-			help.addHelp(button, ConstantsJTch.HELP_BUTTONS_ANIMATIONS[i]);
+			help.addHelp(button, Constants.HELP_BUTTONS_ANIMATIONS[i]);
 		}
 		  
 		parent.setToolBar(toolbar);
@@ -511,23 +481,23 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         reloadAnimation();
         start.setEnabled(true);
 
-        if(policy == Policy.NON_PREEMPTIVE){
-            queuePolicyNonPreemptive = nonPreemptivePolicies[algorithmJComboBox.getSelectedIndex()]; //the index of the JComboBox is the same of the array of queue policies Non preemptive
+        if(simulation.getType() == SimulationType.NON_PREEMPTIVE){
             if(infDuration.isSelected()){
                 maxJobs = -1;
             }
             else{
                 maxJobs = (Integer) duration.getValue();
             }
-            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), policy.toString() + " Scheduling - " + queuePolicyNonPreemptive.toString()));
-            descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+queuePolicyNonPreemptive.getDescription()+"</p></body></html>");
-            animation.updateSingle(queuePolicyNonPreemptive, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem(), maxJobs);
+            simulation = SimulationFactory.createSimulation(simulation.getType(), String.valueOf(algorithmJComboBox.getSelectedItem()));
+            mainPanel.setBorder(new TitledBorder(new EtchedBorder(), simulation.getType().toString() + " Scheduling - " + simulation.getName()));
+            descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+simulation.getDescription()+"</p></body></html>");
+            animation.updateSingle(simulation, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem(), maxJobs);
         }
-        else if(policy == Policy.PREEMPTIVE){
+        else if(simulation.getType() == SimulationType.PREEMPTIVE){
 
         }
         else{ //in case of routing only the animation must be updated
-            if(routingPolicy == RoutingPolicy.PROBABILISTIC){
+            if(simulation.getType() == SimulationType.ROUTING && simulation.getName() == Constants.PROBABILISTIC){
                 animation.updateMultiple(new double[]{(double) prob1.getValue(), (double) prob2.getValue()}, (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
             }
             else{

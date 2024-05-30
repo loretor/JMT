@@ -33,7 +33,7 @@ import jmt.gui.exact.table.ExactTable;
 import jmt.gui.exact.table.ExactTableModel;
 import jmt.gui.exact.table.ListOp;
 import jmt.gui.exact.table.PrototypedTableModel;
-import jmt.jteach.ConstantsJTch;
+import jmt.jteach.Constants;
 import jmt.jteach.Wizard.MainWizard;
 
 /**
@@ -190,7 +190,7 @@ public class ResultsPanel extends WizardPanel{
 
         //----upper part
         Box introductionBox = Box.createHorizontalBox();
-        JLabel label = new JLabel(ConstantsJTch.INTRODUCTION_RESULTS);
+        JLabel label = new JLabel(Constants.INTRODUCTION_RESULTS);
         introductionBox.add(label);
  
         //----center part

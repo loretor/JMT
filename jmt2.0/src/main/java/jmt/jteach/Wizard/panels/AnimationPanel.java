@@ -554,7 +554,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
     @Override
     public void openHelp() {
-        //TODO:fai
+        //TODO:fai help
     }
 
     //----------------- toolbar buttons actions

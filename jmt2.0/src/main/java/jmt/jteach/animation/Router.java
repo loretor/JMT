@@ -51,6 +51,7 @@ public class Router extends JComponent implements JobContainer{
 	private List<Station> nextStations;
 
 	private Simulation simulation;
+	private int indexRoundRobin = -1;
 	private double[] percentages;
 	
 	//double constructor, since we can create a Router without percentages (needed only for PROBABILISTIC Routing Policy) or with them
@@ -129,7 +130,7 @@ public class Router extends JComponent implements JobContainer{
 		int index;
 		switch(simulation.getName()) {
 			case "RR":
-				index = new Random().nextInt(nextEdges.size());
+				index = roundRobin();
 				route(newJob, index);
 				break;
 			case "PROBABILISTIC":
@@ -142,10 +143,20 @@ public class Router extends JComponent implements JobContainer{
 				break;
 		}
 	}
+
+	/**
+	 * Choose the outgoing arc based on RR routing
+	 * @return index of the outgoing edge
+	 */
+	private int roundRobin() {
+		indexRoundRobin = (indexRoundRobin+1) % 3;
+		System.out.println(indexRoundRobin);
+		return indexRoundRobin;
+	}
 	
 	/**
-	 * method used by the Router to know which is the edge to which routing based on probabilistic values
-	 * @return the index of the edge chosen
+	 * Choose the outgoing arc based on Probabilistic routing
+	 * @return index of the outgoing edge
 	 */
 	private int probabilistic() {
 		double r = new Random().nextDouble();
@@ -161,8 +172,8 @@ public class Router extends JComponent implements JobContainer{
 	}
 	
 	/**
-	 * method used by the Router to know which is the station connected to the router with the shortest job queue
-	 * @return the index of the station with shortest job queue
+	 * Choose the outgoing arc based on JSQ routing
+	 * @return index of the outgoing edge
 	 */
 	private int shortestJobQueue() {
 		int min = Integer.MAX_VALUE;

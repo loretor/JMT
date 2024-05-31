@@ -24,6 +24,8 @@ public class AnimationClass extends JComponent implements Animation{
 	protected List<Job> jobList; //instanciate it inside the constructor of the subclass
 	protected Animator anim;
 
+	protected Simulation simulation;
+
 	public AnimationClass(){
 		jobList = new ArrayList<>();
 	}
@@ -79,27 +81,32 @@ public class AnimationClass extends JComponent implements Animation{
 	 * @param nservers number of servers
 	 * @param serviceTime distribution of the service time
 	 * @param interArrivalTime distribution of the inter-arrival time
-	 * @param maxJobs -1 if the simulation has no upper limit, otherwise > 0 means a max number of jobs to simulate
 	 */
-	public void updateSingle(Simulation sim, int nservers, Distributions serviceTime, Distributions interArrivalTime, int maxJobs){ }
+	public void updateSingle(Simulation sim, int nservers, Distributions serviceTime, Distributions interArrivalTime){ }
 
 	/**
 	 * Method for updating the MultipleQueue
+	 * @param sim new info about the simulation
 	 * @param serviceTime distribution of the service time
 	 * @param interArrivalTime distribution of the inter-arrival time
 	 */
-	public void updateMultiple(Distributions serviceTime, Distributions interArrivalTime){}
+	public void updateMultiple(Simulation sim, Distributions serviceTime, Distributions interArrivalTime){}
 
 	/**
 	 * Method for updating the MultipleQueue with routing Policy = PROBABILISTIC
+	 * @param sim new info about the simulation
 	 * @param percentages new array of percentages associated to the outgoing arcs from the router
 	 * @param serviceTime distribution of the service time
 	 * @param interArrivalTime distribution of the inter-arrival time
 	 */
-	public void updateMultiple(double[] percentages, Distributions serviceTime, Distributions interArrivalTime){}
+	public void updateMultiple(Simulation sim, double[] percentages, Distributions serviceTime, Distributions interArrivalTime){}
 
 
 	public Animator getAnimator(){
 		return anim;
+	}
+
+	public Simulation getSimulation(){
+		return simulation;
 	}
 }

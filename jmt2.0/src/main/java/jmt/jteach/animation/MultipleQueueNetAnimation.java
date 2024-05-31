@@ -41,7 +41,6 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	
 	//-- all the classes contained in the Animation, like stations, edges...
 	private Source source;
-	private Animator anim;
 	private Router router;
 	private Sink sink;
 	private List<Station> stationList;
@@ -50,49 +49,48 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	
 	
 	//--all the characteristics of the Animation
-	private Simulation simulation;
 	private int nServers = 1; //by default = 1
 	private Distributions interArrival = Distributions.DETERMINISTIC; //by default the two distributions are DETERMINSTIC
 	private Distributions service = Distributions.DETERMINISTIC;
 	
 	/** Constructor */
-	public MultipleQueueNetAnimation(JPanel container, Simulation simulation) {
+	public MultipleQueueNetAnimation(JPanel container, Simulation sim) {
 		this.parent = container;
-		this.simulation = simulation;
+		simulation = sim;	
 		initGUI(container);
 	}
 	
-	public void initGUI(JPanel container) {
-		anim = new Animator(30, this);
+	public void initGUI(JPanel container) {	
+		anim = new Animator(30, this);	
 		edgeList = new ArrayList<>();
 		stationList = new ArrayList<>();
-		
 		sink = new Sink(container, true, new Point(800,0), this);
+		jobList = new ArrayList<>(); //do not move this line in the super class
 		
-		edgeList.add(new Edge(this,container, true, true, new Point(550,0), new Point(600,0), sink));
+		edgeList.add(new Edge(this,container, true, true, new Point(550,0), new Point(580,0), sink));
 		
 		//two vertical edges
-		edgeList.add(new Edge(this,container, false, false, new Point(550,100+30), new Point(550,252), edgeList.get(0)));
-		edgeList.add(new Edge(this, container, false, false, new Point(550,374), new Point(550,252), edgeList.get(0)));
+		edgeList.add(new Edge(this,container, false, false, new Point(550,50+30), new Point(550,252), edgeList.get(0)));
+		edgeList.add(new Edge(this, container, false, false, new Point(550,287+30), new Point(550,252), edgeList.get(0)));
 		
 		//three horizontal edges
-		edgeList.add(new Edge(this, container, false, false, new Point(500,100+30), new Point(550,100+30), edgeList.get(1)));		
+		edgeList.add(new Edge(this, container, false, false, new Point(500,50+30), new Point(550,50+30), edgeList.get(1)));		
 		edgeList.add(new Edge(this, container, true, false, new Point(500,0), new Point(550,0),  edgeList.get(0)));
-		edgeList.add(new Edge(this, container, false, false, new Point(500,374), new Point(550,374), edgeList.get(2)));
+		edgeList.add(new Edge(this, container, false, false, new Point(500,287+30), new Point(550,287+30), edgeList.get(2)));
 		
 		//three stations
-		stationList.add(new Station(this, container, false, false, new Point(300,100), edgeList.get(3), simulation, nServers));
+		stationList.add(new Station(this, container, false, false, new Point(300,50), edgeList.get(3), simulation, nServers));
 		stationList.add(new Station(this, container, false, true, new Point(300,0), edgeList.get(4), simulation, nServers));
-		stationList.add(new Station(this, container, false, false, new Point(300,252+(252-100-60)), edgeList.get(5), simulation, nServers));
+		stationList.add(new Station(this, container, false, false, new Point(300, 287), edgeList.get(5), simulation, nServers));
 		
 		//three horizontal edges
-		edgeList.add(new Edge(this, container, false, true, new Point(180,100+30), new Point(280,100+30), stationList.get(0)));
+		edgeList.add(new Edge(this, container, false, true, new Point(180,50+30), new Point(280,50+30), stationList.get(0)));
 		edgeList.add(new Edge(this, container, true, true, new Point(210,0), new Point(280,0), stationList.get(1)));
-		edgeList.add(new Edge(this, container, false, true, new Point(180,374), new Point(280,374), stationList.get(2)));
+		edgeList.add(new Edge(this, container, false, true, new Point(180,287+30), new Point(280,287+30), stationList.get(2)));
 		
 		//two vertical edges
-		edgeList.add(new Edge(this, container, false, false, new Point(180,222), new Point(180,100+30), edgeList.get(6)));
-		edgeList.add(new Edge(this, container, false, false, new Point(180,282), new Point(180,374),  edgeList.get(8)));
+		edgeList.add(new Edge(this, container, false, false, new Point(180,200 - 30), new Point(180, 50+30), edgeList.get(6)));
+		edgeList.add(new Edge(this, container, false, false, new Point(180,200 + 30), new Point(180, 287+30),  edgeList.get(8)));
 		
 		//create the two Lists for the router
 		int l = edgeList.size();
@@ -143,20 +141,23 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 
 	@Override
 	public void start() {
-		source.setStart(System.currentTimeMillis());
-		anim.start();	
+		if(!anim.isPaused()) { //if it's the first time the animation is started, otherwise it is a simple restart after a pause
+			source.setStart(System.currentTimeMillis());			
+		}
+		anim.start();
 	}
-
+	
 	@Override
 	public void pause() {
-		anim.pause();	
+		anim.pause();
 	}
-
+	
 	@Override
 	public void reload() {
 		initGUI(parent);
-		repaint();	
+		repaint();
 	}
+
 
 	//TODO: stop for multiple
 
@@ -171,14 +172,17 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	//TODO: next for multiple
 
 	@Override
-	public void updateMultiple(Distributions service, Distributions interA){
-		//TODO: aggirona source e job
-		source.updateDistribution(service, interA);
+	public void updateMultiple(Simulation sim, Distributions service, Distributions interA){
+		simulation = sim;
+		interArrival = interA;
+		this.service = service;
+
+		source.updateDistribution(service, interA);	
 	}
 
 	@Override
-	public void updateMultiple(double[] percentages, Distributions service, Distributions interA){
-		updateMultiple(service, interA);
+	public void updateMultiple(Simulation sim, double[] percentages, Distributions service, Distributions interA){
+		updateMultiple(sim, service, interA);
 		probabilities[0] = percentages[0];
 		probabilities[1] = percentages[1];
 		probabilities[2] = 1.00 - percentages[0] - percentages[1];

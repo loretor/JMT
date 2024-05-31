@@ -67,8 +67,10 @@ public class Animator extends Thread{
 	
 	/** Pause the animation, save also the time at which the animation was paused */
 	public void pause() {
-		isPaused = true;
-		startPause = System.currentTimeMillis();
+		if(!isPaused){
+			isPaused = true;
+			startPause = System.currentTimeMillis();
+		}	
 	}
 	
 	/** Restart the animation, update also the components of animation to let them know the animation was paused for a certain period of time */

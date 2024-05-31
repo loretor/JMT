@@ -12,6 +12,8 @@ import jmt.gui.common.distributions.Distribution;
 import jmt.gui.common.distributions.Exponential;
 import jmt.gui.common.distributions.Hyperexponential;
 import jmt.gui.common.distributions.Uniform;
+import jmt.jteach.Simulation.Simulation;
+import jmt.jteach.Simulation.SimulationType;
 
 /**
  * This class transforms the information of the Animation to match the structure of the CommonModel class.
@@ -23,6 +25,7 @@ import jmt.gui.common.distributions.Uniform;
  */
 public class Solver implements CommonConstants{
     private CommonModel model;
+    private Simulation simulation;
 
     private int classNameIndex = 1;
 
@@ -49,6 +52,7 @@ public class Solver implements CommonConstants{
 
 
     //types of measures selectable
+    //TODO: remove this part 
 	protected static final String[] measureTypes = new String[] {
 			"------ Select an index  ------",
 			SimulationDefinition.MEASURE_QL,
@@ -135,6 +139,7 @@ public class Solver implements CommonConstants{
         model.setQueueStrategy(serverKey, classKey, Defaults.get("stationQueueStrategy"));
         model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
         model.updateBalkingParameter(serverKey, classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
+
         
         model.setStationNumberOfServers(serverKey, 1);
 		model.updateNumOfServers(serverKey, 1);
@@ -188,32 +193,45 @@ public class Solver implements CommonConstants{
 
 
     //--------------- methods to change the parameters of the simulation ------------------
-    public void setStrategy(boolean priority, int index){
-        if(priority){
-            model.setStationQueueStrategy(classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE_PRIORITY);
-            model.setQueueStrategy(serverKey, classKey, queueStrategies[0]); //for now only the FCFS has a priority       
-            model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
-            model.updateBalkingParameter(serverKey, classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE_PRIORITY);
+    
+    /* To change the type of simulation and the algorithm */
+    private void setStrategy(){
+        String strategy = "";
+        String algorithm = simulation.getName();
+
+        switch(simulation.getType()){ //setting the correct string of strategy and algorithm from CommonConstants
+            case NON_PREEMPTIVE:
+                strategy = STATION_QUEUE_STRATEGY_NON_PREEMPTIVE;
+                break;
+            case PROCESSOR_SHARING:
+                strategy = STATION_QUEUE_STRATEGY_PSSERVER;
+                break; 
+            default: //TODO: for now only non preemptive e processor sharing
+                break;
         }
-        else{
-            model.setStationQueueStrategy(serverKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
-            model.setQueueStrategy(serverKey, classKey, queueStrategies[index]);         
-            model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
-            model.updateBalkingParameter(serverKey, classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
-        }    
+
+        model.setStationQueueStrategy(serverKey, strategy);
+        model.setQueueStrategy(serverKey, classKey, algorithm);         
+        model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
+        model.updateBalkingParameter(serverKey, classKey, strategy); 
     }
 
-    public void setInterArrivalTime(int index){
-        model.setClassDistribution(classKey, distributions[index]);
-    }
+    /**
+     * Update the simulation of the solver, this method also updates all the solver accordingly to the new simulation
+     * @param sim the new simulation
+     * @param indexInter index of the new inter arrival time distribution
+     * @param indexService index of the new service time distribution
+     * @param nservers new number of servers
+     */
+    public void updateSolver(Simulation sim, int indexInter, int indexService, int nservers){
+        simulation = sim;
+        setStrategy();
 
-    public void setServiceTime(int index){
-        model.setServiceTimeDistribution(serverKey, classKey, distributions[index]);
-    }
+        model.setClassDistribution(classKey, distributions[indexInter]);
+        model.setServiceTimeDistribution(serverKey, classKey, distributions[indexService]);
 
-    public void setNumberOfServers(int value){
-        model.setStationNumberOfServers(serverKey, value);
-		model.updateNumOfServers(serverKey, value);
+        model.setStationNumberOfServers(serverKey, nservers);
+		model.updateNumOfServers(serverKey, nservers);
     }
     
 }

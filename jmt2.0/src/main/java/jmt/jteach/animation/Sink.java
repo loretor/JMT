@@ -44,9 +44,6 @@ public class Sink extends JComponent implements JobContainer{
     
     AnimationClass anim;
 
-    private int maxJobs = -1; //if maxJobs != -1 then there an upper limit to the number of jobs in the system
-    private int counterJobs = 0;
-
     /**
      * Constructor
      * @param container, JPanel that contains this sink
@@ -79,23 +76,12 @@ public class Sink extends JComponent implements JobContainer{
 
 	@Override
 	public void refresh() {
-		if(maxJobs != -1 && counterJobs == 0){
-            anim.stop();
-        }
+		
 	}
 
 	@Override
 	public void addJob(Job newJob) {
 		//here the addJob is removing the job from the list of jobs
 		anim.removeJob(newJob);
-
-        if(maxJobs != -1){
-            counterJobs -= 1;
-        }  
 	}
-
-    public void setMaxJobs(int j) {
-        maxJobs = j;
-        counterJobs = j;
-    }
 }

@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 
 import jmt.jteach.Constants;
 import jmt.jteach.Simulation.Simulation;
+import jmt.jteach.Simulation.SimulationType;
 import jmt.jteach.animation.customQueue.CustomCollection;
 import jmt.jteach.animation.customQueue.FIFOQueue;
 import jmt.jteach.animation.customQueue.LIFOQueue;
@@ -88,8 +89,7 @@ public class Station extends JComponent implements JobContainer{
 		this.ycentered = ycentered;
 		this.simulation = sim;
 		this.nServers = servers;
-		this.next = next;
-		
+		this.next = next;		
 		
 		boxes = new BoxStation[sizeQueue];
 		for(int i = 0; i < sizeQueue; i++) {
@@ -351,6 +351,10 @@ public class Station extends JComponent implements JobContainer{
 	public void setVelocityFactor(int value) {
 		for(CircleStation c: circles) {
 			c.setVelocityFactor(value);
+		}
+
+		for(BoxStation b: boxes) {
+			b.setVelocityFactor(value);
 		}
 	}
 

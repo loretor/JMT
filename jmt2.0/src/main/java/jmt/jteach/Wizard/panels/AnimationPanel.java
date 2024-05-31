@@ -138,7 +138,12 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			updateAnimationPanel();
+            try {
+                updateAnimationPanel(); 
+            } catch (Exception x) {
+                handleException(x);
+            }
+			
 		}
 	};
 
@@ -195,8 +200,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         this.setLayout(new BorderLayout());
         mainPanel = new JPanel();
 
-        String title = "";
-        if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PREEMPTIVE){
+        String title = ""; //for NON_PREEMPTIVE the algorithm is not already chosen, in all other cases yes
+        if(simulation.getType() != SimulationType.NON_PREEMPTIVE){
+            title = " - " + simulation.getName();
+        }
+        else{
             title = " Scheduling";
         }
         mainPanel.setBorder(new TitledBorder(new EtchedBorder(), simulation.getType().toString() + title));
@@ -473,13 +481,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 	}
 
     /**
-     * Method called by the Create button to update this panel.
-     * It differenciates the changes based on the type of policy, three things have to be updated, the title, the description, the animation 
+     * Method called by the Create button to update this panel
      */
     private void updateAnimationPanel(){
         animation.pause();
         reloadAnimation();
-        start.setEnabled(true);
 
         if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PREEMPTIVE || simulation.getType() == SimulationType.PROCESSOR_SHARING){
             if(infDuration.isSelected()){
@@ -495,14 +501,14 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
                 descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+simulation.getDescription()+"</p></body></html>");
             }
         
-            animation.updateSingle(simulation, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem(), maxJobs);
+            animation.updateSingle(simulation, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
         }
         else{ //in case of routing only the animation must be updated
             if(simulation.getType() == SimulationType.ROUTING && simulation.getName() == Constants.PROBABILISTIC){
-                animation.updateMultiple(new double[]{(double) prob1.getValue(), (double) prob2.getValue()}, (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
+                animation.updateMultiple(simulation, new double[]{(double) prob1.getValue(), (double) prob2.getValue()}, (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
             }
             else{
-                animation.updateMultiple((Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
+                animation.updateMultiple(simulation, (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
             }
         }
 
@@ -515,16 +521,8 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     public void getSimulationResults(){
         //first update the solver with the new values
 
-        if(simulation.getType() == SimulationType.NON_PREEMPTIVE){  //TODO: per ora solo non preemptive, è ovviamente da togliere questo
-            if(((String) algorithmJComboBox.getSelectedItem()).contains("PR")){
-                solver.setStrategy(true, 0);
-            }
-            else{
-                solver.setStrategy(false, algorithmJComboBox.getSelectedIndex());
-            }      
-            solver.setNumberOfServers((int) serversSpinner.getValue());
-            solver.setServiceTime(serviceComboBox.getSelectedIndex());
-            solver.setInterArrivalTime(interAComboBox.getSelectedIndex());
+        if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PROCESSOR_SHARING){  //TODO: per ora solo non preemptive, è ovviamente da togliere questo     
+            solver.updateSolver(simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), (int) serversSpinner.getValue());
     
             File temp = null;
             DispatcherThread dispatcher = null;

@@ -62,9 +62,6 @@ public class Source extends JComponent implements JobContainer{
 	private long passedTime = 0;
 	private int velocityFactor = 1; //to increase the velocity of the simulation
 
-	private int maxJobs = -1; //by default the source runs infinitely, if this value is > 0 then there is an upperbound
-	private int counterJobs = 0;
-
 	private int sizeCircle = 20;
 	private float progression = 0.0f;
 	
@@ -100,10 +97,6 @@ public class Source extends JComponent implements JobContainer{
 			pos.y = parent.getY()+(heightPanel- size)/2 ;
 			pos.x = 20;
 		}
-
-		if(maxJobs != -1 && counterJobs == 0){ //animation finished
-			g.drawImage(finishImg, pos.x+size+5, pos.y, size/3, size/3, null);
-		}
 		
 		g.drawImage(sourceImg, pos.x, pos.y, size, size, null);
 
@@ -121,33 +114,29 @@ public class Source extends JComponent implements JobContainer{
 
 	@Override
 	public void refresh() {
-		if(maxJobs == -1 || (maxJobs != -1 && counterJobs > 0)){
-			passedTime += (System.currentTimeMillis() - pauseTime - start)*velocityFactor;
-			start = System.currentTimeMillis();
+		passedTime += (System.currentTimeMillis() - pauseTime - start)*velocityFactor;
+		start = System.currentTimeMillis();
+		pauseTime = 0;
+		
+		long nextValue = (long)nextRandomValue*1000;
+		long diff = nextValue - passedTime;
+		progression = (float) diff/nextValue;
+		
+		if(progression < 0) {
+			progression = 0;
 			pauseTime = 0;
-			
-			long nextValue = (long)nextRandomValue*1000;
-			long diff = nextValue - passedTime;
-			progression = (float) diff/nextValue;
-			
-			if(progression < 0) {
-				progression = 0;
-				pauseTime = 0;
-				passedTime = 0;
-				start = System.currentTimeMillis();
+			passedTime = 0;
+			start = System.currentTimeMillis();
 
-				routeJob = new Job(service);
-				routeJob(0);
-				try {
-					nextRandomValue = interArrival.nextRand();
-				} catch (IncorrectDistributionParameterException e) {
-					//this will never happen, since the parameters of the distribution of the interArrival are OK
-					nextRandomValue = 64.0;
-				}
-				anim.addNewJob(routeJob);
-
-				counterJobs--;
+			routeJob = new Job(service);
+			routeJob(0);
+			try {
+				nextRandomValue = interArrival.nextRand();
+			} catch (IncorrectDistributionParameterException e) {
+				//this will never happen, since the parameters of the distribution of the interArrival are OK
+				nextRandomValue = 64.0;
 			}
+			anim.addNewJob(routeJob);
 		}		
 	}
 	
@@ -200,12 +189,5 @@ public class Source extends JComponent implements JobContainer{
 
 	public void setVelocityFactor(int value) {
 		velocityFactor = value;
-	}
-
-	public void setMaxJobs(int j) {
-		maxJobs = j;
-		counterJobs = j;
-	}
-	
-	
+	}	
 }

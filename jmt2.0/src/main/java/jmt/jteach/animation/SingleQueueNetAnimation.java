@@ -47,18 +47,17 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	private List<Edge> edgeList;
 	
 	//--all the characteristics of the Animation
-	private Simulation simulation;
 	private int nServers = 1;
 	private Distributions interArrival = Distributions.DETERMINISTIC; //by default the two distributions are DETERMINSTIC
 	private Distributions service = Distributions.DETERMINISTIC;
 	
 	
 	/** Constructor*/
-	public SingleQueueNetAnimation(AnimationPanel animPanel, JPanel container, Simulation simulation) {		
+	public SingleQueueNetAnimation(AnimationPanel animPanel, JPanel container, Simulation sim) {		
 		super();
 		this.animPanel = animPanel;
 		this.parent = container;
-		this.simulation = simulation;
+		simulation = sim;
 		initGUI(container);
 	}
 	
@@ -175,7 +174,7 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	}
 
 	@Override
-	public void updateSingle(Simulation sim, int nservers, Distributions service, Distributions interA, int maxjobs){
+	public void updateSingle(Simulation sim, int nservers, Distributions service, Distributions interA){
 		simulation = sim;
 		interArrival = interA;
 		this.service = service;
@@ -184,8 +183,6 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		station.typeOfQueue(simulation);
 		station.updateNServers(nservers);
 		source.updateDistribution(service, interA);	
-		source.setMaxJobs(maxjobs);
-		sink.setMaxJobs(maxjobs);
 	}
 
 }

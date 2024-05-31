@@ -254,7 +254,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         animationPanel = new JPanel(new BorderLayout());
         //based on the type of Policy passed in the constructor, create a new Animation
         if(simulation.getType() == SimulationType.ROUTING){
-            animation = new MultipleQueueNetAnimation(animationPanel, simulation);     
+            animation = new MultipleQueueNetAnimation(this, animationPanel, simulation);     
         }
         else{
             animation = new SingleQueueNetAnimation(this, animationPanel, simulation);

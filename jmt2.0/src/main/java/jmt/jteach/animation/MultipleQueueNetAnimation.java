@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 
 import jmt.jteach.Distributions;
 import jmt.jteach.Simulation.Simulation;
+import jmt.jteach.Wizard.panels.AnimationPanel;
 
 /**
  * Class with all the JComponents for the Animation of Routing Policy
@@ -37,6 +38,7 @@ import jmt.jteach.Simulation.Simulation;
  * Time: 09.10
  */
 public class MultipleQueueNetAnimation extends AnimationClass{
+	private AnimationPanel animPanel;
 	private JPanel parent;
 	
 	//-- all the classes contained in the Animation, like stations, edges...
@@ -54,8 +56,9 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	private Distributions service = Distributions.DETERMINISTIC;
 	
 	/** Constructor */
-	public MultipleQueueNetAnimation(JPanel container, Simulation sim) {
+	public MultipleQueueNetAnimation(AnimationPanel animPanel, JPanel container, Simulation sim) {
 		this.parent = container;
+		this.animPanel = animPanel;
 		simulation = sim;	
 		initGUI(container);
 	}
@@ -70,8 +73,8 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		edgeList.add(new Edge(this,container, true, true, new Point(550,0), new Point(580,0), sink));
 		
 		//two vertical edges
-		edgeList.add(new Edge(this,container, false, false, new Point(550,50+30), new Point(550,252), edgeList.get(0)));
-		edgeList.add(new Edge(this, container, false, false, new Point(550,287+30), new Point(550,252), edgeList.get(0)));
+		edgeList.add(new Edge(this,container, false, false, new Point(550,50+30), new Point(550,200), edgeList.get(0)));
+		edgeList.add(new Edge(this, container, false, false, new Point(550,287+30), new Point(550,200), edgeList.get(0)));
 		
 		//three horizontal edges
 		edgeList.add(new Edge(this, container, false, false, new Point(500,50+30), new Point(550,50+30), edgeList.get(1)));		
@@ -167,9 +170,57 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		for(Station st: stationList) {
 			st.updatePause(pause);
 		}
+		source.updatePause(pause);
 	}
 
-	//TODO: next for multiple
+	
+	@Override
+	public void stop(){
+		anim.terminate();
+		animPanel.stopAnimation();
+	}
+
+	@Override
+	public void next() {
+		//first update the velocity of each component that works with time
+		source.setVelocityFactor(5);
+		for(Station st: stationList){
+			st.setVelocityFactor(5);
+		}
+		for(Job j: jobList) {
+			j.setVelocityFactor(5);
+		}
+		
+		anim.start();
+		
+		for(Edge e: edgeList) {
+			e.nextEvent();
+		}
+		for(Station st: stationList){
+			st.nextEvent();
+		}	
+	}
+
+	public void resetNextEvent() {
+		//reset all the velocity factors
+		source.setVelocityFactor(1);
+		for(Station st: stationList){
+			st.setVelocityFactor(0);
+		}
+		for(Job j: jobList) {
+			j.resetVelocityFactor();
+		}
+		
+		for(Edge e: edgeList) {
+			e.resetNextEvent();
+		}
+		for(Station st: stationList){
+			st.resetNextEvent();
+		}
+
+		//reset the buttons of the animationPanel
+		animPanel.resetNextStepAnimation();
+	} 
 
 	@Override
 	public void updateMultiple(Simulation sim, Distributions service, Distributions interA){

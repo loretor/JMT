@@ -159,7 +159,7 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	public void resetNextEvent() {
 		//reset all the velocity factors
 		source.setVelocityFactor(1);
-		station.setVelocityFactor(1);
+		station.setVelocityFactor(0); //in stations is = 0, since there is also the processor speed
 		for(Job j: jobList) {
 			j.resetVelocityFactor();
 		}

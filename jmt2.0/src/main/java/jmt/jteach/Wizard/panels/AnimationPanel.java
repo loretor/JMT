@@ -178,8 +178,6 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         openHelp = new Help(this,"JTCH");
         about = new About(this);
 
-        solver = new Solver();
-
         start.setEnabled(false); //cannot start a simulation without setting the parameters
         nextStep.setEnabled(false);
         pause.setEnabled(false);
@@ -188,7 +186,8 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
     public AnimationPanel(MainWizard main, Simulation sim){
         this(main);
-        this.simulation = sim;     
+        this.simulation = sim; 
+        solver = new Solver(simulation);    
         initGUI();
     }
 
@@ -519,27 +518,26 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
     /** Called each time 'Create' is pressed. Start the simulation with the engine to get the results of the simulation in the Results Panel */
     public void getSimulationResults(){
-        //first update the solver with the new values
-
-        if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PROCESSOR_SHARING){  //TODO: per ora solo non preemptive, è ovviamente da togliere questo     
-            solver.updateSolver(simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), (int) serversSpinner.getValue());
-    
-            File temp = null;
-            DispatcherThread dispatcher = null;
-            try {
-                temp = File.createTempFile("~JModelSimulation", ".xml");
-                temp.deleteOnExit();       
-                XMLWriter.writeXML(temp, solver.getModel());
-                String logCSVDelimiter = solver.getModel().getLoggingGlbParameter("delim");
-                String logDecimalSeparator = solver.getModel().getLoggingGlbParameter("decimalSeparator");
-                solver.getModel().setSimulationResults(new ResultsModel(solver.getModel().getPollingInterval().doubleValue(), logCSVDelimiter, logDecimalSeparator));
-                dispatcher = new DispatcherThread(this, solver.getModel());
-                dispatcher.startSimulation(temp);
-            } catch (IOException e) {
-                handleException(e);
-            }
+        int servers = 1;
+        if(simulation.getType() != SimulationType.ROUTING){
+            servers = (int) serversSpinner.getValue();
         }
-        
+        solver.updateSolver(simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers);
+
+        File temp = null;
+        DispatcherThread dispatcher = null;
+        try {
+            temp = File.createTempFile("~JModelSimulation", ".xml");
+            temp.deleteOnExit();       
+            XMLWriter.writeXML(temp, solver.getModel());
+            String logCSVDelimiter = solver.getModel().getLoggingGlbParameter("delim");
+            String logDecimalSeparator = solver.getModel().getLoggingGlbParameter("decimalSeparator");
+            solver.getModel().setSimulationResults(new ResultsModel(solver.getModel().getPollingInterval().doubleValue(), logCSVDelimiter, logDecimalSeparator));
+            dispatcher = new DispatcherThread(this, solver.getModel());
+            dispatcher.startSimulation(temp);
+        } catch (IOException e) {
+            handleException(e);
+        }
     }
 
     public double getLastMeasure(MeasureDefinition md, int index){

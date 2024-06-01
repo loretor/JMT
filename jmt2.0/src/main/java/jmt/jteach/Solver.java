@@ -1,6 +1,7 @@
 package jmt.jteach;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import jmt.gui.common.CommonConstants;
 import jmt.gui.common.Defaults;
@@ -26,14 +27,16 @@ import jmt.jteach.Simulation.SimulationType;
 public class Solver implements CommonConstants{
     private CommonModel model;
     private Simulation simulation;
+    private boolean isSingleQueue = true;
 
     private int classNameIndex = 1;
+    private int serverNameIndex = 1;
 
     //------------------- keys of the model --------------------------
     private Object classKey;
-    private Object serverKey;
     private Object sourceKey;
     private Object sinkKey;
+    private Object routerKey;
 
     //----------- all changable fields of the simulation -------------
     private static final String[] queueStrategies = {
@@ -85,19 +88,30 @@ public class Solver implements CommonConstants{
 	};
 
     /**
-     * Create a Common model with a source, a queue, a sink all connected togheter.
-     * Only one class.
-     * Set also the parameters to look at in the simulation.
+     * Create a Solver with one queue (for NON PREEMPTIVE or PROCESSOR SHARING) or with 3 queues
      */
-    public Solver(){
+    public Solver(Simulation sim){
         model = new CommonModel();
+        simulation = sim;
+        isSingleQueue = simulation.getType() != SimulationType.ROUTING;
         setDistributionsParameters();
         addClass();
+        
+        //first add the queues, so that when you cycle the StationKeys, the first is always a server
+        addQueue();
+        if(!isSingleQueue){
+            addQueue();
+            addQueue();
+            addRouter();
+        }
+
         addSource();
-        addQueue();    
         addSink();
-        setConnections();   
-        addMeasure();    
+        
+        setConnections();  
+        
+        //TODO: change the measures, since now you have 3 different stations
+        addMeasure();   
     }
 
     /** Set the parameters for all the distributions */
@@ -128,10 +142,12 @@ public class Solver implements CommonConstants{
         //model.setRoutingStrategy(sourceKey, classKey, Defaults.getAsNewInstance("stationRoutingStrategy")); //random routing by default
         model.setClassRefStation(classKey, sourceKey); 
     }
+    
 
     /** Add a queue station to the model (like adding a Station cell to the JGraph in JSIM) */
     private void addQueue(){
-        serverKey = model.addStation("Queue", STATION_TYPE_SERVER, 1, new ArrayList<ServerType>());
+        Object serverKey = model.addStation("Queue "+(serverNameIndex), STATION_TYPE_SERVER, 1, new ArrayList<ServerType>());
+        serverNameIndex++;
 
         model.setStationQueueCapacity(serverKey, 5);
         model.setDropRule(serverKey, classKey, "Drop");
@@ -153,21 +169,42 @@ public class Solver implements CommonConstants{
         sinkKey = model.addStation("Sink", STATION_TYPE_SINK, 1, new ArrayList<ServerType>());
     }
 
+    private void addRouter(){
+        routerKey = model.addStation("Router", STATION_TYPE_ROUTER, 1, new ArrayList<ServerType>());
+        Object strategy = null;
+        switch(simulation.getName()){
+            case "RR":
+                strategy = ROUTING_ROUNDROBIN;
+        }
+        model.setRoutingStrategy(routerKey, classKey, strategy);
+    }
+
     
     /** Connect the components of model (like adding edges to the JGraph in JSIM) */
     private void setConnections(){
-        model.setConnected(sourceKey, serverKey, true);
-        model.setConnected(serverKey, sinkKey, true);
+        if(isSingleQueue){
+            model.setConnected(sourceKey, model.getStationKeys().get(0), true);
+            model.setConnected(model.getStationKeys().get(0), sinkKey, true);
+        }
+        else{
+            model.setConnected(sourceKey, routerKey, true);
+            model.setConnected(routerKey, model.getStationKeys().get(0), true);
+            model.setConnected(routerKey, model.getStationKeys().get(1), true);
+            model.setConnected(routerKey, model.getStationKeys().get(2), true);
+            model.setConnected(model.getStationKeys().get(0), sinkKey, true);
+            model.setConnected(model.getStationKeys().get(1), sinkKey, true);
+            model.setConnected(model.getStationKeys().get(2), sinkKey, true);
+        }
     }
 
     /** Add all the metrics to control (like setting the parameters in JSIM) */
     private void addMeasure(){
-        model.addMeasure(SimulationDefinition.MEASURE_AR, serverKey, classKey); //0
+        model.addMeasure(SimulationDefinition.MEASURE_AR, model.getStationKeys().get(0), classKey); //0
         //service??
-        model.addMeasure(SimulationDefinition.MEASURE_RP, serverKey, classKey); //1
-        model.addMeasure(SimulationDefinition.MEASURE_QT, serverKey, classKey); //2
-        model.addMeasure(SimulationDefinition.MEASURE_X, serverKey, classKey); //3
-        model.addMeasure(SimulationDefinition.MEASURE_QL, serverKey, classKey);  //4             
+        model.addMeasure(SimulationDefinition.MEASURE_RP, model.getStationKeys().get(0), classKey); //1
+        model.addMeasure(SimulationDefinition.MEASURE_QT, model.getStationKeys().get(0), classKey); //2
+        model.addMeasure(SimulationDefinition.MEASURE_X, model.getStationKeys().get(0), classKey); //3
+        model.addMeasure(SimulationDefinition.MEASURE_QL, model.getStationKeys().get(0), classKey);  //4             
     }
 
     public CommonModel getModel(){
@@ -176,7 +213,7 @@ public class Solver implements CommonConstants{
 
     //--------------- methods to get some parameters of the simulation --------------------
     public String getQueueStrategy(){
-        return model.getQueueStrategy(serverKey, classKey);
+        return model.getQueueStrategy(model.getStationKeys().get(0), classKey);
     }
 
     public String getInterArrivalDistribution(){
@@ -184,11 +221,11 @@ public class Solver implements CommonConstants{
     }
 
     public String getServiceDistribution(){
-        return ((Distribution) model.getServiceTimeDistribution(serverKey, classKey)).toString();
+        return ((Distribution) model.getServiceTimeDistribution(model.getStationKeys().get(0), classKey)).toString();
     }
 
     public double getServiceTimeMean(){
-        return ((Distribution) model.getServiceTimeDistribution(serverKey, classKey)).getMean();
+        return ((Distribution) model.getServiceTimeDistribution(model.getStationKeys().get(0), classKey)).getMean();
     }
 
 
@@ -206,14 +243,21 @@ public class Solver implements CommonConstants{
             case PROCESSOR_SHARING:
                 strategy = STATION_QUEUE_STRATEGY_PSSERVER;
                 break; 
-            default: //TODO: for now only non preemptive e processor sharing
+            case ROUTING:
+                strategy = STATION_QUEUE_STRATEGY_NON_PREEMPTIVE;
+                algorithm = QUEUE_STRATEGY_FCFS;
+            default: 
                 break;
         }
 
-        model.setStationQueueStrategy(serverKey, strategy);
-        model.setQueueStrategy(serverKey, classKey, algorithm);         
-        model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
-        model.updateBalkingParameter(serverKey, classKey, strategy); 
+        int lenght = isSingleQueue ? 1 : 3;
+        for(int i = 0; i < lenght; i++){
+            Object serverKey = model.getStationKeys().get(i);
+            model.setStationQueueStrategy(serverKey, strategy);
+            model.setQueueStrategy(serverKey, classKey, algorithm);         
+            model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
+            model.updateBalkingParameter(serverKey, classKey, strategy); 
+        }
     }
 
     /**
@@ -228,10 +272,15 @@ public class Solver implements CommonConstants{
         setStrategy();
 
         model.setClassDistribution(classKey, distributions[indexInter]);
-        model.setServiceTimeDistribution(serverKey, classKey, distributions[indexService]);
 
-        model.setStationNumberOfServers(serverKey, nservers);
-		model.updateNumOfServers(serverKey, nservers);
+        int lenght = isSingleQueue ? 1 : 3;
+        for(int i = 0; i < lenght; i++){
+            Object serverKey = model.getStationKeys().get(i);
+            model.setServiceTimeDistribution(serverKey, classKey, distributions[indexService]);
+
+            model.setStationNumberOfServers(serverKey, nservers);
+            model.updateNumOfServers(serverKey, nservers);
+        }
     }
     
 }

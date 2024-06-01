@@ -680,6 +680,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
             solver.getInterArrivalDistribution(), 
             getLastMeasure(results, 0),
             solver.getServiceDistribution(), 
+            solver.getNumberServers(),
             solver.getServiceTimeMean(), 
             getLastMeasure(results, 1),
             getLastMeasure(results, 2), 

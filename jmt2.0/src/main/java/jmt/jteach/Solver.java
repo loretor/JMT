@@ -31,6 +31,7 @@ public class Solver implements CommonConstants{
 
     private int classNameIndex = 1;
     private int serverNameIndex = 1;
+    private int servers = 1;
 
     //------------------- keys of the model --------------------------
     private Object classKey;
@@ -97,7 +98,6 @@ public class Solver implements CommonConstants{
         setDistributionsParameters();
         addClass();
         
-        //first add the queues, so that when you cycle the StationKeys, the first is always a server
         addQueue();
         if(!isSingleQueue){
             addQueue();
@@ -158,7 +158,7 @@ public class Solver implements CommonConstants{
 
         
         model.setStationNumberOfServers(serverKey, 1);
-		model.updateNumOfServers(serverKey, 1);
+		model.updateNumOfServers(serverKey, servers);
         Exponential exp = new Exponential();
         exp.setMean(1);
         model.setServiceTimeDistribution(serverKey, classKey, exp);
@@ -228,6 +228,10 @@ public class Solver implements CommonConstants{
         return ((Distribution) model.getServiceTimeDistribution(model.getStationKeys().get(0), classKey)).getMean();
     }
 
+    public int getNumberServers(){  
+        return servers;
+    }
+
 
     //--------------- methods to change the parameters of the simulation ------------------
     
@@ -250,9 +254,7 @@ public class Solver implements CommonConstants{
                 break;
         }
 
-        int lenght = isSingleQueue ? 1 : 3;
-        for(int i = 0; i < lenght; i++){
-            Object serverKey = model.getStationKeys().get(i);
+        for(Object serverKey: model.getStationKeysServer()){
             model.setStationQueueStrategy(serverKey, strategy);
             model.setQueueStrategy(serverKey, classKey, algorithm);         
             model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
@@ -269,13 +271,12 @@ public class Solver implements CommonConstants{
      */
     public void updateSolver(Simulation sim, int indexInter, int indexService, int nservers){
         simulation = sim;
+        this.servers = nservers;
         setStrategy();
 
         model.setClassDistribution(classKey, distributions[indexInter]);
 
-        int lenght = isSingleQueue ? 1 : 3;
-        for(int i = 0; i < lenght; i++){
-            Object serverKey = model.getStationKeys().get(i);
+        for(Object serverKey: model.getStationKeysServer()){
             model.setServiceTimeDistribution(serverKey, classKey, distributions[indexService]);
 
             model.setStationNumberOfServers(serverKey, nservers);

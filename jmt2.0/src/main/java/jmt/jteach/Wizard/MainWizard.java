@@ -188,14 +188,15 @@ public class MainWizard extends JTchWizard{
 	 * @param arrivalDistr arrival time distribution
 	 * @param lambda the inter arrival time
 	 * @param serviceDistr service time distribution
+	 * @param nServers number of servers for each station
 	 * @param service service time
 	 * @param responseTime response time
 	 * @param queueTime queue time
 	 * @param thoughput thoughput
 	 * @param queueNumber queue number
 	 */
-	public void routeResults(String algorithm, String arrivalDistr, double lambda, String serviceDistr, double service, double responseTime, double queueTime, double thoughput, double queueNumber){
-		resultsPanel.addResult(algorithm, arrivalDistr, lambda, serviceDistr, service, responseTime, queueTime, thoughput, queueNumber);
+	public void routeResults(String algorithm, String arrivalDistr, double lambda, String serviceDistr, int nServers, double service, double responseTime, double queueTime, double thoughput, double queueNumber){
+		resultsPanel.addResult(algorithm, arrivalDistr, lambda, serviceDistr, nServers, service, responseTime, queueTime, thoughput, queueNumber);
 	}
 	
 }

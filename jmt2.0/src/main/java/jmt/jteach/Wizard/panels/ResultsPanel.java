@@ -63,18 +63,20 @@ public class ResultsPanel extends WizardPanel{
 	private final static int COL_DISTR_ARRIVAL = 1;
 	private final static int COL_LAMBDA = 2;
 	private final static int COL_DISTR_SERVICE = 3;
-	private final static int COL_SERVICE = 4;
-    private final static int COL_R = 5;
-    private final static int COL_QUEUETIME = 6; 
-    private final static int COL_NQUEUE = 7;
-    private final static int COL_THROUGHPUT = 8;
-	private final static int COL_DELETE_BUTTON = 9;
+    private final static int COL_NSERVERS = 4;
+	private final static int COL_SERVICE = 5;
+    private final static int COL_R = 6;
+    private final static int COL_QUEUETIME = 7; 
+    private final static int COL_NQUEUE = 8;
+    private final static int COL_THROUGHPUT = 9;
+	private final static int COL_DELETE_BUTTON = 10;
 
     //for each column, an array of values
     private String[] algorithms = new String[0];
     private String[] arrivalDistibutions = new String[0];
     private double[] lambdas = new double[0];
     private String[] serviceDistributions = new String[0];
+    private int[] serversNumber = new int[0];
     private double[] services = new double[0];
     private double[] responseTimes = new double[0];
     private double[] queueTimes = new double[0];
@@ -120,14 +122,15 @@ public class ResultsPanel extends WizardPanel{
 	 * @param arrivalDistr arrival time distribution
 	 * @param lambda the inter arrival time
 	 * @param serviceDistr service time distribution
+     * @param nServers number of servers in the station
 	 * @param service service time
 	 * @param responseTime response time
 	 * @param queueTime queue time
 	 * @param thoughput thoughput
 	 * @param nCustomers customer numbers
 	 */
-    public void addResult(String algorithm, String arrivalDistr, double lambda, String serviceDistr, double service, double responseTime, double queueTime, double thoughput, double nCustomer){
-        setNumberOfResults(nResults+1, algorithm, arrivalDistr, lambda, serviceDistr, service, responseTime, queueTime, thoughput, nCustomer);
+    public void addResult(String algorithm, String arrivalDistr, double lambda, String serviceDistr, int nServers, double service, double responseTime, double queueTime, double thoughput, double nCustomer){
+        setNumberOfResults(nResults+1, algorithm, arrivalDistr, lambda, serviceDistr, nServers, service, responseTime, queueTime, thoughput, nCustomer);
     }
 
     private void addRow() {
@@ -135,7 +138,7 @@ public class ResultsPanel extends WizardPanel{
 	}
 
     /** Change the size of data structures updating also the table */
-    private void setNumberOfResults(int number, String algorithm, String arrivalDistr, double lambda, String serviceDistr, double service, double responseTime, double queueTime, double thoughput, double nCustomer) {
+    private void setNumberOfResults(int number, String algorithm, String arrivalDistr, double lambda, String serviceDistr, int nServers, double service, double responseTime, double queueTime, double thoughput, double nCustomer) {
 		table.stopEditing();
 		nResults = number;
 
@@ -144,6 +147,7 @@ public class ResultsPanel extends WizardPanel{
         arrivalDistibutions = ArrayUtils.resize(arrivalDistibutions, nResults, null);
         lambdas = ArrayUtils.resize(lambdas, nResults, 0.0);
         serviceDistributions = ArrayUtils.resize(serviceDistributions, nResults, null);
+        serversNumber = ArrayUtils.resize(serversNumber, nResults, 0);
         services = ArrayUtils.resize(services, nResults, 0.0);
         responseTimes = ArrayUtils.resize(responseTimes, nResults, 0.0);
         queueTimes = ArrayUtils.resize(queueTimes, nResults, 0.0);
@@ -155,6 +159,7 @@ public class ResultsPanel extends WizardPanel{
         arrivalDistibutions[nResults-1] = arrivalDistr;
         lambdas[nResults-1] = lambda;
         serviceDistributions[nResults-1] = serviceDistr;
+        serversNumber[nResults-1] = nServers;
         services[nResults-1] =  service;
         responseTimes[nResults-1] = responseTime;
         queueTimes[nResults-1] = queueTime;
@@ -257,6 +262,7 @@ public class ResultsPanel extends WizardPanel{
 		arrivalDistibutions = ArrayUtils.delete(arrivalDistibutions, i);
 		lambdas = ArrayUtils.delete(lambdas, i);
 		serviceDistributions = ArrayUtils.delete(serviceDistributions, i);
+        serversNumber = ArrayUtils.delete(serversNumber, i);
         services = ArrayUtils.delete(services, i);
         responseTimes = ArrayUtils.delete(responseTimes, i);
         queueTimes = ArrayUtils.delete(queueTimes, i);
@@ -381,10 +387,10 @@ public class ResultsPanel extends WizardPanel{
 
     /** The model for the table */
     private class ResultsTableModel extends ExactTableModel implements PrototypedTableModel {
-        private final int nColumns = 10;
+        private final int nColumns = 11;
 
-        //index, algorithm, distribution arrival, lambda, distribution service, service, response time, queue times, queue numbers, station numbers, delete
-        private Object[] prototypes = { "10000", "-------------", "-------------------------", 100.00, "-------------------------", 100.00, 100.00, 100.00, 10, 10, "" };
+        //------------------------------index, algorithm, distribution arrival, --------lambda, distribution service, ----nServers, service, response time, queue times, ncustomers, thoughput, delete
+        private Object[] prototypes = { "100", "------", "------------------", "", "------------------", "", "", "", "", "", "", "", "" };
 
 		@Override
 		public Object getPrototype(int columnIndex) {
@@ -402,16 +408,18 @@ public class ResultsPanel extends WizardPanel{
                     return "\u03BB";
                 case COL_DISTR_SERVICE:
                     return "Service Distr.";
+                case COL_NSERVERS:
+                    return "N.Servers";
                 case COL_SERVICE:
-                    return "Service Time";
+                    return "S";
                 case COL_R:
-                    return "Response Time";
+                    return "R";
                 case COL_QUEUETIME:
-                    return "Queue Time";
-                case COL_THROUGHPUT:
-                    return "Throughput";
+                    return "Q";
                 case COL_NQUEUE:
-                    return "Numbers of Customers";          
+                    return "N";
+                case COL_THROUGHPUT:
+                    return "X";                 
                 default:
                     return null;
             }
@@ -438,16 +446,18 @@ public class ResultsPanel extends WizardPanel{
                     return lambdas[rowIndex];
                 case COL_DISTR_SERVICE:
                     return serviceDistributions[rowIndex];
+                case COL_NSERVERS:
+                    return serversNumber[rowIndex];
                 case COL_SERVICE:
                     return services[rowIndex];
                 case COL_R:
                     return responseTimes[rowIndex];
                 case COL_QUEUETIME:
-                    return queueTimes[rowIndex];
-                case COL_THROUGHPUT:
-                    return thoughputs[rowIndex];
+                    return queueTimes[rowIndex];             
                 case COL_NQUEUE:
-                    return nCustomers[rowIndex];         
+                    return nCustomers[rowIndex];  
+                case COL_THROUGHPUT:
+                    return thoughputs[rowIndex];       
                 default:
                     return null;
             }

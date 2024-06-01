@@ -125,7 +125,7 @@ public class Router extends JComponent implements JobContainer{
 	}
 
 	@Override
-	public void addJob(Job newJob) {
+	public void addJob(JobContainer prec, Job newJob) {
 		//choose where to route the job based on the type of policy
 		int index;
 		switch(simulation.getName()) {
@@ -202,7 +202,7 @@ public class Router extends JComponent implements JobContainer{
 			else {
 				job.unsetOnEdge();
 			}
-			nextEdges.get(index).addJob(job);	
+			nextEdges.get(index).addJob(this, job);	
 		}
 		
 	}

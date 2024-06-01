@@ -257,11 +257,11 @@ public class Edge extends JComponent implements JobContainer{
 	}
 	
 	@Override
-	public void addJob(Job newJob) {
+	public void addJob(JobContainer prec, Job newJob) {
 		newJob.setStartingPosition(start.x, start.y); //when a new Job is added, then its position is the starting point of the edge
 		jobList.add(newJob);
 
-		if(nextEvent) {
+		if(nextEvent &&!(prec instanceof Edge)) { //do not stop for the next event if a job is passing from an edge to another
 			animation.pause();
 			animation.resetNextEvent();
 		}
@@ -280,7 +280,7 @@ public class Edge extends JComponent implements JobContainer{
 			else {
 				job.unsetOnEdge();
 			}
-			nextContainer.addJob(job);	
+			nextContainer.addJob(this, job);	
 		}
 		else {
 			job.unsetOnEdge();			

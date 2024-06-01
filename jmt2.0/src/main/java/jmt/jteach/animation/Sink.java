@@ -80,7 +80,7 @@ public class Sink extends JComponent implements JobContainer{
 	}
 
 	@Override
-	public void addJob(Job newJob) {
+	public void addJob(JobContainer prec, Job newJob) {
 		//here the addJob is removing the job from the list of jobs
 		anim.removeJob(newJob);
 	}

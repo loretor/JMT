@@ -165,11 +165,11 @@ public class Source extends JComponent implements JobContainer{
 		else {
 			routeJob.unsetOnEdge();
 		}
-		next.addJob(routeJob);
+		next.addJob(this, routeJob);
 	}
 
 	@Override
-	public void addJob(Job newJob) {
+	public void addJob(JobContainer prec, Job newJob) {
 		
 	}
 

@@ -93,7 +93,7 @@ public class CircleStation extends JComponent implements JobContainer{
 	}
 	
 	@Override
-	public void addJob(Job newJob) {
+	public void addJob(JobContainer prec, Job newJob) {
 		currentJob = newJob;
 		entranceTime = System.currentTimeMillis();
 		isWorking = true;

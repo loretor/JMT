@@ -34,6 +34,6 @@ public interface JobContainer {
 	 * Add a new Job to this JobContainer
 	 * @param newJob Job to add to this Container
 	 */
-	public void addJob(Job newJob);
+	public void addJob(JobContainer prev, Job newJob);
 	
 }

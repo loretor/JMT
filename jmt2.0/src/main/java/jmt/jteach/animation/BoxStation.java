@@ -118,7 +118,7 @@ public class BoxStation extends JComponent implements JobContainer{
 	}
 	
 	@Override
-	public void addJob(Job newJob) {
+	public void addJob(JobContainer prec, Job newJob) {
 		if(!newJob.equals(currentJob)) { //need to update only if the newJob is different than the one that the box already has
 			entranceTime = System.currentTimeMillis();
 		}

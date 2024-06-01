@@ -214,7 +214,7 @@ public class Station extends JComponent implements JobContainer{
 		if(jobQueue.size() >= 1) { //some jobs are waiting to enter inside the circles
 			for(int i = 0; i < nServers; i++) {
 				if(!circles[i].isWorking()) { //if the circle is not working than the head of the queue can go inside the circle
-					circles[i].addJob((Job) jobQueue.first());
+					circles[i].addJob(this, (Job) jobQueue.first());
 					jobQueue.removeHead();
 					
 					if(jobQueue.size() == 0) {
@@ -236,7 +236,7 @@ public class Station extends JComponent implements JobContainer{
 		//for all the jobs in the queue, we need to update the correspondent boxStation
 		int index = 0;
 		for(Job j: jobQueue) {
-			boxes[index].addJob(j);
+			boxes[index].addJob(this, j);
 			index++;
 		}
 		
@@ -279,11 +279,11 @@ public class Station extends JComponent implements JobContainer{
 		else {
 			job.unsetOnEdge();
 		}
-		getNextContainer().addJob(job);
+		getNextContainer().addJob(this, job);
 	}
 	
 	@Override
-	public void addJob(Job newJob) {
+	public void addJob(JobContainer prec, Job newJob) {
 		newJob.setEntrance(); //update the entrance in the queue
 		
 		//try to add the job inside the queue, if the queue is full, then drop the job

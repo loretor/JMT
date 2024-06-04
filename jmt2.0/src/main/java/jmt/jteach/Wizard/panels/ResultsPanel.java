@@ -401,7 +401,7 @@ public class ResultsPanel extends WizardPanel{
         public String getColumnName(int index) {
             switch (index) {
                 case COL_ALGO:
-                    return "Algorithm";
+                    return "Scheduling Algo.";
                 case COL_DISTR_ARRIVAL:
                     return "Arrival Distr.";
                 case COL_LAMBDA:

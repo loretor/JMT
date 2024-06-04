@@ -186,8 +186,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
     public AnimationPanel(MainWizard main, Simulation sim){
         this(main);
-        this.simulation = sim; 
-        solver = new Solver(simulation, this);    
+        this.simulation = sim;   
         initGUI();
     }
 
@@ -528,10 +527,9 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
             prob[0] = (double) prob1.getValue();
             prob[1] = (double) prob2.getValue();
             prob[2] = 1.0 - prob[0] - prob[1];
-            //showErrorMessage(String.valueOf(prob[0]));
-            //showErrorMessage(String.valueOf(prob[1]));
         }
-        solver.updateSolver(simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob);
+        //solver.updateSolver(simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob);
+        solver = new Solver(this, simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob);
 
         File temp = null;
         DispatcherThread dispatcher = null;

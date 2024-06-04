@@ -205,7 +205,7 @@ public class Station extends JComponent implements JobContainer{
         	g.setFont(new Font("Arial", Font.PLAIN, 10));
         	double processorSpeed = jobQueue.size() > 0 ? (double)nServers/(jobQueue.size() + nServers): 1;
         	DecimalFormat df = new DecimalFormat("#.##");
-        	g.drawString("Processor Speed: "+df.format(processorSpeed), pos.x,  pos.y-20);
+        	g.drawString("Processor Speed: "+df.format(processorSpeed), pos.x,  pos.y-25);
 		}
 	}
 	

@@ -97,18 +97,23 @@ public class Solver implements CommonConstants{
     /**
      * Create a Solver with one queue (for NON PREEMPTIVE or PROCESSOR SHARING) or with 3 queues
      */
-    public Solver(Simulation sim, AnimationPanel anim){
+
+    /*      
+
+    */
+    public Solver(AnimationPanel anim, Simulation sim, int indexInter, int indexService, int nservers, double[] prob){
         this.anim = anim;
         model = new CommonModel();
         simulation = sim;
+        servers = nservers;
         isSingleQueue = simulation.getType() != SimulationType.ROUTING;
         setDistributionsParameters();
-        addClass();
+        addClass(indexInter);
         
-        addQueue();
+        addQueue(indexService, nservers);
         if(!isSingleQueue){
-            addQueue();
-            addQueue();
+            addQueue(indexService, nservers);
+            addQueue(indexService, nservers);
             addRouter();
         }
 
@@ -120,9 +125,9 @@ public class Solver implements CommonConstants{
         //TODO: change the measures, since now you have 3 different stations
         addMeasure(); 
         
-        /*if(!isSingleQueue){ //this operation needs to be performed after setting the connections
-            setRouterStrategy();
-        } */
+        if(!isSingleQueue){ //this operation needs to be performed after setting the connections
+            setRouterStrategy(prob);
+        } 
     }
 
     /** Set the parameters for all the distributions */
@@ -138,13 +143,13 @@ public class Solver implements CommonConstants{
     }
 
     /** Add a class to the model (similar to the task you perform in JSIM when you click on the class button) */
-    private void addClass(){
+    private void addClass(int indexInter){
         classKey = model.addClass(Defaults.get("className") + (++classNameIndex),
             Defaults.getAsInteger("classType").intValue(),
             Defaults.getAsInteger("classPriority"),
             Defaults.getAsDouble("classSoftDeadline"),
             Defaults.getAsInteger("classPopulation"), 
-            Defaults.getAsNewInstance("classDistribution")); 
+            distributions[indexInter]); 
     }
 
     /** Add a source station to the model (like adding a Source cell to the JGraph of JSIM) */
@@ -156,24 +161,44 @@ public class Solver implements CommonConstants{
     
 
     /** Add a queue station to the model (like adding a Station cell to the JGraph in JSIM) */
-    private void addQueue(){
+    private void addQueue(int indexService, int nservers){
         Object serverKey = model.addStation("Queue "+(serverNameIndex), STATION_TYPE_SERVER, 1, new ArrayList<ServerType>());
         serverNameIndex++;
 
         model.setStationQueueCapacity(serverKey, 5);
         model.setDropRule(serverKey, classKey, "Drop");
-        model.setStationQueueStrategy(serverKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
-        model.setQueueStrategy(serverKey, classKey, Defaults.get("stationQueueStrategy"));
-        model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
-        model.updateBalkingParameter(serverKey, classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
+        setStrategy(serverKey);
+        //model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
+        //model.updateBalkingParameter(serverKey, classKey, STATION_QUEUE_STRATEGY_NON_PREEMPTIVE);
+       
+        model.setStationNumberOfServers(serverKey, nservers);
+        model.updateNumOfServers(serverKey, nservers);
 
-        
-        model.setStationNumberOfServers(serverKey, 1);
-		model.updateNumOfServers(serverKey, servers);
-        Exponential exp = new Exponential();
-        exp.setMean(1);
-        model.setServiceTimeDistribution(serverKey, classKey, exp);
+        model.setServiceTimeDistribution(serverKey, classKey, distributions[indexService]);
     }
+
+    /* To change the type of simulation and the algorithm */
+    private void setStrategy(Object serverKey){
+        String strategy = "";
+        String algorithm = simulation.getName();
+
+        switch(simulation.getType()){ //setting the correct string of strategy and algorithm from CommonConstants
+            case NON_PREEMPTIVE:
+                strategy = STATION_QUEUE_STRATEGY_NON_PREEMPTIVE;
+                break;
+            case PROCESSOR_SHARING:
+                strategy = STATION_QUEUE_STRATEGY_PSSERVER;
+                break; 
+            case ROUTING:
+                strategy = STATION_QUEUE_STRATEGY_NON_PREEMPTIVE;
+                algorithm = QUEUE_STRATEGY_FCFS;
+            default: 
+                break;
+        }
+
+        model.setStationQueueStrategy(serverKey, strategy);
+        model.setQueueStrategy(serverKey, classKey, algorithm);         
+    }   
 
     /** Add a sink station to the model (like adding a Sink cell to teh JGraph in JSIM) */
     private void addSink(){
@@ -212,12 +237,16 @@ public class Solver implements CommonConstants{
         model.addMeasure(SimulationDefinition.MEASURE_QL, model.getStationKeys().get(0), classKey);  //4             
     }
 
+    /** Set the router strategy */
     private void setRouterStrategy(double[] probabilities){
+        anim.showErrorMessage(simulation.getName());
         switch(simulation.getName()){
             case "RR":
                 model.setRoutingStrategy(routerKey, classKey, ROUTING_ROUNDROBIN);
+                break;
             case "JSQ":
                 model.setRoutingStrategy(routerKey, classKey, ROUTING_SHORTESTQL);
+                break;
             case "PROBABILITIES":
                 ProbabilityRouting pr = new ProbabilityRouting();
                 model.setRoutingStrategy(routerKey, classKey, pr);
@@ -227,9 +256,9 @@ public class Solver implements CommonConstants{
                 Vector<Object> outputs = model.getForwardConnections(routerKey);
 
                 for (int i = 0; i < outputs.size(); i++) {
-                    anim.showErrorMessage(String.valueOf(outputs.get(i))+"---");
                     values.put(outputs.get(i), Double.valueOf(probabilities[i]));
-                }                   
+                } 
+                break;                  
         }
         
     }
@@ -257,67 +286,5 @@ public class Solver implements CommonConstants{
 
     public int getNumberServers(){  
         return servers;
-    }
-
-
-    //--------------- methods to change the parameters of the simulation ------------------
-    
-    /* To change the type of simulation and the algorithm */
-    private void setStrategy(){
-        String strategy = "";
-        String algorithm = simulation.getName();
-
-        switch(simulation.getType()){ //setting the correct string of strategy and algorithm from CommonConstants
-            case NON_PREEMPTIVE:
-                strategy = STATION_QUEUE_STRATEGY_NON_PREEMPTIVE;
-                break;
-            case PROCESSOR_SHARING:
-                strategy = STATION_QUEUE_STRATEGY_PSSERVER;
-                break; 
-            case ROUTING:
-                strategy = STATION_QUEUE_STRATEGY_NON_PREEMPTIVE;
-                algorithm = QUEUE_STRATEGY_FCFS;
-            default: 
-                break;
-        }
-
-        for(Object serverKey: model.getStationKeysServer()){
-            model.setStationQueueStrategy(serverKey, strategy);
-            model.setQueueStrategy(serverKey, classKey, algorithm);         
-            model.setServiceWeight(serverKey, classKey, Defaults.getAsDouble("serviceWeight"));
-            model.updateBalkingParameter(serverKey, classKey, strategy); 
-        }
-    }
-
-    /**
-     * Update the simulation of the solver, this method also updates all the solver accordingly to the new simulation
-     * @param sim the new simulation
-     * @param indexInter index of the new inter arrival time distribution
-     * @param indexService index of the new service time distribution
-     * @param nservers new number of servers
-     * @param prob array of probabilities for probabilties routing
-     */
-    public void updateSolver(Simulation sim, int indexInter, int indexService, int nservers, double[] prob){
-        simulation = sim;
-        this.servers = nservers;     
-        setStrategy();
-        
-
-
-        model.setClassDistribution(classKey, distributions[indexInter]);
-
-        for(Object serverKey: model.getStationKeysServer()){
-            model.setServiceTimeDistribution(serverKey, classKey, distributions[indexService]);
-
-            model.setStationNumberOfServers(serverKey, nservers);
-            model.updateNumOfServers(serverKey, nservers);
-        }
-
-        if(sim.getType() == SimulationType.ROUTING && sim.getName() == "PROBABILITIES"){
-            setRouterStrategy(prob);
-        }
-
-        
-    }
-    
+    }    
 }

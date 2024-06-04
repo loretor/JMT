@@ -52,7 +52,7 @@ public class SimulationFactory {
                 switch(algorithm){
                     case "RR":
                         return new RR();
-                    case "PROBABILISTIC":
+                    case "PROBABILITIES":
                         return new PROBABILISTIC();
                     case "JSQ":
                         return new JSQ();

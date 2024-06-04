@@ -83,7 +83,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
     private HoverHelp help; //retrieve from parent the HoverHelp
 
 	//----------- variables for the panel with all the buttons of the graph
-	private final String[] data = {"NON-PREEMPTIVE", "", "PROCESSOR SHARING", "", "PREEMPTIVE", "", "RR", "", "PROBABLISITC", "", "...", "", "MARKOV CHAINS"}; //some of them are empty because they represent the empty box between two elements of the list
+	private final String[] data = {"NON-PREEMPTIVE", "", "PROCESSOR SHARING", "", "PREEMPTIVE", "", "RR", "", "PROBABLITIES", "", "...", "", "MARKOV CHAINS"}; //some of them are empty because they represent the empty box between two elements of the list
 	private final JList<String> list = new JList<>(data);
 
 	//all actions associated to the buttons of the Menu and ToolBar
@@ -151,7 +151,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction RR = new AbstractAction(Constants.RR) {
+	protected AbstractAction RR = new AbstractAction("Round Robin") {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.ROUTING_TOOLTIPS[0]);
@@ -163,7 +163,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction PROBABILISTIC = new AbstractAction(Constants.PROBABILISTIC) {
+	protected AbstractAction PROBABILISTIC = new AbstractAction("Probabilities") {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.ROUTING_TOOLTIPS[1]);
@@ -175,7 +175,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		}
 	};
 
-	protected AbstractAction JSQ = new AbstractAction(Constants.JSQ) {
+	protected AbstractAction JSQ = new AbstractAction("Join Shortest Queue") {
 		private static final long serialVersionUID = 1L;
 		{
 			putValue(Action.SHORT_DESCRIPTION, Constants.ROUTING_TOOLTIPS[2]);

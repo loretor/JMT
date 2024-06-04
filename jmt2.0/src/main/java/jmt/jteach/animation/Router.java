@@ -94,7 +94,7 @@ public class Router extends JComponent implements JobContainer{
 		this(parent, xcentered, ycentered, pos, nextEdges, nextStations, simulation);
 		this.percentages = percentages;
 		
-		if(simulation.getName() == "PROBABILISTIC") { //if the policy is the PROB then the edges must paint also their percentage
+		if(simulation.getName() == "PROBABILITIES") { //if the policy is the PROB then the edges must paint also their percentage
 			for(int i = 0; i < nextEdges.size(); i++) {
 				nextEdges.get(i).paintPercentage(percentages[i]);
 			}
@@ -133,7 +133,7 @@ public class Router extends JComponent implements JobContainer{
 				index = roundRobin();
 				route(newJob, index);
 				break;
-			case "PROBABILISTIC":
+			case "PROBABILITIES":
 				index = probabilistic();
 				route(newJob, index);
 				break;

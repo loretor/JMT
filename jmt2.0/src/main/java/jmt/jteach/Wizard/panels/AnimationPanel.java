@@ -187,7 +187,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     public AnimationPanel(MainWizard main, Simulation sim){
         this(main);
         this.simulation = sim; 
-        solver = new Solver(simulation);    
+        solver = new Solver(simulation, this);    
         initGUI();
     }
 
@@ -519,10 +519,19 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     /** Called each time 'Create' is pressed. Start the simulation with the engine to get the results of the simulation in the Results Panel */
     public void getSimulationResults(){
         int servers = 1;
+        double[] prob = null;
         if(simulation.getType() != SimulationType.ROUTING){
             servers = (int) serversSpinner.getValue();
         }
-        solver.updateSolver(simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers);
+        if(simulation.getType() == SimulationType.ROUTING && simulation.getName() == Constants.PROBABILISTIC){
+            prob = new double[3];
+            prob[0] = (double) prob1.getValue();
+            prob[1] = (double) prob2.getValue();
+            prob[2] = 1.0 - prob[0] - prob[1];
+            //showErrorMessage(String.valueOf(prob[0]));
+            //showErrorMessage(String.valueOf(prob[1]));
+        }
+        solver.updateSolver(simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob);
 
         File temp = null;
         DispatcherThread dispatcher = null;

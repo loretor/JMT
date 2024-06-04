@@ -1,6 +1,9 @@
 package jmt.jteach;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import jmt.gui.common.CommonConstants;
@@ -13,8 +16,10 @@ import jmt.gui.common.distributions.Distribution;
 import jmt.gui.common.distributions.Exponential;
 import jmt.gui.common.distributions.Hyperexponential;
 import jmt.gui.common.distributions.Uniform;
+import jmt.gui.common.routingStrategies.ProbabilityRouting;
 import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.Simulation.SimulationType;
+import jmt.jteach.Wizard.panels.AnimationPanel;
 
 /**
  * This class transforms the information of the Animation to match the structure of the CommonModel class.
@@ -25,6 +30,7 @@ import jmt.jteach.Simulation.SimulationType;
  * Time: 17.28
  */
 public class Solver implements CommonConstants{
+    private AnimationPanel anim;
     private CommonModel model;
     private Simulation simulation;
     private boolean isSingleQueue = true;
@@ -91,7 +97,8 @@ public class Solver implements CommonConstants{
     /**
      * Create a Solver with one queue (for NON PREEMPTIVE or PROCESSOR SHARING) or with 3 queues
      */
-    public Solver(Simulation sim){
+    public Solver(Simulation sim, AnimationPanel anim){
+        this.anim = anim;
         model = new CommonModel();
         simulation = sim;
         isSingleQueue = simulation.getType() != SimulationType.ROUTING;
@@ -111,7 +118,11 @@ public class Solver implements CommonConstants{
         setConnections();  
         
         //TODO: change the measures, since now you have 3 different stations
-        addMeasure();   
+        addMeasure(); 
+        
+        /*if(!isSingleQueue){ //this operation needs to be performed after setting the connections
+            setRouterStrategy();
+        } */
     }
 
     /** Set the parameters for all the distributions */
@@ -170,13 +181,7 @@ public class Solver implements CommonConstants{
     }
 
     private void addRouter(){
-        routerKey = model.addStation("Router", STATION_TYPE_ROUTER, 1, new ArrayList<ServerType>());
-        Object strategy = null;
-        switch(simulation.getName()){
-            case "RR":
-                strategy = ROUTING_ROUNDROBIN;
-        }
-        model.setRoutingStrategy(routerKey, classKey, strategy);
+        routerKey = model.addStation("Router", STATION_TYPE_ROUTER, 1, new ArrayList<ServerType>());  
     }
 
     
@@ -205,6 +210,28 @@ public class Solver implements CommonConstants{
         model.addMeasure(SimulationDefinition.MEASURE_QT, model.getStationKeys().get(0), classKey); //2
         model.addMeasure(SimulationDefinition.MEASURE_X, model.getStationKeys().get(0), classKey); //3
         model.addMeasure(SimulationDefinition.MEASURE_QL, model.getStationKeys().get(0), classKey);  //4             
+    }
+
+    private void setRouterStrategy(double[] probabilities){
+        switch(simulation.getName()){
+            case "RR":
+                model.setRoutingStrategy(routerKey, classKey, ROUTING_ROUNDROBIN);
+            case "JSQ":
+                model.setRoutingStrategy(routerKey, classKey, ROUTING_SHORTESTQL);
+            case "PROBABILITIES":
+                ProbabilityRouting pr = new ProbabilityRouting();
+                model.setRoutingStrategy(routerKey, classKey, pr);
+                Map<Object, Double> values = pr.getValues();
+                values.clear();
+                
+                Vector<Object> outputs = model.getForwardConnections(routerKey);
+
+                for (int i = 0; i < outputs.size(); i++) {
+                    anim.showErrorMessage(String.valueOf(outputs.get(i))+"---");
+                    values.put(outputs.get(i), Double.valueOf(probabilities[i]));
+                }                   
+        }
+        
     }
 
     public CommonModel getModel(){
@@ -268,11 +295,14 @@ public class Solver implements CommonConstants{
      * @param indexInter index of the new inter arrival time distribution
      * @param indexService index of the new service time distribution
      * @param nservers new number of servers
+     * @param prob array of probabilities for probabilties routing
      */
-    public void updateSolver(Simulation sim, int indexInter, int indexService, int nservers){
+    public void updateSolver(Simulation sim, int indexInter, int indexService, int nservers, double[] prob){
         simulation = sim;
-        this.servers = nservers;
+        this.servers = nservers;     
         setStrategy();
+        
+
 
         model.setClassDistribution(classKey, distributions[indexInter]);
 
@@ -282,6 +312,12 @@ public class Solver implements CommonConstants{
             model.setStationNumberOfServers(serverKey, nservers);
             model.updateNumOfServers(serverKey, nservers);
         }
+
+        if(sim.getType() == SimulationType.ROUTING && sim.getName() == "PROBABILITIES"){
+            setRouterStrategy(prob);
+        }
+
+        
     }
     
 }

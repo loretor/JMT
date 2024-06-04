@@ -36,7 +36,7 @@ public class Constants {
     public static final String PS = "PS";
 
     public static final String RR = "RR";
-    public static final String PROBABILISTIC = "PROBABILISTIC";
+    public static final String PROBABILISTIC = "PROBABILITIES";
     public static final String JSQ = "JSQ";
 
     //descriptions of all the policies
@@ -56,7 +56,7 @@ public class Constants {
     public static final String RR_DESCRIPTION =
         "The RR (Round Robin) routing policy is a routing algorithm to distribute jobs as they arrive at the router. Jobs are routed cyclically to the outgoing links according to a circular routing pattern. The first customer is send to the top station, then second one to the central one, the third to the bottom one, and the cycle repeates.";
     public static final String PROB_DESCRIPTION =
-        "The Probabilistic routing policy is a routing algorithm to distribute jobs as they arrive at the router. Jobs are routed based on probabilities to one of the edges connected to the router. The sum of all probabilities must be equal to 1.";
+        "The Probabilities routing policy is a routing algorithm to distribute jobs as they arrive at the router. Jobs are routed based on probabilities to one of the edges connected to the router. The sum of all probabilities must be equal to 1.";
     public static final String JSQ_DESCRIPTION =
         "The JSQ (Join the Shortest Job Queue) routing policy is a routing algorithm to distribute jobs as they arrive at the router. Jobs are routed to the station connected to the router that has the smallest number of customers in its queue.";
     
@@ -102,7 +102,7 @@ public class Constants {
 
     public static final String[] ROUTING_TOOLTIPS = {
         "Round Robin",
-        "Probabilistic",
+        "Probabilities",
         "Join the Shortest Queue"
     };
 
@@ -129,7 +129,7 @@ public class Constants {
         "",
         "Opens a new panel with a Round Robin simulation",
         "",
-        "Opens a new panel with a the Probabilistic Routing simulation",
+        "Opens a new panel with a the Probabilities Routing simulation",
         "",
         "Select the algorithm for a Routing simulation",       
         "", 

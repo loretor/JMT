@@ -50,8 +50,8 @@ public class Job extends JComponent{
 	private long entrance; //this value is the associated long value for the entrance of a job inside a JComponent
 	private int velocityFactor = 1;
 	
-	public Job(Distributions service) {	
-		color = getRandomColor();
+	public Job(Distributions service, Color color) {	
+		this.color = color;
 		priority = new Random().nextInt(5)+1; //set priority always > 1 otherwise it does not work properly in the BoxStation
 		this.service = service;
 		try {
@@ -85,15 +85,6 @@ public class Job extends JComponent{
 			g.fillRect(pos.x + 16, pos.y - 30 + (boxHeight-result), boxWidth-1, result);
 		}	
 	}
-
-	/** Create a random color associated to each job */
-    private Color getRandomColor() {
-        Random rand = new Random();
-        int r = rand.nextInt(256);
-        int g = rand.nextInt(256);
-        int b = rand.nextInt(256);
-        return new Color(r, g, b); 
-    }
     
     public void setEntrance() {
     	entrance = System.currentTimeMillis()*velocityFactor;

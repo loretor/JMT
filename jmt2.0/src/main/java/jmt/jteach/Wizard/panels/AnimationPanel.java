@@ -623,7 +623,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     }
 
     public void showInfoMessage() {
-        JOptionPane.showMessageDialog(parent, "Simulation saved in the table", "Simulation Saved", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(parent, Constants.PROMPT_SIMULATION_FINISHED[0], Constants.PROMPT_SIMULATION_FINISHED[1], JOptionPane.INFORMATION_MESSAGE);
     }
 
 

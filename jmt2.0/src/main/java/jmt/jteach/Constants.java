@@ -157,4 +157,9 @@ public class Constants {
         "Stop the running simulation",
         "Open the help page"
     };
+
+    public static final String[] PROMPT_SIMULATION_FINISHED = {
+        "Simulation results saved in the Table",
+        "Simulation Results"
+    };
 }

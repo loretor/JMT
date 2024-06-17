@@ -25,6 +25,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.geom.Arc2D;
+import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -49,7 +50,6 @@ public class Source extends JComponent implements JobContainer{
 	private long start; //solo per debug, sarà da eliminare
 	
 	private Image sourceImg;
-	private Image finishImg;
 	private boolean centered = false;
 	private int size = 50;
 	
@@ -64,6 +64,8 @@ public class Source extends JComponent implements JobContainer{
 
 	private int sizeCircle = 20;
 	private float progression = 0.0f;
+
+	private Color jobColor;
 	
 	
 	/**
@@ -84,8 +86,8 @@ public class Source extends JComponent implements JobContainer{
 		this.interArrival = interArrival;
 		this.service = service;
 		
+		jobColor = getRandomColor();
 		sourceImg = JMTImageLoader.loadImageAwt("Source");
-		finishImg = JMTImageLoader.loadImageAwt("Measure_ok");
 	}
 	
 	public void paint(Graphics g) {
@@ -101,12 +103,12 @@ public class Source extends JComponent implements JobContainer{
 		g.drawImage(sourceImg, pos.x, pos.y, size, size, null);
 
 		//TODO: remove those two lines, only for debug
-		g.setFont(new Font("Arial", Font.BOLD, 13));
-		g.drawString(String.valueOf(nextRandomValue), pos.x, pos.y-20);
+		//g.setFont(new Font("Arial", Font.BOLD, 13));
+		//g.drawString(String.valueOf(nextRandomValue), pos.x, pos.y-20);
 
 		//pie arrivals
 		g.drawOval(pos.x + size/2 - sizeCircle/2, pos.y+size+10, sizeCircle, sizeCircle);
-		g.setColor(new Color(50, 168, 82));
+		g.setColor(jobColor);
 		Graphics2D g2d = (Graphics2D) g.create();
 		Arc2D arc = new Arc2D.Double(pos.x + size/2 - sizeCircle/2, pos.y+size+10, sizeCircle, sizeCircle, 90, 360*progression, Arc2D.PIE); //paint the circle
 	    g2d.fill(arc); 
@@ -128,8 +130,10 @@ public class Source extends JComponent implements JobContainer{
 			passedTime = 0;
 			start = System.currentTimeMillis();
 
-			routeJob = new Job(service);
+			routeJob = new Job(service, jobColor);
+			jobColor = getRandomColor(); //get a new color for the next job
 			routeJob(0);
+
 			try {
 				nextRandomValue = interArrival.nextRand();
 			} catch (IncorrectDistributionParameterException e) {
@@ -156,6 +160,15 @@ public class Source extends JComponent implements JobContainer{
 			}
 		}
 	}
+
+	/** Create a random color associated to each job */
+    private Color getRandomColor() {
+        Random rand = new Random();
+        int r = rand.nextInt(256);
+        int g = rand.nextInt(256);
+        int b = rand.nextInt(256);
+        return new Color(r, g, b); 
+    }
 
 	
 	public void routeJob(int i) {

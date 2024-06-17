@@ -239,7 +239,6 @@ public class Solver implements CommonConstants{
 
     /** Set the router strategy */
     private void setRouterStrategy(double[] probabilities){
-        anim.showErrorMessage(simulation.getName());
         switch(simulation.getName()){
             case "RR":
                 model.setRoutingStrategy(routerKey, classKey, ROUTING_ROUNDROBIN);

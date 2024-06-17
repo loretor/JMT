@@ -83,7 +83,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
     private HoverHelp help; //retrieve from parent the HoverHelp
 
 	//----------- variables for the panel with all the buttons of the graph
-	private final String[] data = {"NON-PREEMPTIVE", "", "PROCESSOR SHARING", "", "PREEMPTIVE", "", "RR", "", "PROBABLITIES", "", "...", "", "MARKOV CHAINS"}; //some of them are empty because they represent the empty box between two elements of the list
+	private final String[] data = {"NON-PREEMPTIVE", "", "PROCESSOR SHARING", "", "PREEMPTIVE", "", "ROUND ROBIN", "", "PROBABLITIES", "", "...", "", "MARKOV CHAINS"}; //some of them are empty because they represent the empty box between two elements of the list
 	private final JList<String> list = new JList<>(data);
 
 	//all actions associated to the buttons of the Menu and ToolBar

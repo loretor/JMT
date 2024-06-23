@@ -29,10 +29,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -77,6 +75,8 @@ import jmt.jteach.Simulation.SimulationFactory;
 import jmt.jteach.Simulation.SimulationType;
 import jmt.jteach.Wizard.MainWizard;
 import jmt.jteach.Wizard.WizardPanelTCH;
+import jmt.jteach.Wizard.distributions.AnimDistribution;
+import jmt.jteach.Wizard.distributions.DistributionFactory;
 import jmt.jteach.actionsWizard.*;
 import jmt.jteach.animation.AnimationClass;
 import jmt.jteach.animation.MultipleQueueNetAnimation;
@@ -98,8 +98,8 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     private JPanel mainPanel;
     private JLabel descrLabel;
     private JComboBox<String> algorithmJComboBox = null;
-    private JComboBox<Distributions> interAComboBox;
-    private JComboBox<Distributions> serviceComboBox;
+    private JComboBox<String> interAComboBox;
+    private JComboBox<String> serviceComboBox;
     private JSpinner serversSpinner;
     private JSlider trafficIntensitySlider;
     private JLabel trafficIntensityLabel;
@@ -113,7 +113,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     //------------ variables for parameters JPanel ---------------
     private JPanel parametersPanel;
     private final int spaceBetweenPanels = 3;
-    private final Distributions[] distributions = Distributions.values(); 
+    private final String[] distributions = AnimDistribution.getDistributions(); 
     private JCheckBox infDuration;
     private JSpinner duration;
     private int maxJobs = -1; //-1, means simulation runs infinitely, otherwise > 0 means an upper limit
@@ -371,7 +371,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         JPanel interAPanel = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[2]);
         interAPanel.setLayout(new GridLayout(1,2));
         interAPanel.add(new JLabel("Inter Arrival Time:"));
-        interAComboBox = new JComboBox<Distributions>(distributions);
+        interAComboBox = new JComboBox<String>(distributions);
         interAPanel.add(interAComboBox);
         parametersPanel.add(interAPanel);
 
@@ -379,7 +379,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         JPanel serviceTPanel = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[3]);
         serviceTPanel.setLayout(new GridLayout(1,2));
         serviceTPanel.add(new JLabel("Service Time:"));
-        serviceComboBox = new JComboBox<Distributions>(distributions);
+        serviceComboBox = new JComboBox<String>(distributions);
         serviceTPanel.add(serviceComboBox);
         parametersPanel.add(serviceTPanel);
 
@@ -550,6 +550,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         animation.pause();
         reloadAnimation();
 
+        AnimDistribution sd = DistributionFactory.createDistribution(String.valueOf(serviceComboBox.getSelectedItem()));
+        sd.setMean(mhu);
+        AnimDistribution ad = DistributionFactory.createDistribution(String.valueOf(interAComboBox.getSelectedItem()));
+        ad.setMean(lambda);
+
         if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PREEMPTIVE || simulation.getType() == SimulationType.PROCESSOR_SHARING){
             if(infDuration.isSelected()){
                 maxJobs = -1;
@@ -564,14 +569,14 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
                 descrLabel.setText("<html><body><p style='text-align:justify;'><font size=\"3\">"+simulation.getDescription()+"</p></body></html>");
             }
         
-            animation.updateSingle(simulation, (int)serversSpinner.getValue(), (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
+            animation.updateSingle(simulation, (int)serversSpinner.getValue(), sd, ad);
         }
         else{ //in case of routing only the animation must be updated
             if(simulation.getType() == SimulationType.ROUTING && simulation.getName() == Constants.PROBABILISTIC){
-                animation.updateMultiple(simulation, new double[]{(double) prob1.getValue(), (double) prob2.getValue()}, (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
+                animation.updateMultiple(simulation, new double[]{(double) prob1.getValue(), (double) prob2.getValue()}, sd, ad);
             }
             else{
-                animation.updateMultiple(simulation, (Distributions)serviceComboBox.getSelectedItem(), (Distributions)interAComboBox.getSelectedItem());
+                animation.updateMultiple(simulation, sd, ad);
             }
         }
 

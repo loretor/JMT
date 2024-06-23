@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 
 import jmt.jteach.Distributions;
 import jmt.jteach.Simulation.Simulation;
+import jmt.jteach.Wizard.distributions.AnimDistribution;
 import jmt.jteach.Wizard.panels.AnimationPanel;
 
 /**
@@ -48,8 +49,8 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	
 	//--all the characteristics of the Animation
 	private int nServers = 1;
-	private Distributions interArrival = Distributions.DETERMINISTIC; //by default the two distributions are DETERMINSTIC
-	private Distributions service = Distributions.DETERMINISTIC;
+	private AnimDistribution interArrival; //by default the two distributions are DETERMINSTIC
+	private AnimDistribution service;
 	
 	
 	/** Constructor*/
@@ -174,7 +175,7 @@ public class SingleQueueNetAnimation extends AnimationClass{
 	}
 
 	@Override
-	public void updateSingle(Simulation sim, int nservers, Distributions service, Distributions interA){
+	public void updateSingle(Simulation sim, int nservers, AnimDistribution service, AnimDistribution interA){
 		simulation = sim;
 		interArrival = interA;
 		this.service = service;

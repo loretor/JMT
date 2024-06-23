@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 
 import jmt.jteach.Distributions;
 import jmt.jteach.Simulation.Simulation;
+import jmt.jteach.Wizard.distributions.AnimDistribution;
 import jmt.jteach.Wizard.panels.AnimationPanel;
 
 /**
@@ -52,8 +53,8 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	
 	//--all the characteristics of the Animation
 	private int nServers = 1; //by default = 1
-	private Distributions interArrival = Distributions.DETERMINISTIC; //by default the two distributions are DETERMINSTIC
-	private Distributions service = Distributions.DETERMINISTIC;
+	private AnimDistribution interArrival; //by default the two distributions are DETERMINSTIC
+	private AnimDistribution service;
 	
 	/** Constructor */
 	public MultipleQueueNetAnimation(AnimationPanel animPanel, JPanel container, Simulation sim) {
@@ -223,7 +224,7 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	} 
 
 	@Override
-	public void updateMultiple(Simulation sim, Distributions service, Distributions interA){
+	public void updateMultiple(Simulation sim, AnimDistribution service, AnimDistribution interA){
 		simulation = sim;
 		interArrival = interA;
 		this.service = service;
@@ -232,7 +233,7 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	}
 
 	@Override
-	public void updateMultiple(Simulation sim, double[] percentages, Distributions service, Distributions interA){
+	public void updateMultiple(Simulation sim, double[] percentages, AnimDistribution service, AnimDistribution interA){
 		updateMultiple(sim, service, interA);
 		probabilities[0] = percentages[0];
 		probabilities[1] = percentages[1];

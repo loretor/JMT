@@ -28,6 +28,7 @@ import javax.swing.JComponent;
 
 import jmt.common.exception.IncorrectDistributionParameterException;
 import jmt.jteach.Distributions;
+import jmt.jteach.Wizard.distributions.AnimDistribution;
 
 public class Job extends JComponent{
 	//--variables needed only for the movement along the edges
@@ -45,12 +46,12 @@ public class Job extends JComponent{
 	
 	//those values are only for debug now
 	public int maxValue = 10; //this value is for the conversion from the duration to a colored box (try to select a max value accordingly to the type of distribution)
-	public Distributions service;
+	public AnimDistribution service;
 	
 	private long entrance; //this value is the associated long value for the entrance of a job inside a JComponent
 	private int velocityFactor = 1;
 	
-	public Job(Distributions service, Color color) {	
+	public Job(AnimDistribution service, Color color) {	
 		this.color = color;
 		priority = new Random().nextInt(5)+1; //set priority always > 1 otherwise it does not work properly in the BoxStation
 		this.service = service;
@@ -75,8 +76,8 @@ public class Job extends JComponent{
 			g.drawRect(pos.x + 15, pos.y - 30, boxWidth, boxHeight);
 
 			//TODO:remove those two lines, only for debugging
-			//g.setFont(new Font("Arial", Font.BOLD, 13));
-			//g.drawString(String.valueOf(duration), pos.x - 15, pos.y-40);
+			g.setFont(new Font("Arial", Font.BOLD, 13));
+			g.drawString(String.valueOf(duration), pos.x - 15, pos.y-40);
 			
 			//to convert the duration to the size of the above box
 			g.setColor(color);

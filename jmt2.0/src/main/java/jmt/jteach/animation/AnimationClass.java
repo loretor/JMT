@@ -10,6 +10,7 @@ import javax.swing.JComponent;
 
 import jmt.jteach.Distributions;
 import jmt.jteach.Simulation.Simulation;
+import jmt.jteach.Wizard.distributions.AnimDistribution;
 
 /**
  * This class is a super class for all the animations.
@@ -82,7 +83,7 @@ public class AnimationClass extends JComponent implements Animation{
 	 * @param serviceTime distribution of the service time
 	 * @param interArrivalTime distribution of the inter-arrival time
 	 */
-	public void updateSingle(Simulation sim, int nservers, Distributions serviceTime, Distributions interArrivalTime){ }
+	public void updateSingle(Simulation sim, int nservers, AnimDistribution serviceTime, AnimDistribution interArrivalTime){ }
 
 	/**
 	 * Method for updating the MultipleQueue
@@ -90,7 +91,7 @@ public class AnimationClass extends JComponent implements Animation{
 	 * @param serviceTime distribution of the service time
 	 * @param interArrivalTime distribution of the inter-arrival time
 	 */
-	public void updateMultiple(Simulation sim, Distributions serviceTime, Distributions interArrivalTime){}
+	public void updateMultiple(Simulation sim, AnimDistribution serviceTime, AnimDistribution interArrivalTime){}
 
 	/**
 	 * Method for updating the MultipleQueue with routing Policy = PROBABILISTIC
@@ -99,7 +100,7 @@ public class AnimationClass extends JComponent implements Animation{
 	 * @param serviceTime distribution of the service time
 	 * @param interArrivalTime distribution of the inter-arrival time
 	 */
-	public void updateMultiple(Simulation sim, double[] percentages, Distributions serviceTime, Distributions interArrivalTime){}
+	public void updateMultiple(Simulation sim, double[] percentages, AnimDistribution serviceTime, AnimDistribution interArrivalTime){}
 
 
 	public Animator getAnimator(){

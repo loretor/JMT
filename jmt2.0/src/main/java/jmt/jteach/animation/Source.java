@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import jmt.common.exception.IncorrectDistributionParameterException;
 import jmt.gui.common.JMTImageLoader;
 import jmt.jteach.Distributions;
+import jmt.jteach.Wizard.distributions.AnimDistribution;
 
 /**
  * This class is responsible for creating the jobs and routing them to the first edge of the animation
@@ -54,8 +55,8 @@ public class Source extends JComponent implements JobContainer{
 	private int size = 50;
 	
 	private AnimationClass anim;
-	private Distributions interArrival;
-	private Distributions service;
+	private AnimDistribution interArrival;
+	private AnimDistribution service;
 	private double nextRandomValue = 0;
 
 	private long pauseTime = 0; //keep track for how long the animation was paused
@@ -77,7 +78,7 @@ public class Source extends JComponent implements JobContainer{
      * @param next, next JContainer linked to the source
 	 * @param interArrival, distribution of the interarrival time
      */
-	public Source(AnimationClass anim, JPanel container,boolean centered, Point pos, JobContainer next, Distributions interArrival, Distributions service) {
+	public Source(AnimationClass anim, JPanel container,boolean centered, Point pos, JobContainer next, AnimDistribution interArrival, AnimDistribution service) {
 		this.parent = container;
 		this.pos = pos;
 		this.next = next;	
@@ -103,8 +104,8 @@ public class Source extends JComponent implements JobContainer{
 		g.drawImage(sourceImg, pos.x, pos.y, size, size, null);
 
 		//TODO: remove those two lines, only for debug
-		//g.setFont(new Font("Arial", Font.BOLD, 13));
-		//g.drawString(String.valueOf(nextRandomValue), pos.x, pos.y-20);
+		g.setFont(new Font("Arial", Font.BOLD, 13));
+		g.drawString(String.valueOf(nextRandomValue), pos.x, pos.y-20);
 
 		//pie arrivals
 		g.drawOval(pos.x + size/2 - sizeCircle/2, pos.y+size+10, sizeCircle, sizeCircle);
@@ -195,7 +196,7 @@ public class Source extends JComponent implements JobContainer{
 	 * @param service new distribution for service time
 	 * @param interA new distribution for inter arrival time
 	 */
-	public void updateDistribution(Distributions service, Distributions interA){
+	public void updateDistribution(AnimDistribution service, AnimDistribution interA){
 		this.service = service;
 		interArrival = interA;
 	}

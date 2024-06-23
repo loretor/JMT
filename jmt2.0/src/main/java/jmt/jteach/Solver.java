@@ -53,7 +53,14 @@ public class Solver implements CommonConstants{
         QUEUE_STRATEGY_LJF
     };
 
-    private static Distribution[] distributions = { //for now the same distributions for interarrival time and service time
+    private static Distribution[] serviceDistributions = { 
+        new Exponential(),
+        new Deterministic(),
+        new Uniform(),
+        new Hyperexponential()
+    };
+
+    private static Distribution[] interArrivalDistributions = { 
         new Exponential(),
         new Deterministic(),
         new Uniform(),
@@ -94,20 +101,15 @@ public class Solver implements CommonConstants{
 			SimulationDefinition.MEASURE_NS
 	};
 
-    /**
-     * Create a Solver with one queue (for NON PREEMPTIVE or PROCESSOR SHARING) or with 3 queues
-     */
 
-    /*      
-
-    */
-    public Solver(AnimationPanel anim, Simulation sim, int indexInter, int indexService, int nservers, double[] prob){
+    public Solver(AnimationPanel anim, Simulation sim, double lambda, double mhu, int indexInter, int indexService, int nservers, double[] prob){
         this.anim = anim;
         model = new CommonModel();
         simulation = sim;
         servers = nservers;
         isSingleQueue = simulation.getType() != SimulationType.ROUTING;
-        setDistributionsParameters();
+        setDistributionsParameters(serviceDistributions, mhu);
+        setDistributionsParameters(interArrivalDistributions, lambda);
         addClass(indexInter);
         
         addQueue(indexService, nservers);
@@ -130,16 +132,25 @@ public class Solver implements CommonConstants{
         } 
     }
 
-    /** Set the parameters for all the distributions */
-    public void setDistributionsParameters(){
-        distributions[0].setMean(4.0);
-        distributions[1].setMean(4.0);
+    /** Set the parameters for all the distributions. Always keep the mean = 1/mhu, change the cv accordingly */
+    public void setDistributionsParameters(Distribution[] distributions, double mhu){
+        double mean = 1/mhu;
+        distributions[0].setMean(1/mhu);
 
-        distributions[2].setMean(3.5);
-        distributions[2].setC(0.14433);
+        distributions[1].setMean(1/mhu);
 
-        distributions[3].setMean(4.167);
-        distributions[3].setC(1.039);
+        double min = mean - 1;
+        double max = mean + 1;
+        double ds = (max-min)/Math.sqrt(12);
+        distributions[2].setMean(mean);
+        distributions[2].setC(ds/mean);
+
+        double p = 0.5; 
+        double l1 = 1;
+        double l2 = 1/(mean*2 - 1); //l1 = 1, l2 can be retrieved with this formula to keep the mean = 1/mhu
+        double var = 2*p/(Math.pow(l1, 2)) + 2*p/(Math.pow(l2, 2)) - Math.pow(mean, 2);
+        distributions[3].setMean(mean);
+        distributions[3].setC(Math.sqrt(var)/mean);
     }
 
     /** Add a class to the model (similar to the task you perform in JSIM when you click on the class button) */
@@ -149,7 +160,7 @@ public class Solver implements CommonConstants{
             Defaults.getAsInteger("classPriority"),
             Defaults.getAsDouble("classSoftDeadline"),
             Defaults.getAsInteger("classPopulation"), 
-            distributions[indexInter]); 
+            interArrivalDistributions[indexInter]); 
     }
 
     /** Add a source station to the model (like adding a Source cell to the JGraph of JSIM) */
@@ -174,7 +185,7 @@ public class Solver implements CommonConstants{
         model.setStationNumberOfServers(serverKey, nservers);
         model.updateNumOfServers(serverKey, nservers);
 
-        model.setServiceTimeDistribution(serverKey, classKey, distributions[indexService]);
+        model.setServiceTimeDistribution(serverKey, classKey, serviceDistributions[indexService]);
     }
 
     /* To change the type of simulation and the algorithm */

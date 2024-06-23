@@ -598,8 +598,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
             prob[1] = (double) prob2.getValue();
             prob[2] = 1.0 - prob[0] - prob[1];
         }
-        //solver.updateSolver(simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob);
-        solver = new Solver(this, simulation, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob);
+        solver = new Solver(this, simulation, lambda, mhu, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob);
 
         File temp = null;
         DispatcherThread dispatcher = null;

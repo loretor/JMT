@@ -141,6 +141,7 @@ public class Constants {
         "Select how many servers are available for each station",
         "Select the type of distribution for the inter arrival time between jobs",
         "Select the type of distribution for the service time for each station in the simulation",
+        "Select the traffic intensity for the simulation. Based on the chosen value, the parameters of Inter arrival and Service distribution will be adjusted accordingly",
         "By default, the simulation runs indefinitely. To change this behavior, uncheck the box and set the number of jobs to generate",
         "Once all the parameters are setted, click this button to create the animation. At this point you can start the animation"
     };

@@ -27,9 +27,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
-
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -44,6 +47,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
@@ -97,13 +101,14 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     private JComboBox<Distributions> interAComboBox;
     private JComboBox<Distributions> serviceComboBox;
     private JSpinner serversSpinner;
+    private JSlider trafficIntensitySlider;
+    private JLabel trafficIntensityLabel;
     private JSpinner prob1 = null; //those two spinners are instanciated only if Probabilisitic routing is selected
     private JSpinner prob2 = null;
     private JButton createButton;
     private JPanel animationPanel;
     private HoverHelp help;
     
-
     //------------ variables for parameters JPanel ---------------
     private JPanel parametersPanel;
     private final int spaceBetweenPanels = 5;
@@ -111,6 +116,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     private JCheckBox infDuration;
     private JSpinner duration;
     private int maxJobs = -1; //-1, means simulation runs infinitely, otherwise > 0 means an upper limit
+    //--- variables for slider 
+    private final double multiplierSlider = 0.01; 
+    private final int startValueSlider = 50;
+    private final String sliderS = "Traffic Intensity (\u03C1):  ";
+    private final DecimalFormat df = new DecimalFormat("#.##");
 
     //-------------all the Actions of this panel------------------
     private AbstractTCHAction exit;
@@ -356,7 +366,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         //Inter arrival time panel
         JPanel interAPanel = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[2]);
         interAPanel.setLayout(new GridLayout(1,2));
-        interAPanel.add(new JLabel("Inter Arrival:"));
+        interAPanel.add(new JLabel("Inter Arrival Time:"));
         interAComboBox = new JComboBox<Distributions>(distributions);
         interAPanel.add(interAComboBox);
         parametersPanel.add(interAPanel);
@@ -369,8 +379,17 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         serviceTPanel.add(serviceComboBox);
         parametersPanel.add(serviceTPanel);
 
+        //Slider panel
+        JPanel trafficIntensityPanel = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[4]);
+        trafficIntensityPanel.setLayout(new GridLayout(2,1));
+        trafficIntensityLabel = new JLabel(sliderS + df.format(startValueSlider * multiplierSlider));
+        trafficIntensityPanel.add(trafficIntensityLabel);
+        trafficIntensitySlider = createSlider();
+        trafficIntensityPanel.add(trafficIntensitySlider);
+        parametersPanel.add(trafficIntensityPanel);
+        
         //Simulation Duration
-        JPanel simulationDuration = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[4]);
+        JPanel simulationDuration = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[5]);
         simulationDuration.setLayout(new GridLayout(1,2));
         simulationDuration.add(new JLabel("Max jobs generated:"));
 
@@ -399,7 +418,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
         //create button
         paddingBorder = new EmptyBorder(0,80,0,80);
-        JPanel createPanel = createPanel(paddingBorder, true, spaceBetweenPanels*2, Constants.HELP_PARAMETERS_PANELS[5]);
+        JPanel createPanel = createPanel(paddingBorder, true, spaceBetweenPanels*2, Constants.HELP_PARAMETERS_PANELS[6]);
         createPanel.setLayout(new BorderLayout());
         createButton = new JButton(CREATE);
         help.addHelp(createButton, Constants.HELP_PARAMETERS_PANELS[4]);
@@ -425,6 +444,43 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         help.addHelp(p, helpText);
         return p;
 	}
+
+    /* Method for setting the slider for the traffic intensity */
+    private JSlider createSlider(){
+        JSlider slider = new JSlider();
+        slider.setMaximum(100);
+        slider.setMinimum(0);
+        slider.setMajorTickSpacing(25);
+        slider.setMinorTickSpacing(1);
+        slider.setSnapToTicks(true);
+        slider.setValue(startValueSlider);
+
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
+        labelTable.put(0, new JLabel("0.0"));
+        labelTable.put(25, new JLabel("0.25"));
+        labelTable.put(50, new JLabel("0.5"));
+        labelTable.put(75, new JLabel("0.75"));
+        labelTable.put(100, new JLabel("1.0"));
+        slider.setLabelTable(labelTable);
+        slider.setPaintLabels(true);
+
+        slider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent evt) {
+                sliderStateChanged(evt);
+            }
+        });
+
+        return slider;
+    }
+
+    /**
+     * Called each time the trafficIntensitySlider changes its value
+     * @param evt the trigger event
+     */
+    public void sliderStateChanged(ChangeEvent evt){
+        double value = trafficIntensitySlider.getValue() * multiplierSlider;
+        trafficIntensityLabel.setText(sliderS + df.format(value));
+    }
 
     /**
 	 * Update the menuBar for the Scheduling Window

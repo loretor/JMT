@@ -50,8 +50,7 @@ public class Constants {
         "The LJF (Longest Job First) scheduling policy is a scheduling algorithm that orders the job inside the queue based on their service time. Jobs with higher service time are prioritized with respect to the others inside the queue.";
     
     public static final String PS_DESCRIPTION = 
-        "The Processor Sharing (PS) scheduling policy is a scheduling algorithm where the server works as if all the customers in the station are processed simultaneously, but devotes to each of them a fraction of its total capacity that is inversely proportional to the number of customers. If the station has m servers but only n < m resident cutomers, then each customer is executed as if it were alone." + //
-                        "n<m resident customers, then each customer is executed as if it were alone";
+        "<html>The Processor Sharing (PS) scheduling policy is a scheduling algorithm where the server processes all customers simultaneously, allocating a fraction of its total capacity to each, inversely proportional to the number of customers. If the station has m servers but only n &lt; m customers. each is executed as if it were alone.</html>";
 
     public static final String RR_DESCRIPTION =
         "The RR (Round Robin) routing policy is a routing algorithm to distribute jobs as they arrive at the router. Jobs are routed cyclically to the outgoing links according to a circular routing pattern. The first customer is send to the top station, then second one to the central one, the third to the bottom one, and the cycle repeates.";

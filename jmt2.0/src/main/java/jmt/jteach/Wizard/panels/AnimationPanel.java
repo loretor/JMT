@@ -103,6 +103,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     private JSpinner serversSpinner;
     private JSlider trafficIntensitySlider;
     private JLabel trafficIntensityLabel;
+    private JLabel paramTrafficLabel;
     private JSpinner prob1 = null; //those two spinners are instanciated only if Probabilisitic routing is selected
     private JSpinner prob2 = null;
     private JButton createButton;
@@ -111,7 +112,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     
     //------------ variables for parameters JPanel ---------------
     private JPanel parametersPanel;
-    private final int spaceBetweenPanels = 5;
+    private final int spaceBetweenPanels = 3;
     private final Distributions[] distributions = Distributions.values(); 
     private JCheckBox infDuration;
     private JSpinner duration;
@@ -120,6 +121,9 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     private final double multiplierSlider = 0.01; 
     private final int startValueSlider = 50;
     private final String sliderS = "Traffic Intensity (\u03C1):  ";
+    private String sliderFS = "\u03BB: %.2f e \u03BC: %.2f";
+    private double lambda = 0.25;
+    private double mhu = 0.5;
     private final DecimalFormat df = new DecimalFormat("#.##");
 
     //-------------all the Actions of this panel------------------
@@ -278,9 +282,9 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         Box mainBox = Box.createVerticalBox();
         mainBox.add(Box.createVerticalStrut(20));
 		mainBox.add(introductionBox);
-		mainBox.add(Box.createVerticalStrut(20));
+		mainBox.add(Box.createVerticalStrut(10));
         mainBox.add(mainPanel);
-        mainBox.add(Box.createVerticalStrut(20));
+        mainBox.add(Box.createVerticalStrut(10));
 
         Box totalBox = Box.createHorizontalBox(); //this box is for adding also the horizontal padding
 		totalBox.add(Box.createHorizontalStrut(20));
@@ -381,11 +385,13 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
         //Slider panel
         JPanel trafficIntensityPanel = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[4]);
-        trafficIntensityPanel.setLayout(new GridLayout(2,1));
+        trafficIntensityPanel.setLayout(new GridLayout(3,1));
         trafficIntensityLabel = new JLabel(sliderS + df.format(startValueSlider * multiplierSlider));
         trafficIntensityPanel.add(trafficIntensityLabel);
         trafficIntensitySlider = createSlider();
         trafficIntensityPanel.add(trafficIntensitySlider);
+        paramTrafficLabel = new JLabel(String.format(sliderFS, lambda, mhu));
+        trafficIntensityPanel.add(paramTrafficLabel);
         parametersPanel.add(trafficIntensityPanel);
         
         //Simulation Duration
@@ -478,8 +484,11 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
      * @param evt the trigger event
      */
     public void sliderStateChanged(ChangeEvent evt){
-        double value = trafficIntensitySlider.getValue() * multiplierSlider;
-        trafficIntensityLabel.setText(sliderS + df.format(value));
+        double rho = trafficIntensitySlider.getValue() * multiplierSlider;
+        trafficIntensityLabel.setText(sliderS + df.format(rho));
+
+        mhu = lambda / rho; //rho = lambda / mhu
+        paramTrafficLabel.setText(String.format(sliderFS, lambda, mhu));
     }
 
     /**

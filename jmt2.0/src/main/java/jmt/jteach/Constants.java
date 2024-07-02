@@ -159,7 +159,7 @@ public class Constants {
     };
 
     public static final String[] PROMPT_SIMULATION_FINISHED = {
-        "Simulation results saved in the Table",
+        "Simulation results saved in the Table. Do you want to save the results?",
         "Simulation Results"
     };
 }

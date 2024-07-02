@@ -691,8 +691,9 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         nextStep.setEnabled(false);
     }
 
-    public void showInfoMessage() {
-        JOptionPane.showMessageDialog(parent, Constants.PROMPT_SIMULATION_FINISHED[0], Constants.PROMPT_SIMULATION_FINISHED[1], JOptionPane.INFORMATION_MESSAGE);
+    public int showInfoMessage() {
+        Object[] options = {"Yes", "No"};
+        return JOptionPane.showOptionDialog(parent, Constants.PROMPT_SIMULATION_FINISHED[0], Constants.PROMPT_SIMULATION_FINISHED[1], JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, null);
     }
 
 
@@ -747,20 +748,22 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
     @Override
     public void simulationFinished() { //called by dispatcher when the simulation is finished
-        //I opted for this solution since the progressionListener is not very well synchronized with the available data, it happened most of the times that the progression was 100% bu there was no available data
-        showInfoMessage();
+        //I opted for this solution since the progressionListener is not very well synchronized with the available data, it happened most of the times that the progression was 100% but there was no available data
+        int res = showInfoMessage();
         
-        MeasureDefinition results = solver.getModel().getSimulationResults();
+        if(res == 0){
+            MeasureDefinition results = solver.getModel().getSimulationResults();
 
-        parent.routeResults(solver.getQueueStrategy(), 
-            solver.getInterArrivalDistribution(), 
-            getLastMeasure(results, 0),
-            solver.getServiceDistribution(), 
-            solver.getNumberServers(),
-            solver.getServiceTimeMean(), 
-            getLastMeasure(results, 1),
-            getLastMeasure(results, 2), 
-            getLastMeasure(results, 3), 
-            getLastMeasure(results, 4));
+            parent.routeResults(solver.getQueueStrategy(), 
+                solver.getInterArrivalDistribution(), 
+                getLastMeasure(results, 0),
+                solver.getServiceDistribution(), 
+                solver.getNumberServers(),
+                solver.getServiceTimeMean(), 
+                getLastMeasure(results, 1),
+                getLastMeasure(results, 2), 
+                getLastMeasure(results, 3), 
+                getLastMeasure(results, 4));
+        }    
     }
 }

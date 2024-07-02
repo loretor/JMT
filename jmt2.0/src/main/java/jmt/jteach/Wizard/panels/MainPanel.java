@@ -83,7 +83,7 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
     private HoverHelp help; //retrieve from parent the HoverHelp
 
 	//----------- variables for the panel with all the buttons of the graph
-	private final String[] data = {"NON-PREEMPTIVE", "", "PROCESSOR SHARING", "", "PREEMPTIVE", "", "ROUND ROBIN", "", "PROBABLITIES", "", "...", "", "MARKOV CHAINS"}; //some of them are empty because they represent the empty box between two elements of the list
+	private final String[] data = {"Non-preemptive", "", "Preemptive", "", "Processor Sharing", "", "Round Robin", "", "Probabilities", "", "...", "", "Markov Chains"}; //some of them are empty because they represent the empty box between two elements of the list
 	private final JList<String> list = new JList<>(data);
 
 	//all actions associated to the buttons of the Menu and ToolBar
@@ -384,15 +384,15 @@ public class MainPanel extends WizardPanel implements WizardPanelTCH{
 		subMenus[1] = new JPopupMenu(); //subMenu for the separator
 
 		subMenus[2] = new JPopupMenu();
-		subMenus[2].add(new CustomMenuItem(PS, true));
+		subMenus[2].add(new CustomMenuItem("FCFS-PR", false));
+		subMenus[2].add(new CustomMenuItem("LCFS-PR", false));
+		subMenus[2].add(new CustomMenuItem("SRPT", false));
+		subMenus[2].add(new CustomMenuItem("EDF", false));
 
 		subMenus[3] = new JPopupMenu(); //subMenu for the separator
 		
 		subMenus[4] = new JPopupMenu();
-		subMenus[4].add(new CustomMenuItem("FCFS-PR", false));
-		subMenus[4].add(new CustomMenuItem("LCFS-PR", false));
-		subMenus[4].add(new CustomMenuItem("SRPT", false));
-		subMenus[4].add(new CustomMenuItem("EDF", false));
+		subMenus[4].add(new CustomMenuItem(PS, true));
 		
 		subMenus[5] = new JPopupMenu(); //subMenu for the separator
 		

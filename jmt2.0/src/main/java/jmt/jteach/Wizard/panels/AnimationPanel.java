@@ -67,7 +67,6 @@ import jmt.gui.common.definitions.MeasureDefinition;
 import jmt.gui.common.definitions.ResultsModel;
 import jmt.gui.common.xml.XMLWriter;
 import jmt.jteach.Constants;
-import jmt.jteach.Distributions;
 import jmt.jteach.Solver;
 import jmt.jteach.Simulation.NonPreemptiveSimulation;
 import jmt.jteach.Simulation.Simulation;

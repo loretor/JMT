@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import jmt.jteach.Distributions;
 import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.Wizard.distributions.AnimDistribution;
 import jmt.jteach.Wizard.panels.AnimationPanel;
@@ -71,37 +70,30 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		sink = new Sink(container, true, new Point(800,0), this);
 		jobList = new ArrayList<>(); //do not move this line in the super class
 		
-		edgeList.add(new Edge(this,container, true, true, new Point(550,0), new Point(580,0), sink));
+		//final horizontal edge
+		edgeList.add(new Edge(this,container, true, true, new Point[] {new Point(550,0), new Point(580,0)}, sink));
 		
-		//two vertical edges
-		edgeList.add(new Edge(this,container, false, false, new Point(550,50+30), new Point(550,200), edgeList.get(0)));
-		edgeList.add(new Edge(this, container, false, false, new Point(550,287+30), new Point(550,200), edgeList.get(0)));
-		
-		//three horizontal edges
-		edgeList.add(new Edge(this, container, false, false, new Point(500,50+30), new Point(550,50+30), edgeList.get(1)));		
-		edgeList.add(new Edge(this, container, true, false, new Point(500,0), new Point(550,0),  edgeList.get(0)));
-		edgeList.add(new Edge(this, container, false, false, new Point(500,287+30), new Point(550,287+30), edgeList.get(2)));
+		//3 edges from stations to final edge
+		edgeList.add(new Edge(this,container, false, false, new Point[]{ new Point(500,50+30), new Point(550,50+30), new Point(550,210)}, edgeList.get(0)));
+		edgeList.add(new Edge(this, container, true, false, new Point[] {new Point(500,0), new Point(550,0)},  edgeList.get(0)));
+		edgeList.add(new Edge(this, container, false, false, new Point[] { new Point(500,300+30), new Point(550,300+30), new Point(550,210)}, edgeList.get(0)));
 		
 		//three stations
-		stationList.add(new Station(this, container, false, false, new Point(300,50), edgeList.get(3), simulation, nServers));
-		stationList.add(new Station(this, container, false, true, new Point(300,0), edgeList.get(4), simulation, nServers));
-		stationList.add(new Station(this, container, false, false, new Point(300, 287), edgeList.get(5), simulation, nServers));
+		stationList.add(new Station(this, container, false, false, new Point(300,50), edgeList.get(1), simulation, nServers));
+		stationList.add(new Station(this, container, false, true, new Point(300,0), edgeList.get(2), simulation, nServers));
+		stationList.add(new Station(this, container, false, false, new Point(300, 300), edgeList.get(3), simulation, nServers));
 		
-		//three horizontal edges
-		edgeList.add(new Edge(this, container, false, true, new Point(180,50+30), new Point(280,50+30), stationList.get(0)));
-		edgeList.add(new Edge(this, container, true, true, new Point(210,0), new Point(280,0), stationList.get(1)));
-		edgeList.add(new Edge(this, container, false, true, new Point(180,287+30), new Point(280,287+30), stationList.get(2)));
-		
-		//two vertical edges
-		edgeList.add(new Edge(this, container, false, false, new Point(180,200 - 30), new Point(180, 50+30), edgeList.get(6)));
-		edgeList.add(new Edge(this, container, false, false, new Point(180,200 + 30), new Point(180, 287+30),  edgeList.get(8)));
-		
+		//3 edges from router to stations
+		edgeList.add(new Edge(this, container, false, true, new Point[] {new Point(180,210 - 30), new Point(180, 50+30), new Point(280,50+30)}, stationList.get(0)));
+		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(210,0), new Point(280,0)}, stationList.get(1)));
+		edgeList.add(new Edge(this, container, false, true, new Point[] { new Point(180,210 + 30), new Point(180, 300+30), new Point(280,300+30)}, stationList.get(2)));
+				
 		//create the two Lists for the router
 		int l = edgeList.size();
-		List<Edge> eList = new ArrayList<>(Arrays.asList(edgeList.get(l-2), edgeList.get(l-4), edgeList.get(l-1)));
+		List<Edge> eList = new ArrayList<>(Arrays.asList(edgeList.get(l-3), edgeList.get(l-2), edgeList.get(l-1)));
 		router = new Router(container, false, true, new Point(160,0), eList, stationList, simulation, probabilities);
 		
-		edgeList.add(new Edge(this, container, true, true, new Point(80,0), new Point(150,0), router));
+		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(80,0), new Point(150,0)}, router));
 		
 		source = new Source(this, container, true, new Point(10,0), edgeList.get(edgeList.size()-1), interArrival, service);
 		

@@ -33,7 +33,6 @@ import jmt.jteach.Wizard.WizardPanelTCH;
 import jmt.jteach.actionsWizard.AbstractTCHAction;
 import jmt.jteach.actionsWizard.Help;
 import jmt.jteach.actionsWizard.PauseSimulation;
-import jmt.jteach.actionsWizard.ReloadSimulation;
 import jmt.jteach.actionsWizard.StartSimulation;
 import jmt.jteach.actionsWizard.StopSimulation;
 

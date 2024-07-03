@@ -57,7 +57,6 @@ import jmt.gui.common.JMTImageLoader;
 import jmt.gui.jwat.JWatWizard;
 import jmt.jteach.Constants;
 import jmt.jteach.Simulation.Simulation;
-import jmt.jteach.Simulation.Simulation.*;
 import jmt.jteach.Simulation.SimulationFactory;
 import jmt.jteach.Simulation.SimulationType;
 import jmt.jteach.Wizard.MainWizard;

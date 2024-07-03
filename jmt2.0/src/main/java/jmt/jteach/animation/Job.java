@@ -27,7 +27,6 @@ import java.util.Random;
 import javax.swing.JComponent;
 
 import jmt.common.exception.IncorrectDistributionParameterException;
-import jmt.jteach.Distributions;
 import jmt.jteach.Wizard.distributions.AnimDistribution;
 
 public class Job extends JComponent{
@@ -35,6 +34,8 @@ public class Job extends JComponent{
 	private Point pos;
 	private int speed = 2;	
 	private boolean onEdge = false; //this parameter is used to know if the current job is on a Edge or not
+	private Direction direction; //use this to know the direction where the job is going
+	private int finalPos; //to know the position of the next point the job is going to 
 	
 	private int circleSize = 15;
 	private int boxWidth = 12;
@@ -111,10 +112,14 @@ public class Job extends JComponent{
      * Method to set the staring point position of a job. It is called by an edge that have this new Job on its route.
      * @param x x position of the Job
      * @param y y position of the Job
+	 * @param d direction of the movement
+	 * @param finalPos index of the array of edges of the next point 
      */
-    public void setStartingPosition(int x, int y) {
+    public void setStartingPosition(int x, int y,  Direction d, int finalPos) {
     	pos = new Point(x - circleSize/2, y - circleSize/2); //remove circleSize/2 to adapt the position, since g.fillOval always draws considering the point as the left up corner of the square that contains the circle
-    }
+		this.direction = d;
+    	this.finalPos = finalPos;
+	}
     
     /**
      * Method to update the position of a moving job.
@@ -142,6 +147,14 @@ public class Job extends JComponent{
     public void setDuration() {
     	duration = 0;
     }
+
+	public Direction getDirection(){
+		return direction;
+	}
+
+	public int getFinalPos(){
+		return finalPos;
+	}
 
 	/** Called by the BoxStation in PS, to update the new duration of the job */
 	public void setDuration(double value) {

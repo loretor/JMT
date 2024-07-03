@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import jmt.jteach.Distributions;
 import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.Wizard.distributions.AnimDistribution;
 

@@ -32,7 +32,6 @@ import javax.swing.JPanel;
 
 import jmt.common.exception.IncorrectDistributionParameterException;
 import jmt.gui.common.JMTImageLoader;
-import jmt.jteach.Distributions;
 import jmt.jteach.Wizard.distributions.AnimDistribution;
 
 /**

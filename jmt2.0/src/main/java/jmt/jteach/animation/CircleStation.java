@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Arc2D;
-import java.util.Random;
 
 import javax.swing.JComponent;
 
@@ -64,7 +63,7 @@ public class CircleStation extends JComponent implements JobContainer{
 		
 		g.setColor(color);
         Graphics2D g2d = (Graphics2D) g.create();
-        int radius = sHeight/2;
+        //int radius = sHeight/2;
         
         Arc2D arc = new Arc2D.Double((sPos.x + sLength+1), sPos.y + position, sHeight, sHeight, 90, 360*progression, Arc2D.PIE); //paint the circle
     	g2d.fill(arc);    

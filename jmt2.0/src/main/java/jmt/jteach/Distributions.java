@@ -30,7 +30,6 @@ import jmt.engine.random.Uniform;
 import jmt.engine.random.UniformPar;
 import jmt.engine.random.engine.MersenneTwister;
 import jmt.engine.random.engine.RandomEngine;
-import jmt.gui.common.distributions.Distribution;
 
 /**
  * Enum class for all the distributions that the tool offers for the service time and the inter arrival time.

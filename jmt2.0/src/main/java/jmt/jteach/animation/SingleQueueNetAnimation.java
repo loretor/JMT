@@ -25,7 +25,6 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import jmt.jteach.Distributions;
 import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.Wizard.distributions.AnimDistribution;
 import jmt.jteach.Wizard.panels.AnimationPanel;
@@ -69,9 +68,9 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		jobList = new ArrayList<>(); //do not move in the super class, since each time I have to reload the simulation, this method is called
 		
 		sink = new Sink(container, true, new Point(0,0), this);
-		edgeList.add(new Edge(this, container, true, true, new Point(450,0), new Point(590,0), sink));
+		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(450,0), new Point(590,0)}, sink));
 		station = new Station(this, container, true, true, new Point(0,0), edgeList.get(0), simulation, nServers);
-		edgeList.add(new Edge(this, container, true, true, new Point(80,0), new Point(230,0), station));
+		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(80,0), new Point(230,0)}, station));
 		source = new Source(this, container, true, new Point(0,0), edgeList.get(edgeList.size()-1), interArrival, service);
 	}
 	

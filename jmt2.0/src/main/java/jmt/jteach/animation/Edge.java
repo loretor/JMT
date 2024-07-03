@@ -81,9 +81,7 @@ public class Edge extends JComponent implements JobContainer{
 	//--variables of the edge
 	private boolean centered;
 	private boolean isArrow;
-	private Point start;
-	private Point finish;
-	private Direction direction;
+	private Point[] points;
 	
 	private List<Job> jobList;
 	private JobContainer nextContainer = null;
@@ -105,50 +103,56 @@ public class Edge extends JComponent implements JobContainer{
 	 * @param finish point of the edge
 	 * @param next, JobContainer next to this edge
 	 */
-	public Edge(AnimationClass anim, JPanel container, boolean centered, boolean isArrow, Point start, Point finish, JobContainer next) {
+	public Edge(AnimationClass anim, JPanel container, boolean centered, boolean isArrow, Point[] points, JobContainer next) {
 		this.animation = anim;
 		this.parent = container;
 		this.centered = centered;
 		this.isArrow = isArrow;
-		this.start = start;
-		this.finish = finish;
+		this.points = points;
 		this.nextContainer = next;
 		
 		jobList = new ArrayList<>();
-		
-		setDirection();
 	}
 	
 	public void paint(Graphics g) {
 		super.paint(g);
 		
-		if(centered) {
-			int heightPanel = parent.getHeight();	
-			start.y = parent.getY()+(heightPanel)/2;
-			finish.y = start.y;
-		}
-				
-		g.setColor(Color.BLACK);
-		g.drawLine(start.x, start.y, finish.x, finish.y);	
+		Graphics2D g2d = (Graphics2D) g;
+			
+		//create a connection for each couple of adjacent points
+		for(int i = 0; i < points.length - 1; i++) {
+			Point start = points[i];
+			Point finish = points[i+1];
+			
+			if(centered) {
+				int heightPanel = parent.getHeight();	
+				start.y = parent.getY()+(heightPanel)/2;
+				finish.y = start.y;
+			}
+			
+			Color chosenColor = Color.BLACK;
+			g.setColor(chosenColor);
+			g.drawLine(start.x, start.y, finish.x, finish.y);	
+		}	
 		
 		//only if the routing policy with probability is chosen
 		if(paintPercentage) {
 			g.setFont(new Font("Arial", Font.PLAIN, 10));
 			DecimalFormat df = new DecimalFormat("#.##");
 			String value = "prob: "+ df.format(percentage);
+			Direction direction = getDirection(points[0], points[1]);
 			if(direction == Direction.UP || direction == Direction.DOWN) {
-				g.drawString(value, start.x - 50,  start.y + direction.direction() * 20);
+				g.drawString(value, points[0].x - 50,  points[0].y + direction.direction() * 20);
 			}
 			else {
-				g.drawString(value, start.x,  start.y + direction.direction() * 20);
+				g.drawString(value, points[0].x,  points[0].y + direction.direction() * 20);
 			}
 		}
 
 		//only if the edge is an arrow (for now the arrow is only for a direction = right)
 		if(isArrow) {
-			Graphics2D g2d = (Graphics2D) g;
-			int[] xPoints = {finish.x+5, finish.x, finish.x}; // x coordinates
-		    int[] yPoints = {finish.y, finish.y-5, finish.y+5};   // y coordinates
+			int[] xPoints = {points[points.length-1].x+5, points[points.length-1].x, points[points.length-1].x}; // x coordinates
+		    int[] yPoints = {points[points.length-1].y, points[points.length-1].y-5, points[points.length-1].y+5};   // y coordinates
 
 		    g2d.setColor(Color.BLACK);
 	        g2d.fillPolygon(xPoints, yPoints, 3); //draw the triangle
@@ -165,22 +169,22 @@ public class Edge extends JComponent implements JobContainer{
 		percentage = p;
 	}
 	
-	/** Method to understand the direction of the edge based on the values of start and finish point */
-	public void setDirection() {
+	/** Method to understand the direction of the segment defined by two points */
+	public Direction getDirection(Point start, Point finish) {
 		if(start.x == finish.x) { //two vertical points
 			if(start.y > finish.y) {
-				direction = Direction.UP;
+				return Direction.UP;
 			}
 			else {
-				direction = Direction.DOWN;
+				return Direction.DOWN;
 			}
 		}
 		else { //two horizontal points
 			if(start.x > finish.x) {
-				direction = Direction.LEFT;
+				return Direction.LEFT;
 			}
 			else {
-				direction = Direction.RIGHT;
+				return Direction.RIGHT;
 			}
 		}
 	}
@@ -190,8 +194,13 @@ public class Edge extends JComponent implements JobContainer{
 		//check for each job if it is still in the edge, if not route it to the next element, otherwise update its position
 		for(int i = 0; i < jobList.size(); i++) {
 			Job j = jobList.get(i);
-			if(checkFinish(j)) {
-				routeJob(i);
+			if(checkFinish(j, j.getFinalPos())) {
+				if(j.getFinalPos() == points.length - 1) { //job travelled along all the edges 
+					routeJob(i);
+				}
+				else {
+					j.setStartingPosition(points[j.getFinalPos()].x, points[j.getFinalPos()].y, getDirection(points[j.getFinalPos()], points[j.getFinalPos()+1]), j.getFinalPos() + 1); 
+				}			
 			}
 			else {
 				moveJob(j);
@@ -205,7 +214,7 @@ public class Edge extends JComponent implements JobContainer{
 	 */
 	private void moveJob(Job j) {
 		Point current = j.getPosition();
-		switch(direction) {
+		switch(j.getDirection()) {
 			case UP: 
 				j.updatePosition(current.x, current.y - j.getSpeed());
 				break;
@@ -225,13 +234,15 @@ public class Edge extends JComponent implements JobContainer{
 	 * Check whether the Job has completed its path along the edge.
 	 * The check is performed based on the direction of the edge and on the position of the job
 	 * @param j Job to check
+	 * @param finalPos index of Points (the arrival point for the job moving in the segment)
 	 * @return boolean, true if the job has reached the finish point, false otherwise
 	 */
-	private boolean checkFinish(Job j) {
+	private boolean checkFinish(Job j, int finalPos) {
 		Point current = j.getPosition();
+		Point finish = points[finalPos];
 		//add to current half of the circleSize, in order to consider the center of the circle as the position of the job, and not the start drawing point
 		int circleSize = j.getCircleSize();
-		switch(direction) {
+		switch(j.getDirection()) {
 			case LEFT:
 				if(current.x + circleSize/2 <= finish.x) {
 					return true;
@@ -258,10 +269,10 @@ public class Edge extends JComponent implements JobContainer{
 	
 	@Override
 	public void addJob(JobContainer prec, Job newJob) {
-		newJob.setStartingPosition(start.x, start.y); //when a new Job is added, then its position is the starting point of the edge
+		newJob.setStartingPosition(points[0].x, points[0].y, getDirection(points[0], points[1]), 1); //when a new Job is added, then its position is the starting point of the edge
 		jobList.add(newJob);
 
-		if(nextEvent &&!(prec instanceof Edge)) { //do not stop for the next event if a job is passing from an edge to another
+		if(nextEvent) { //do not stop for the next event if a job is passing from an edge to another
 			animation.pause();
 			animation.resetNextEvent();
 		}

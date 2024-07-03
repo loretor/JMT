@@ -31,7 +31,6 @@ import javax.swing.JPanel;
 
 import jmt.jteach.Constants;
 import jmt.jteach.Simulation.Simulation;
-import jmt.jteach.Simulation.SimulationType;
 import jmt.jteach.animation.customQueue.CustomCollection;
 import jmt.jteach.animation.customQueue.FIFOQueue;
 import jmt.jteach.animation.customQueue.LIFOQueue;

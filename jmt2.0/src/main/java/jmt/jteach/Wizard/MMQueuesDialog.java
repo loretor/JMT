@@ -17,12 +17,8 @@
  */
 package jmt.jteach.Wizard;
 
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;

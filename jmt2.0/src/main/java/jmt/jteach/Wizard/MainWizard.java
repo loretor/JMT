@@ -20,10 +20,8 @@ package jmt.jteach.Wizard;
 
 import jmt.gui.common.CommonConstants;
 import jmt.gui.common.JMTImageLoader;
-import jmt.gui.common.animation.Animation;
 import jmt.jteach.Wizard.panels.MainPanel;
 import jmt.jteach.Wizard.panels.ResultsPanel;
-import jmt.jteach.Solver;
 import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.Wizard.panels.AnimationPanel;
 import jmt.jteach.Wizard.panels.MMQueuesPanel;
@@ -70,7 +68,7 @@ public class MainWizard extends JTchWizard{
         this.setIconImage(JMTImageLoader.loadImage(IMG_JWATICON).getImage());
 		this.setTitle(TITLE);
 		this.setSize(CommonConstants.MAX_GUI_WIDTH_JWAT, CommonConstants.MAX_GUI_HEIGHT_JWAT);
-		//this.setResizable(false);
+		this.setResizable(false);
 
         centerWindow();
 

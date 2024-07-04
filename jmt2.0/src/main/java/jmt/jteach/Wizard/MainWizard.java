@@ -20,6 +20,7 @@ package jmt.jteach.Wizard;
 
 import jmt.gui.common.CommonConstants;
 import jmt.gui.common.JMTImageLoader;
+import jmt.gui.common.animation.Animation;
 import jmt.jteach.Wizard.panels.MainPanel;
 import jmt.jteach.Wizard.panels.ResultsPanel;
 import jmt.jteach.Simulation.Simulation;
@@ -196,5 +197,4 @@ public class MainWizard extends JTchWizard{
 	public void routeResults(String algorithm, String arrivalDistr, double lambda, String serviceDistr, int nServers, double service, double responseTime, double queueTime, double thoughput, double queueNumber){
 		resultsPanel.addResult(algorithm, arrivalDistr, lambda, serviceDistr, nServers, service, responseTime, queueTime, thoughput, queueNumber);
 	}
-	
 }

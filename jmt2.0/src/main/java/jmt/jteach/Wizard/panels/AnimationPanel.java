@@ -141,6 +141,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
 
     //------------- engine simulation --------------------------
     private Solver solver;
+    private DispatcherThread dispatcher;
 
 
     //Action associated to the button Create
@@ -600,7 +601,6 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         solver = new Solver(this, simulation, lambda, mhu, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob);
 
         File temp = null;
-        DispatcherThread dispatcher = null;
         try {
             temp = File.createTempFile("~JModelSimulation", ".xml");
             temp.deleteOnExit();       
@@ -609,6 +609,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
             String logDecimalSeparator = solver.getModel().getLoggingGlbParameter("decimalSeparator");
             solver.getModel().setSimulationResults(new ResultsModel(solver.getModel().getPollingInterval().doubleValue(), logCSVDelimiter, logDecimalSeparator));
             dispatcher = new DispatcherThread(this, solver.getModel());
+            dispatcher.setDaemon(true);
             dispatcher.startSimulation(temp);
         } catch (IOException e) {
             handleException(e);
@@ -746,23 +747,19 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     }
 
     @Override
-    public void simulationFinished() { //called by dispatcher when the simulation is finished
-        //I opted for this solution since the progressionListener is not very well synchronized with the available data, it happened most of the times that the progression was 100% but there was no available data
-        int res = showInfoMessage();
-        
-        if(res == 0){
-            MeasureDefinition results = solver.getModel().getSimulationResults();
+    //I opted for this solution since the progressionListener is not very well synchronized with the available data, it happened most of the times that the progression was 100% but there was no available data
+    public void simulationFinished() { //called by dispatcher when the simulation is finished   
+        MeasureDefinition results = solver.getModel().getSimulationResults();
 
-            parent.routeResults(solver.getQueueStrategy(), 
-                solver.getInterArrivalDistribution(), 
-                getLastMeasure(results, 0),
-                solver.getServiceDistribution(), 
-                solver.getNumberServers(),
-                solver.getServiceTimeMean(), 
-                getLastMeasure(results, 1),
-                getLastMeasure(results, 2), 
-                getLastMeasure(results, 3), 
-                getLastMeasure(results, 4));
-        }    
+        parent.routeResults(solver.getQueueStrategy(), 
+            solver.getInterArrivalDistribution(), 
+            getLastMeasure(results, 0),
+            solver.getServiceDistribution(), 
+            solver.getNumberServers(),
+            solver.getServiceTimeMean(), 
+            getLastMeasure(results, 1),
+            getLastMeasure(results, 2), 
+            getLastMeasure(results, 3), 
+            getLastMeasure(results, 4));          
     }
 }

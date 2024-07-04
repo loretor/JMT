@@ -113,9 +113,8 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
     private JPanel parametersPanel;
     private final int spaceBetweenPanels = 3;
     private final String[] distributions = AnimDistribution.getDistributions(); 
-    private JCheckBox infDuration;
-    private JSpinner duration;
-    private int maxJobs = -1; //-1, means simulation runs infinitely, otherwise > 0 means an upper limit
+    private JSpinner maxSamples;
+
     //--- variables for slider 
     private final double multiplierSlider = 0.01; 
     private final int startValueSlider = 50;
@@ -397,29 +396,9 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         //Simulation Duration
         JPanel simulationDuration = createPanel(paddingBorder, true, spaceBetweenPanels, Constants.HELP_PARAMETERS_PANELS[5]);
         simulationDuration.setLayout(new GridLayout(1,2));
-        simulationDuration.add(new JLabel("Max jobs generated:"));
-
-        JPanel valuePanel = new JPanel(new BorderLayout());
-        duration = new JSpinner(new SpinnerNumberModel(10, 1, 600, 1));
-        duration.setEnabled(false);
-        valuePanel.add(duration, BorderLayout.WEST);
-        valuePanel.add(Box.createHorizontalStrut(3), BorderLayout.CENTER);     
-        infDuration = new JCheckBox("infinite");
-        infDuration.setSelected(true);
-        infDuration.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(infDuration.isSelected()){
-                    duration.setEnabled(false);
-                    maxJobs = -1;
-                }
-                else{
-                    duration.setEnabled(true);
-                }
-            }           
-        });
-        valuePanel.add(infDuration, BorderLayout.EAST);
-        simulationDuration.add(valuePanel);
+        simulationDuration.add(new JLabel("Max n. of samples:"));
+        maxSamples = new JSpinner(new SpinnerNumberModel(10000000, 100000, Integer.MAX_VALUE, 50000));   
+        simulationDuration.add(maxSamples);
         parametersPanel.add(simulationDuration);
 
         //create button
@@ -555,14 +534,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
         AnimDistribution ad = DistributionFactory.createDistribution(String.valueOf(interAComboBox.getSelectedItem()));
         ad.setMean(lambda);
 
-        if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PREEMPTIVE || simulation.getType() == SimulationType.PROCESSOR_SHARING){
-            if(infDuration.isSelected()){
-                maxJobs = -1;
-            }
-            else{
-                maxJobs = (Integer) duration.getValue();
-            }
-            
+        if(simulation.getType() == SimulationType.NON_PREEMPTIVE || simulation.getType() == SimulationType.PREEMPTIVE || simulation.getType() == SimulationType.PROCESSOR_SHARING){            
             if(simulation.getType() == SimulationType.NON_PREEMPTIVE){ //in case of non preemptive update the title and the description
                 simulation = SimulationFactory.createSimulation(simulation.getType(), String.valueOf(algorithmJComboBox.getSelectedItem()));
                 mainPanel.setBorder(new TitledBorder(new EtchedBorder(), simulation.getType().toString() + " Scheduling - " + simulation.getName()));
@@ -598,7 +570,7 @@ public class AnimationPanel extends WizardPanel implements WizardPanelTCH, GuiIn
             prob[1] = (double) prob2.getValue();
             prob[2] = 1.0 - prob[0] - prob[1];
         }
-        solver = new Solver(this, simulation, lambda, mhu, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob);
+        solver = new Solver(simulation, lambda, mhu, interAComboBox.getSelectedIndex(), serviceComboBox.getSelectedIndex(), servers, prob, (Integer) maxSamples.getValue());
 
         File temp = null;
         try {

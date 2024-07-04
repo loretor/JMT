@@ -17,7 +17,6 @@ import jmt.gui.common.distributions.Uniform;
 import jmt.gui.common.routingStrategies.ProbabilityRouting;
 import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.Simulation.SimulationType;
-import jmt.jteach.Wizard.panels.AnimationPanel;
 
 /**
  * This class transforms the information of the Animation to match the structure of the CommonModel class.
@@ -28,7 +27,6 @@ import jmt.jteach.Wizard.panels.AnimationPanel;
  * Time: 17.28
  */
 public class Solver implements CommonConstants{
-    private AnimationPanel anim;
     private CommonModel model;
     private Simulation simulation;
     private boolean isSingleQueue = true;
@@ -44,13 +42,6 @@ public class Solver implements CommonConstants{
     private Object routerKey;
 
     //----------- all changable fields of the simulation -------------
-    private static final String[] queueStrategies = {
-        QUEUE_STRATEGY_FCFS,
-        QUEUE_STRATEGY_LCFS,
-        QUEUE_STRATEGY_SJF,
-        QUEUE_STRATEGY_LJF
-    };
-
     private static Distribution[] serviceDistributions = { 
         new Exponential(),
         new Deterministic(),
@@ -99,9 +90,17 @@ public class Solver implements CommonConstants{
 			SimulationDefinition.MEASURE_NS
 	};
 
-
-    public Solver(AnimationPanel anim, Simulation sim, double lambda, double mhu, int indexInter, int indexService, int nservers, double[] prob){
-        this.anim = anim;
+    /**
+     * @param sim Simulation data Structure
+     * @param lambda parameter for the InterArrival Time
+     * @param mhu parameter for the Service Time
+     * @param indexInter index of the array of Distributions for InterArrival Time
+     * @param indexService index of the array of Distributions for Service Time
+     * @param nservers number of servers in the simulation
+     * @param prob array of probabilities (for Routing Probabilities)
+     * @param maxSamples max samples for the animation
+     */
+    public Solver(Simulation sim, double lambda, double mhu, int indexInter, int indexService, int nservers, double[] prob, int maxSamples){
         model = new CommonModel();
         simulation = sim;
         servers = nservers;
@@ -109,6 +108,7 @@ public class Solver implements CommonConstants{
         setDistributionsParameters(serviceDistributions, mhu);
         setDistributionsParameters(interArrivalDistributions, lambda);
         addClass(indexInter);
+        model.setMaxSimulationSamples(maxSamples);
         
         addQueue(indexService, nservers);
         if(!isSingleQueue){
@@ -122,7 +122,6 @@ public class Solver implements CommonConstants{
         
         setConnections();  
         
-        //TODO: change the measures, since now you have 3 different stations
         addMeasure(); 
         
         if(!isSingleQueue){ //this operation needs to be performed after setting the connections

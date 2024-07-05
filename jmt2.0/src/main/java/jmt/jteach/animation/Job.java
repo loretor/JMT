@@ -78,8 +78,8 @@ public class Job extends JComponent{
 			g.drawRect(pos.x + 15, pos.y - 30, boxWidth, boxHeight);
 
 			//TODO:remove those two lines, only for debugging
-			g.setFont(new Font("Arial", Font.BOLD, 13));
-			g.drawString(String.valueOf(duration), pos.x - 15, pos.y-40);
+			//g.setFont(new Font("Arial", Font.BOLD, 13));
+			//g.drawString(String.valueOf(duration), pos.x - 15, pos.y-40);
 			
 			//to convert the duration to the size of the above box
 			g.setColor(color);

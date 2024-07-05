@@ -50,7 +50,7 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 	private double[] probabilities = {0.00,0.00,0.00};
 	
 	
-	//--all the characteristics of the Animation
+	//-- all the characteristics of the Animation
 	private int nServers = 1; //by default = 1
 	private AnimDistribution interArrival; //by default the two distributions are DETERMINSTIC
 	private AnimDistribution service;

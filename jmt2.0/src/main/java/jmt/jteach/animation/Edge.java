@@ -18,17 +18,21 @@
 
 package jmt.jteach.animation;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 /** 
  * This class is needed to understand the direction where the edge is pointing based on the starting point and the finish point.
@@ -94,6 +98,12 @@ public class Edge extends JComponent implements JobContainer{
 	//for the nextEvent simulation
 	private boolean nextEvent = false;
 	private int velocityFactor = 1;
+
+	//for the highlight
+	private int counterHighLight;
+	private Timer timer;
+	private Color jobColor;
+	private boolean highlight = false;
 	
 	/**
 	 * Constructor
@@ -134,8 +144,17 @@ public class Edge extends JComponent implements JobContainer{
 			}
 			
 			Color chosenColor = Color.BLACK;
-			g.setColor(chosenColor);
-			g.drawLine(start.x, start.y, finish.x, finish.y);	
+			if(highlight) {
+				chosenColor = jobColor;
+				g2d.setStroke(new BasicStroke(4));
+				g2d.setColor(chosenColor);
+				g2d.drawLine(start.x, start.y, finish.x, finish.y);	
+				g2d.setStroke(new BasicStroke(1));
+			}
+			else {
+				g.setColor(chosenColor);
+				g.drawLine(start.x, start.y, finish.x, finish.y);	
+			}	
 		}	
 		
 		//only if the routing policy with probability is chosen
@@ -157,7 +176,6 @@ public class Edge extends JComponent implements JobContainer{
 			int[] xPoints = {points[points.length-1].x+5, points[points.length-1].x, points[points.length-1].x}; // x coordinates
 		    int[] yPoints = {points[points.length-1].y, points[points.length-1].y-5, points[points.length-1].y+5};   // y coordinates
 
-		    g2d.setColor(Color.BLACK);
 	        g2d.fillPolygon(xPoints, yPoints, 3); //draw the triangle
 		}
 	}
@@ -321,4 +339,35 @@ public class Edge extends JComponent implements JobContainer{
     	speed /= velocityFactor;
     	velocityFactor = 1;
     }
+
+	/* Methods for highlight */
+	public void highlightON(Color jobColor) {
+		counterHighLight = 0;
+		if(timer != null) {
+			timer.stop();
+		}
+		timer = new Timer(300, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                highlight();
+			}
+        });
+		
+		this.jobColor = jobColor;
+		timer.start();
+	}
+	
+	
+	public void highlight() {
+		if(counterHighLight >= 3) {
+			timer.stop();
+			counterHighLight = 0;
+			highlight = false;
+		}
+		else {
+			highlight = !highlight;
+			counterHighLight++;
+		}
+		
+	}
 }

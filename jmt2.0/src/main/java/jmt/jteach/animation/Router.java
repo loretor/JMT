@@ -203,6 +203,7 @@ public class Router extends JComponent implements JobContainer{
 				job.unsetOnEdge();
 			}
 			nextEdges.get(index).addJob(this, job);	
+			nextEdges.get(index).highlightON(job.getColor());
 		}
 		
 	}

@@ -71,12 +71,12 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		jobList = new ArrayList<>(); //do not move this line in the super class
 		
 		//final horizontal edge
-		edgeList.add(new Edge(this,container, true, true, new Point[] {new Point(550,0), new Point(580,0)}, sink));
+		edgeList.add(new Edge(this,container, true, true, new Point[] {new Point(550,0), new Point(580,0)}, 2, sink));
 		
 		//3 edges from stations to final edge
-		edgeList.add(new Edge(this,container, false, false, new Point[]{ new Point(500,50+30), new Point(550,50+30), new Point(550,210)}, edgeList.get(0)));
-		edgeList.add(new Edge(this, container, true, false, new Point[] {new Point(500,0), new Point(550,0)},  edgeList.get(0)));
-		edgeList.add(new Edge(this, container, false, false, new Point[] { new Point(500,300+30), new Point(550,300+30), new Point(550,210)}, edgeList.get(0)));
+		edgeList.add(new Edge(this,container, false, false, new Point[]{ new Point(500,50+30), new Point(550,50+30), new Point(550,210)}, 2, edgeList.get(0)));
+		edgeList.add(new Edge(this, container, true, false, new Point[] {new Point(500,0), new Point(550,0)},  2, edgeList.get(0)));
+		edgeList.add(new Edge(this, container, false, false, new Point[] { new Point(500,300+30), new Point(550,300+30), new Point(550,210)}, 2, edgeList.get(0)));
 		
 		//three stations
 		stationList.add(new Station(this, container, false, false, new Point(300,50), edgeList.get(1), simulation, nServers));
@@ -84,16 +84,16 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		stationList.add(new Station(this, container, false, false, new Point(300, 300), edgeList.get(3), simulation, nServers));
 		
 		//3 edges from router to stations
-		edgeList.add(new Edge(this, container, false, true, new Point[] {new Point(180,210 - 30), new Point(180, 50+30), new Point(280,50+30)}, stationList.get(0)));
-		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(210,0), new Point(280,0)}, stationList.get(1)));
-		edgeList.add(new Edge(this, container, false, true, new Point[] { new Point(180,210 + 30), new Point(180, 300+30), new Point(280,300+30)}, stationList.get(2)));
+		edgeList.add(new Edge(this, container, false, true, new Point[] {new Point(180,210 - 30), new Point(180, 50+30), new Point(280,50+30)}, 2, stationList.get(0)));
+		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(210,0), new Point(280,0)}, 2/2.75, stationList.get(1))); //the value of the speed is 2/2.75 because it comes from some calculations to have the same time to traverse this edge and the other two
+		edgeList.add(new Edge(this, container, false, true, new Point[] { new Point(180,210 + 30), new Point(180, 300+30), new Point(280,300+30)}, 2, stationList.get(2)));
 				
 		//create the two Lists for the router
 		int l = edgeList.size();
 		List<Edge> eList = new ArrayList<>(Arrays.asList(edgeList.get(l-3), edgeList.get(l-2), edgeList.get(l-1)));
 		router = new Router(container, false, true, new Point(160,0), eList, stationList, simulation, probabilities);
 		
-		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(80,0), new Point(150,0)}, router));
+		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(80,0), new Point(150,0)}, 2, router));
 		
 		source = new Source(this, container, true, new Point(10,0), edgeList.get(edgeList.size()-1), interArrival, service);
 		
@@ -183,6 +183,9 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		for(Job j: jobList) {
 			j.setVelocityFactor(5);
 		}
+		for(Edge e: edgeList){
+			e.setVelocityFactor(5);
+		}
 		
 		anim.start();
 		
@@ -202,6 +205,9 @@ public class MultipleQueueNetAnimation extends AnimationClass{
 		}
 		for(Job j: jobList) {
 			j.resetVelocityFactor();
+		}
+		for(Edge e: edgeList){
+			e.resetVelocityFactor();
 		}
 		
 		for(Edge e: edgeList) {

@@ -30,12 +30,13 @@ import jmt.common.exception.IncorrectDistributionParameterException;
 import jmt.jteach.Wizard.distributions.AnimDistribution;
 
 public class Job extends JComponent{
-	//--variables needed only for the movement along the edges
-	private Point pos;
-	private int speed = 2;	
+	//--variables needed only for the movement along the edges (speed is a value of the edge, since jobs can have different speeds based on the edge on which they are)
+	private Point pos;	
 	private boolean onEdge = false; //this parameter is used to know if the current job is on a Edge or not
 	private Direction direction; //use this to know the direction where the job is going
 	private int finalPos; //to know the position of the next point the job is going to 
+	private double fractX = 0.0;
+	private double fractY = 0.0;
 	
 	private int circleSize = 15;
 	private int boxWidth = 12;
@@ -127,18 +128,32 @@ public class Job extends JComponent{
      * @param x x position of the Job
      * @param y y position of the Job
      */
-    public void updatePosition(int x, int y) {
-    	pos = new Point(x, y);
+    public void updatePosition(double x, double y) {
+		/* All the methods for the graphical part like fillOval() use coordinate space with integer precision.
+		 * Here instead we have them as double values (because the edge's speed has sometime a decimal part).
+		 * The idea is to accumulate the decimal part and add +1 only when it is >= 1
+		 */
+		fractX += (x - Math.floor(x));
+		fractY += (y - Math.floor(y));
+		int intX = (int) Math.floor(x);
+		int intY = (int) Math.floor(y);
+
+		if(fractX >= 1){
+			fractX = fractX - 1;
+			intX += 1;
+		}
+		if(fractY >= 1){
+			fractY = fractY -1;
+			intY += 1;
+		}
+
+    	pos = new Point(intX, intY);
     }
     
     public Point getPosition() {
     	return pos;
     }
-    
-    public int getSpeed() {
-    	return speed;
-    }
-    
+        
     public int getCircleSize() {
     	return circleSize;
     }
@@ -169,13 +184,12 @@ public class Job extends JComponent{
     	onEdge = false;
     }
 
+	/* Next step methods */
 	public void setVelocityFactor(int value) {
-    	speed *= value;
     	velocityFactor = value;
     }
 
 	public void resetVelocityFactor() {
-    	speed /= velocityFactor;
     	velocityFactor = 1;
     }
 }

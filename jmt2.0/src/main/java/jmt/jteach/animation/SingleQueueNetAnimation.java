@@ -68,9 +68,9 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		jobList = new ArrayList<>(); //do not move in the super class, since each time I have to reload the simulation, this method is called
 		
 		sink = new Sink(container, true, new Point(0,0), this);
-		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(450,0), new Point(590,0)}, sink));
+		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(450,0), new Point(590,0)}, 2, sink));
 		station = new Station(this, container, true, true, new Point(0,0), edgeList.get(0), simulation, nServers);
-		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(80,0), new Point(230,0)}, station));
+		edgeList.add(new Edge(this, container, true, true, new Point[] {new Point(80,0), new Point(230,0)}, 2, station));
 		source = new Source(this, container, true, new Point(0,0), edgeList.get(edgeList.size()-1), interArrival, service);
 	}
 	
@@ -147,6 +147,9 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		for(Job j: jobList) {
 			j.setVelocityFactor(5);
 		}
+		for(Edge e: edgeList){
+			e.setVelocityFactor(5);
+		}
 		
 		anim.start();
 		
@@ -162,6 +165,9 @@ public class SingleQueueNetAnimation extends AnimationClass{
 		station.setVelocityFactor(0); //in stations is = 0, since there is also the processor speed
 		for(Job j: jobList) {
 			j.resetVelocityFactor();
+		}
+		for(Edge e: edgeList){
+			e.resetVelocityFactor();
 		}
 		
 		for(Edge e: edgeList) {

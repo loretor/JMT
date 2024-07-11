@@ -11,5 +11,5 @@ The user can modify certain model parameters, such as inter arrival time distrib
 
 ## Images
 <p align="center">
-  <img src="/Images/FCFSpng.png.png" />
+  <img src="https://github.com/loretor/JMT/blob/main/Images/FCFSpng.png" />
 </p>

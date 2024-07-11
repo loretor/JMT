@@ -11,5 +11,17 @@ The user can modify certain model parameters, such as inter arrival time distrib
 
 ## Images
 <p align="center">
+  <img src="https://github.com/loretor/JMT/blob/main/Images/Home.jpg" />
+</p>
+
+<p align="center">
   <img src="https://github.com/loretor/JMT/blob/main/Images/FCFSpng.png" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/loretor/JMT/blob/main/Images/Results.png" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/loretor/JMT/blob/main/Images/RR.png" />
 </p>

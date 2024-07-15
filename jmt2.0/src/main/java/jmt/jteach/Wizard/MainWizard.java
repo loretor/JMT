@@ -22,7 +22,10 @@ import jmt.gui.common.CommonConstants;
 import jmt.gui.common.JMTImageLoader;
 import jmt.gui.common.animation.Animation;
 import jmt.jteach.Wizard.panels.MainPanel;
-import jmt.jteach.Wizard.panels.ResultsPanel;
+import jmt.jteach.Wizard.panels.resultsPanel.ResultsPanel;
+import jmt.jteach.Wizard.panels.resultsPanel.ResultsPanelRouting;
+import jmt.jteach.Wizard.panels.resultsPanel.ResultsPanelScheduling;
+import jmt.jteach.Simulation.RoutingSimulation;
 import jmt.jteach.Simulation.Simulation;
 import jmt.jteach.Wizard.panels.AnimationPanel;
 import jmt.jteach.Wizard.panels.MMQueuesPanel;
@@ -62,6 +65,7 @@ public class MainWizard extends JTchWizard{
 	//list of panels after the MainPanel
 	private List<WizardPanel> panelCollection = new ArrayList<>();
 	private AnimationPanel animationPanel;
+	private Simulation sim;
 	private ResultsPanel resultsPanel;
 	
     
@@ -99,13 +103,19 @@ public class MainWizard extends JTchWizard{
 	 * @param simulation the type of Simulation
 	 */
 	public void setAnimationPanelEnv(Simulation simulation){
+		this.sim = simulation;
 		this.setTitle(TITLE + " - "+ TITLE_QUEUEING + ", "+simulation.getType().toString());
 
 		animationPanel = new AnimationPanel(this, simulation);
 		this.addPanel(animationPanel);
 		panelCollection.add(animationPanel);
 
-		resultsPanel = new ResultsPanel(this);
+		if(simulation instanceof RoutingSimulation){
+			resultsPanel = new ResultsPanelRouting(this);
+		}
+		else{
+			resultsPanel = new ResultsPanelScheduling(this);
+		}
 		this.addPanel(resultsPanel);
 		panelCollection.add(resultsPanel);
 
@@ -195,6 +205,12 @@ public class MainWizard extends JTchWizard{
 	 * @param queueNumber queue number
 	 */
 	public void routeResults(String algorithm, String arrivalDistr, double lambda, String serviceDistr, int nServers, double service, double responseTime, double queueTime, double thoughput, double queueNumber){
-		resultsPanel.addResult(algorithm, arrivalDistr, lambda, serviceDistr, nServers, service, responseTime, queueTime, thoughput, queueNumber);
+		if(sim instanceof RoutingSimulation){
+			resultsPanel.addResult(algorithm, arrivalDistr, lambda, serviceDistr, service, responseTime, queueTime, thoughput, queueNumber);
+		}
+		else{
+			resultsPanel.addResult(algorithm, arrivalDistr, lambda, serviceDistr, nServers, service, responseTime, queueTime, thoughput, queueNumber);
+		}
+		
 	}
 }

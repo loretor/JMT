@@ -1,6 +1,6 @@
 # New feature for [Java Modelling Tools](https://jmt.sourceforge.net/)
 
-Current version is jmt2.0. The new feature is in [repository](https://github.com/loretor/JMT/tree/main/jmt2.0/src/main/java/jmt/jteach)
+The new feature is in this [repository](https://github.com/loretor/JMTNewVersion/tree/main/src/main/java/jmt/jmch)
 
 ## Scope of the new feature
 The new feature enhances the existing JMCH tool within JMT. JMCH is a Modelling classroom helper for learning queueing theory through animations.

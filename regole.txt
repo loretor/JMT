@@ -1,7 +1,0 @@
-svn update per andare ad aggiornare la cartella
-
-- mvn validate per verificare che sia un project maven valido
-- mvn package per provare a buildare tenendo aperto il codice su visual studio (perchè? non lo so)
-se non builda allora devi riavviare il pc e poi riprovare (dovrebbe andare, chat dice che è il SO che ha salvato nella cache
-info che potrebbero andare a fare collisione)
-Non cancellare nulla in target
